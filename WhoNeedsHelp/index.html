@@ -25,7 +25,7 @@
                     <form onsubmit="saveUsername()" class="has-feedback">
                         <div class="form-group" id="usernameGroup">
                             <label for="usernameModal"></label>
-                            <input type="text" pattern="[^ ][\w ]+[^ ]" class="form-control" id="usernameModalInput" onkeyup="validate()" />
+                            <input type="text" pattern="[\w]+\b( [\w]+)*\b" class="form-control" id="usernameModalInput" onkeyup="validate()" />
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Start</button>
@@ -36,18 +36,21 @@
         </div> <!--</modal-dialog>-->
     </div> <!--</modal>-->
     <script type="text/javascript">
+        "use strict";
+        var patt = /[\w]+\b( [\w]+)*\b/;
         $(document).ready(function() {
             $("#usernameModal").modal("toggle");
         });
         function saveUsername() {
             var input = $("#usernameModalInput");
-            var name = input.val().replace("  ", " ").exec(/[^ ][\w ]+[^ ]/);
-            console.log(name);
+            var name = input.val().replace("  ", " ");
+            var n = patt.exec(name);
+            console.log(n);
         }
         function validate() {
             var t = $("#usernameModalInput").val();
             console.log(t);
-            if (t.match(/[^ ][\w ]+[^ ]/)) {
+            if (patt.test(t)) {
                 $("#usernameGroup").addClass("has-success").removeClass("has-error");
             } else {
                 $("#usernameGroup").addClass("has-error").removeClass("has-success");
