@@ -18,3 +18,23 @@ c:\users\rasmus hansen\documents\visual studio 2013\Projects\WhoNeedsHelp\WhoNee
 c:\users\rasmus hansen\documents\visual studio 2013\Projects\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.csprojResolveAssemblyReference.cache
 c:\users\rasmus hansen\documents\visual studio 2013\Projects\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.dll
 c:\users\rasmus hansen\documents\visual studio 2013\Projects\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.pdb
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\WhoNeedsHelp.dll.config
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\WhoNeedsHelp.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\WhoNeedsHelp.pdb
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.AspNet.SignalR.Core.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.Security.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Newtonsoft.Json.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Owin.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.AspNet.SignalR.Core.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Microsoft.Owin.Security.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\bin\Newtonsoft.Json.xml
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.csprojResolveAssemblyReference.cache
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.dll
+C:\Users\Rasmus Hansen\Documents\GitHub\WhoNeedsHelp\WhoNeedsHelp\obj\Debug\WhoNeedsHelp.pdb
