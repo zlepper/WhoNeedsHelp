@@ -6,7 +6,7 @@ using Microsoft.AspNet.SignalR;
 
 namespace WhoNeedsHelp
 {
-    public class HelpHub : Hub
+    public class ChannelHub : Hub
     {
         public void Hello()
         {

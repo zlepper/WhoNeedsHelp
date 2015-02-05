@@ -36,3 +36,66 @@
         });
     });
 });*/
+
+
+"use strict";
+// The pattern for the username
+var patt = /[\w][\w ]+[\w]/;
+
+// Make a connection to the correct hub
+// In this case the CentralHub which handles this application.
+var chat = $.connection.centralHub;
+var fetchTables;
+
+    function setUserName2() {
+        var input = $("#usernameModalInput");
+        var name = input.val();
+        name = name.replace(/[\s]+/g, " ");
+        var n = name.match(patt);
+        console.log(n[0]);
+        chat.server.send(1, null, n[0]);
+        $("#usernameModal").modal("hide");
+        fetchTables();
+    }
+
+    function setUserName() {
+        setUserName2();
+        return false;
+    }
+
+    var validate = function(e) {
+        if (event.keyCode === 13) {
+            setUserName2();
+        } else {
+            var t = $("#usernameModalInput").val();
+            if (patt.test(t)) {
+                $("#usernameGroup").addClass("has-success").removeClass("has-error");
+            } else {
+                $("#usernameGroup").addClass("has-error").removeClass("has-success");
+            }
+        }
+    }
+
+    chat.client.broadcastMessage = function (table) {
+        $("#HelpList").html(table);
+    }
+$.connection.hub.start().done(function () {
+    fetchTables = function() {
+        chat.server.getData(1);
+    }
+
+    
+
+    $(document).ready(function () {
+        // Show the get username modal
+        $("#usernameModal").modal("show");
+        //$("#modalForm").submit(function () {
+        
+        $("#requestHelpForm").submit(function () {
+            return false;
+        });
+
+    });
+});
+
+

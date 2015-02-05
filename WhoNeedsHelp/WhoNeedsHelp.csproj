@@ -58,6 +58,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\packages\MySql.Data.6.9.5\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -106,11 +109,14 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CentralHub.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelHandler.cs" />
+    <Compile Include="ChannelHub.cs" />
+    <Compile Include="ChatHandler.cs" />
+    <Compile Include="ChatMessage.cs" />
     <Compile Include="ConnectionMappings.cs" />
     <Compile Include="HelpHub.cs" />
-    <Compile Include="ChatHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="User.cs" />
