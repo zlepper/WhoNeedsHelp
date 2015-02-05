@@ -22,10 +22,10 @@
                     <h4 class="modal-title">Navn</h4>
                 </div>
                 <div class="modal-body">
-                    <form onsubmit="saveUsername()" class="has-feedback">
+                    <form class="has-feedback" id="modalForm">
                         <div class="form-group" id="usernameGroup">
                             <label for="usernameModal"></label>
-                            <input type="text" pattern="[\w]+\b( [\w]+)*\b" class="form-control" id="usernameModalInput" onkeyup="validate()" />
+                            <input type="text" class="form-control" id="usernameModalInput" onkeyup="validate()" />
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Start</button>
@@ -35,18 +35,24 @@
             </div> <!--</modal-content>-->
         </div> <!--</modal-dialog>-->
     </div> <!--</modal>-->
+    <!--Script to handle the above modal-->
     <script type="text/javascript">
         "use strict";
-        var patt = /[\w]+\b( [\w]+)*\b/;
-        $(document).ready(function() {
-            $("#usernameModal").modal("toggle");
+        var patt = /[\w][\w ]+[\w]/;
+        $(document).ready(function () {
+            $("#usernameModal").modal("show");
         });
-        function saveUsername() {
+        $("#modalForm").submit(function() {
             var input = $("#usernameModalInput");
-            var name = input.val().replace("  ", " ");
-            var n = patt.exec(name);
-            console.log(n);
-        }
+            var name = input.val();
+            console.log(name);
+            name = name.replace(/[\s]+/g, " ");
+            console.log(name);
+            var n = name.match(patt);
+            console.log(n[0]);
+            $("#usernameModal").modal("hide");
+            return false;
+        });
         function validate() {
             var t = $("#usernameModalInput").val();
             console.log(t);
@@ -90,7 +96,7 @@
             Update said button to say "awaiting help" when a help
             request is in the list.
             Also a "Cancel request" button-->
-            <form class="form-inline">
+            <form class="form-inline" id="requestHelpForm">
                 <div class="form-group">
                     <label for="question"></label>
                     <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
@@ -99,6 +105,13 @@
                     <button type="submit" class="btn btn-default">Efterspørg hjælp</button>
                 </div>
             </form>
+            <!--Script to handle the above form-->
+            <script type="text/javascript">
+                "use strict";
+                $("#requestHelpForm").submit(function () {
+                    return false;
+                });
+            </script>
         </div>
         <div class="col-md-3">
             <!--Put some chat function thingy here-->
