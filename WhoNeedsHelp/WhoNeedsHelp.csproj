@@ -116,7 +116,6 @@
     <Compile Include="ChatHandler.cs" />
     <Compile Include="ChatMessage.cs" />
     <Compile Include="ConnectionMappings.cs" />
-    <Compile Include="HelpHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="User.cs" />

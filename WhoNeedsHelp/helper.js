@@ -45,57 +45,84 @@ var patt = /[\w][\w ]+[\w]/;
 // Make a connection to the correct hub
 // In this case the CentralHub which handles this application.
 var chat = $.connection.centralHub;
+chat.logging = true;
 var fetchTables;
+var setUserName;
+var setUserName2;
+var validate;
 
-    function setUserName2() {
-        var input = $("#usernameModalInput");
-        var name = input.val();
-        name = name.replace(/[\s]+/g, " ");
-        var n = name.match(patt);
-        console.log(n[0]);
-        chat.server.send(1, null, n[0]);
-        $("#usernameModal").modal("hide");
-        fetchTables();
-    }
+setUserName2 = function () {
+    var input = $("#usernameModalInput");
+    var name = input.val();
+    name = name.replace(/[\s]+/g, " ");
+    var n = name.match(patt);
+    console.log(n[0]);
+    chat.server.send(1, n[0]);
+    $("#usernameModal").modal("hide");
+    return false;
+}
 
-    function setUserName() {
-        setUserName2();
-        return false;
-    }
+setUserName = function () {
+    setUserName2();
+    return false;
+}
 
-    var validate = function(e) {
-        if (event.keyCode === 13) {
-            setUserName2();
-        } else {
-            var t = $("#usernameModalInput").val();
-            if (patt.test(t)) {
-                $("#usernameGroup").addClass("has-success").removeClass("has-error");
-            } else {
-                $("#usernameGroup").addClass("has-error").removeClass("has-success");
-            }
-        }
+validate = function() {
+    var t = $("#usernameModalInput").val();
+    if (patt.test(t)) {
+        $("#usernameGroup").addClass("has-success").removeClass("has-error");
+    } else {
+        $("#usernameGroup").addClass("has-error").removeClass("has-success");
     }
+}
 
-    chat.client.broadcastMessage = function (table) {
-        $("#HelpList").html(table);
-    }
+chat.client.broadcastTable = function(table) {
+    $("#HelpList").html(table);
+}
+
+chat.client.log = function (text)
+{
+    console.log(text);
+}
+
+chat.client.appendChannel = function (html) {
+    console.log(html);
+    $("#ChannelList").append(html);
+}
+
+chat.client.errorChannelAlreadyMade = function() {
+    alert("This channel already exists");
+}
+    
 $.connection.hub.start().done(function () {
+    console.log("connected");
     fetchTables = function() {
         chat.server.getData(1);
     }
 
     
 
-    $(document).ready(function () {
-        // Show the get username modal
-        $("#usernameModal").modal("show");
-        //$("#modalForm").submit(function () {
-        
-        $("#requestHelpForm").submit(function () {
-            return false;
-        });
-
-    });
+   
 });
 
 
+$(document).ready(function () {
+    // Show the get username modal
+    $("#usernameModal").modal("show");
+    //$("#modalForm").submit(function () {
+
+    $("#usernameModalForm").submit(function () {
+        setUserName2();
+    });
+
+    $("#requestHelpForm").submit(function () {
+        return false;
+    });
+
+    $("#CreateChannelForm").submit(function () {
+        var channelName = $("#newChannelName").val();
+        console.log(channelName);
+        chat.server.send(3, channelName);
+    });
+
+});

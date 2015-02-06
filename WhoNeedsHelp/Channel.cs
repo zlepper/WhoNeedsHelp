@@ -7,8 +7,11 @@ namespace WhoNeedsHelp
 {
     public class Channel
     {
-        public Dictionary<string, User> Users = new Dictionary<string, User>();
-        public List<User> UsersRequestingHelp = new List<User>(); 
+        public readonly Dictionary<string, User> Users = new Dictionary<string, User>();
+        public readonly List<User> UsersRequestingHelp = new List<User>();
+        public User Administrator;
+        public string ChannelName;
+        public string ChannelId;
 
         public bool RequestHelp(User user)
         {
@@ -18,6 +21,13 @@ namespace WhoNeedsHelp
             }
             UsersRequestingHelp.Add(user);
             return true;
+        }
+
+        public string CreateHtml()
+        {
+            string html = string.Format("<a href='#' id='{1}' class='list-group-item'>{0}</a>", ChannelName,
+                ChannelId + "-selector");
+            return html;
         }
 
         public string CreateTable()
@@ -56,4 +66,5 @@ namespace WhoNeedsHelp
                 Users.Add(u.ConnectionId, u);
             }
         }
+    }
 }

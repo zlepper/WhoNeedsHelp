@@ -24,13 +24,15 @@
                     <h4 class="modal-title">Navn</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group" id="usernameGroup">
-                        <label for="usernameModal">Navn</label>
-                        <input type="text" class="form-control" id="usernameModalInput" onkeyup="validate()" on/>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-primary" onclick="setUserName()">Start</button>
-                    </div>
+                    <form onsubmit="return false;" id="usernameModalForm">
+                        <div class="form-group" id="usernameGroup">
+                            <label for="usernameModal">Navn</label>
+                            <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Start</button>
+                        </div>
+                    </form>
                 </div>
             </div> <!--</modal-content>-->
         </div> <!--</modal-dialog>-->
@@ -45,8 +47,19 @@
     <div class="row">
         <div class="col-md-3">
             <!--Put some additional channel selection here-->
-            <!--First list current "channels"-->
+            <div class="list-group" id="ChannelList">
+                <!--Current channels will appear here-->
+            </div>
             <!--Next have a "Create new channel" thingy-->
+            <form onsubmit="return false; " class="form-inline" id="CreateChannelForm">
+                <div class="form-group">
+                    <label for="newChannelName">Ny kanal</label>
+                    <input type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
+                </div>
+            </form>
             <!--Have a join hidden channel bar-->
             <!--Have a search par thing for channels-->
         </div>
@@ -73,7 +86,7 @@
                     <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-default">Efterspørg hjælp</button>
+                    <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
                 </div>
             </form>
         </div>
