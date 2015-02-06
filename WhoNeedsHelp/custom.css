@@ -1,0 +1,8 @@
+﻿body {
+    padding-top: 50px;
+}
+
+#ChannelList {
+    overflow-y: auto;
+    max-height: 300px;
+}

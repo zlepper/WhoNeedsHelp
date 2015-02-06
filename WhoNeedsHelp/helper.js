@@ -57,7 +57,7 @@ setUserName2 = function () {
     name = name.replace(/[\s]+/g, " ");
     var n = name.match(patt);
     console.log(n[0]);
-    chat.server.send(1, n[0]);
+    chat.server.send("1", n[0]);
     $("#usernameModal").modal("hide");
     return false;
 }
@@ -99,10 +99,6 @@ $.connection.hub.start().done(function () {
     fetchTables = function() {
         chat.server.getData(1);
     }
-
-    
-
-   
 });
 
 
@@ -122,7 +118,6 @@ $(document).ready(function () {
     $("#CreateChannelForm").submit(function () {
         var channelName = $("#newChannelName").val();
         console.log(channelName);
-        chat.server.send(3, channelName);
+        chat.server.send("3", channelName);
     });
-
 });

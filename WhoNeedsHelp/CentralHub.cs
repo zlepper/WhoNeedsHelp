@@ -13,22 +13,23 @@ namespace WhoNeedsHelp
         public static Dictionary<string, User> Users = new Dictionary<string, User>();
         public static Dictionary<string, Channel> Channels = new Dictionary<string, Channel>(); 
 
-        public void Send(int action, string[] parameters)
+        public void Send(string action, string parameters)
         {
+            Debug.WriteLine("test");
             switch (action)
             {
                 // Create User
-                case 1:
+                case "1":
                     // parameters[0] should be the username
-                    SetUsername(parameters[0]);
+                    SetUsername(parameters);
                     break;
-                case 2:
+                case "2":
                     // parameters are ignored.
                     RequestHelp();
                     break;
-                case 3:
+                case "3":
                     // param[0] should be the new channel name
-                    CreateNewChannel(parameters[0]);
+                    CreateNewChannel(parameters);
                     break;
 
             }
@@ -101,6 +102,7 @@ namespace WhoNeedsHelp
 
         public override Task OnConnected()
         {
+            Debug.WriteLine(Context.ConnectionId);
             Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId});
 
             return base.OnConnected();
