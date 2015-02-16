@@ -1,8 +1,8 @@
-﻿body {
+﻿/*body {
     padding-top: 50px;
-}
+}*/
 
-#ChannelList {
+.ChannelList {
     overflow-y: auto;
     max-height: 300px;
 }

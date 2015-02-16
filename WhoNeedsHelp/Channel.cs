@@ -8,32 +8,30 @@ namespace WhoNeedsHelp
     public class Channel
     {
         public readonly Dictionary<string, User> Users = new Dictionary<string, User>();
-        public readonly List<User> UsersRequestingHelp = new List<User>();
-        public User Administrator;
+        private readonly List<User> _usersRequestingHelp = new List<User>();
+        public readonly User Administrator;
         public string ChannelName;
         public string ChannelId;
 
+        public Channel(User u)
+        {
+            Administrator = u;
+        }
+
         public bool RequestHelp(User user)
         {
-            if (UsersRequestingHelp.Contains(user))
+            if (_usersRequestingHelp.Contains(user))
             {
                 return false;
             }
-            UsersRequestingHelp.Add(user);
+            _usersRequestingHelp.Add(user);
             return true;
-        }
-
-        public string CreateHtml()
-        {
-            string html = string.Format("<a href='#' id='{1}' class='list-group-item'>{0}</a>", ChannelName,
-                ChannelId + "-selector");
-            return html;
         }
 
         public string CreateTable()
         {
             string table = "";
-            foreach (User u in UsersRequestingHelp)
+            foreach (User u in _usersRequestingHelp)
             {
                 string question = u.GetQuestion(this);
                 table +=

@@ -7,6 +7,8 @@
     <!--Script references. -->
     <!--Reference the jQuery library. -->
     <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <!--Reference the jQuery UI library-->
+    <script src="Scripts/jquery-ui-1.11.3.min.js"></script>
     <!--Reference the Bootstrap jquery library-->
     <script src="Scripts/bootstrap.min.js"></script>
     <!--Reference the SignalR library. -->
@@ -41,18 +43,56 @@
     </div> <!--</modal>-->
 
     <div class="row">
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <p class="navbar-text">Forbundet med navn: <span id="CurrentUserName">Navn endnu ikke valgt</span></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <!--Put all userinformation here.
         Userid
-        People in that specific channel
         -->
     </div>
     <div class="row">
         <div class="col-md-3">
             <!--Put some additional channel selection here-->
-            <div class="list-group" id="ChannelList">
+            <div class="list-group ChannelList" id="ChannelList">
                 <!--Current channels will appear here-->
             </div>
-            <!--Next have a "Create new channel" thingy-->
+            <!--Join channel form-->
+            <!-- Live søgning efter 5 tegn.
+            Dette betyder at der først bliver søgt når 
+                man har valgt en bruger at søge efter -->
+            <form onsubmit=" return false; " class="form-inline" id="SearchChannelForm">
+                <div class="form-group">
+                    <label for="SearchChannelName">Søg efter kanal</label>
+                    <input type="text" name="SearchChannelName" placeholder="Søg efter kanel" id="SearchChannelName" class="form-control"/>
+                </div>
+            </form>
+            <div class="list-group ChannelList" id="SearchChannelResults">
+                <!--Searched for channels will appear here-->
+            </div>
+            <!--Create new channel form-->
             <form onsubmit="return false; " class="form-inline" id="CreateChannelForm">
                 <div class="form-group">
                     <label for="newChannelName">Ny kanal</label>
