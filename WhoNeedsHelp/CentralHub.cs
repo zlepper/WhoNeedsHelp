@@ -54,7 +54,7 @@ namespace WhoNeedsHelp
             int activeUsers = 0;
             if (u.CurrentChannel != null)
             {
-                activeUsers = u.CurrentChannel.Users.Values.Count(user => user.CurrentChannel == u.CurrentChannel)-1;
+                activeUsers = u.CurrentChannel.GetActiveUsers()-1;
                 foreach (KeyValuePair<string, User> userPair in u.CurrentChannel.Users)
                 {
                     Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, u.CurrentChannel.Users.Count, u.CurrentChannel.ChannelId);
@@ -63,7 +63,7 @@ namespace WhoNeedsHelp
             Channel c = Channels[channelId];
             u.CurrentChannel = c;
             Clients.Caller.SetChannel(channelId);
-            activeUsers = c.Users.Values.Count(user => user.CurrentChannel == u.CurrentChannel);
+            activeUsers = c.GetActiveUsers();
             foreach (KeyValuePair<string, User> userPair in c.Users)
             {
                 Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, c.Users.Count, channelId);

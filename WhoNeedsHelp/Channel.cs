@@ -18,6 +18,11 @@ namespace WhoNeedsHelp
             Administrator = u;
         }
 
+        public int GetActiveUsers()
+        {
+            return Users.Values.Count(user => user.CurrentChannel == this);
+        }
+
         public bool RequestHelp(User user)
         {
             if (_usersRequestingHelp.Contains(user))
