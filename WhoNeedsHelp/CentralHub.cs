@@ -120,7 +120,7 @@ namespace WhoNeedsHelp
 
         private void CreateNewChannel(string channelName)
         {
-            string channelId = Context.ConnectionId.Substring(0, 5) + "-" + channelName;
+            string channelId = Context.ConnectionId.Substring(0, 5) + "-" + channelName.Replace(" ", "-");
             if (Channels.ContainsKey(channelId))
             {
                 Clients.Caller.ErrorChannelAlreadyMade();

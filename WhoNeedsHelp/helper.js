@@ -49,8 +49,10 @@ chat.client.appendChannel = function (channelname, channelid) {
 
 chat.client.setChannel = function (channel) {
     $("#CurrentChannelId").html(channel);
-    $("div#ChannelList > a.active").removeClass("active", 1000);
-    $("#" + channel).addClass("active", 1000);
+    $("div#ChannelList > a.active").removeClass("active", 400);
+    setTimeout(function() {
+        $("#" + channel).addClass("active", 400);
+    }, 100);
 }
 
 chat.client.updateChannelCount = function(activeUsers, connectedUsers, channelId) {
@@ -121,7 +123,6 @@ $(document).ready(function () {
 
     $("#CreateChannelForm").submit(function () {
         var channelName = $("#newChannelName").val();
-        console.log(channelName);
         chat.server.send("3", channelName);
     });
 
