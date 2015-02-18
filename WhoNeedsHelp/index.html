@@ -110,7 +110,7 @@
             <div id="HelpList">
             <!--Help panels will appear here-->
             </div>
-            <!--<div class="panel panel-primary">
+            <!--<div class="panel panel-primary" id="ConnectionId-ChannelId">
                 <div class="panel-heading">
                     <h3 class="panel-title">Some username</h3>
                 </div>
@@ -122,15 +122,24 @@
             Update said button to say "awaiting help" when a help
             request is in the list.
             Also a "Cancel request" button-->
-            <form class="form-inline" id="requestHelpForm">
+            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
                 <div class="form-group">
                     <label for="question"></label>
-                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
+                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
                 </div>
             </form>
+            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit="return false;">
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary">Fjern Spørgsmål</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary">Ændre Spørgsmål</button>
+                </div>
+            </form>
+            <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
         </div>
         <div class="col-md-3">
             <!--Put some chat function thingy here-->

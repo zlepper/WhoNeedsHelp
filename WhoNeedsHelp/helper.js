@@ -80,6 +80,51 @@ chat.client.channelsFound = function(ids, names) {
         $("#" + ids[i]).show("clip");
     }
 }
+
+chat.client.addQuestions = function (usernames, questions, questionIds) {
+    var helpList = $("#HelpList");
+    helpList.empty();
+    for (var i = 0; i < questionIds.length; i++) {
+        var html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div><div class=\"panel-body\">" + questions[i] + "</div></div>";
+        helpList.append(html);
+        setTimeout(showId(questionIds[i]), 200*i);
+    }
+}
+
+chat.client.addQuestion = function(username, question, questionId) {
+    var helpList = $("#HelpList");
+    var html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div><div class=\"panel-body\">" + question + "</div></div>";
+    helpList.append(html);
+    $("#" + questionId).show("drop");
+}
+
+var setQuestionLayout = function(layout) {
+    switch (layout) {
+        // Standard Layout
+        case 1:
+            $("#requestingHelp").hide();
+            $("#noChannelsSelected").hide();
+            $("#requestHelpForm").show();
+            break;
+        // No channel selected
+        case 2:
+            $("#requestingHelp").hide();
+            $("#noChannelsSelected").show();
+            $("#requestHelpForm").hide();
+            break;
+        // Have question in current channel
+        case 3:
+            $("#requestingHelp").show();
+            $("#noChannelsSelected").hide();
+            $("#requestHelpForm").hide();
+            break;
+    default:
+    }
+}
+
+var showId = function(id) {
+    $("#" + id).show("drop");
+}
     
 $.connection.hub.start().done(function () {
     console.log("connected");
@@ -118,7 +163,10 @@ $(document).ready(function () {
     });
 
     $("#requestHelpForm").submit(function () {
-        return false;
+        var question = $("#question").val();
+        if (question !== "") {
+            
+        }
     });
 
     $("#CreateChannelForm").submit(function () {
