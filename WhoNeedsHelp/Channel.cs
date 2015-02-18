@@ -64,9 +64,9 @@ namespace WhoNeedsHelp
 
         public void RemoveUser(User u)
         {
-            if (!Users.ContainsKey(u.ConnectionId))
+            if (Users.ContainsKey(u.ConnectionId))
             {
-                Users.Add(u.ConnectionId, u);
+                Users.Remove(u.ConnectionId);
             }
         }
     }

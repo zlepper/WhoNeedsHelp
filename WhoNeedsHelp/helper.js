@@ -87,7 +87,7 @@ $.connection.hub.start().done(function () {
         chat.server.getData(1);
     }
 
-    $(document).on("click", "a.channel-remove", function () {
+    $(document).on("click", "span.channel-remove", function () {
         var tmpid = $(this).parent().attr("id");
         chat.server.send("4", tmpid);
     });

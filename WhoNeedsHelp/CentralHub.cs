@@ -60,13 +60,16 @@ namespace WhoNeedsHelp
                     Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, u.CurrentChannel.Users.Count, u.CurrentChannel.ChannelId);
                 }
             }
-            Channel c = Channels[channelId];
-            u.CurrentChannel = c;
-            Clients.Caller.SetChannel(channelId);
-            activeUsers = c.GetActiveUsers();
-            foreach (KeyValuePair<string, User> userPair in c.Users)
+            if (Channels.ContainsKey(channelId))
             {
-                Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, c.Users.Count, channelId);
+                Channel c = Channels[channelId];
+                u.CurrentChannel = c;
+                Clients.Caller.SetChannel(channelId);
+                activeUsers = c.GetActiveUsers();
+                foreach (KeyValuePair<string, User> userPair in c.Users)
+                {
+                    Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, c.Users.Count, channelId);
+                }
             }
         }
 
@@ -113,6 +116,11 @@ namespace WhoNeedsHelp
                 {
                     c.RemoveUser(u);
                     Clients.Caller.ExitChannel(c.ChannelId);
+                    int activeUsers = c.GetActiveUsers();
+                    foreach (string connectionId in Channels[channelId].Users.Keys)
+                    {
+                        Clients.Client(connectionId).UpdateChannelCount(activeUsers, c.Users.Count, c.ChannelId);
+                    }
                 }
                 
             }
@@ -192,6 +200,17 @@ namespace WhoNeedsHelp
 
         public override Task OnDisconnected(bool stopCalled)
         {
+            User u = Users[Context.ConnectionId];
+            var channelsToClear = from channel in Channels.Values
+                where channel.Administrator == u
+                select channel;
+            foreach (Channel channel in channelsToClear)
+            {
+                foreach (string connectionId in channel.Users.Keys)
+                {
+                    Clients.Client(connectionId).ExitChannel(channel.ChannelId);
+                }
+            }
             Users.Remove(Context.ConnectionId);
 
             return base.OnDisconnected(stopCalled);
