@@ -8,35 +8,41 @@ namespace WhoNeedsHelp
     public class Channel
     {
         public readonly Dictionary<string, User> Users = new Dictionary<string, User>();
-        private readonly List<User> _usersRequestingHelp = new List<User>();
+        public readonly List<User> UsersRequestingHelp = new List<User>();
         public readonly User Administrator;
         public string ChannelName;
         public string ChannelId;
+        public List<string> chatMessages = new List<string>(); 
 
         public Channel(User u)
         {
             Administrator = u;
         }
 
-        public int GetActiveUsers()
+        public int GetActiveUserCount()
         {
             return Users.Values.Count(user => user.CurrentChannel == this);
         }
 
+        public List<User> GetActiveUsers()
+        {
+            return Users.Values.Where(user => user.CurrentChannel == this).ToList();
+        }
+
         public bool RequestHelp(User user)
         {
-            if (_usersRequestingHelp.Contains(user))
+            if (UsersRequestingHelp.Contains(user))
             {
                 return false;
             }
-            _usersRequestingHelp.Add(user);
+            UsersRequestingHelp.Add(user);
             return true;
         }
 
         public string CreateTable()
         {
             string table = "";
-            foreach (User u in _usersRequestingHelp)
+            foreach (User u in UsersRequestingHelp)
             {
                 string question = u.GetQuestion(this);
                 table +=

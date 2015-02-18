@@ -6,3 +6,9 @@
     overflow-y: auto;
     max-height: 300px;
 }
+
+#HelpList {
+    padding-top: 10px;
+    overflow-y: auto;
+    max-height: 800px;
+}

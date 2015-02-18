@@ -19,6 +19,7 @@ var setUserName2 = function () {
     chat.server.send("1", n[0]);
     $("#CurrentUserName").html(n[0]);
     $("#usernameModal").modal("hide");
+    $("#SearchChannelName").focus();
     return false;
 }
 
@@ -29,10 +30,6 @@ var validate = function() {
     } else {
         $("#usernameGroup").addClass("has-error").removeClass("has-success");
     }
-}
-
-chat.client.broadcastTable = function(table) {
-    $("#HelpList").html(table);
 }
 
 chat.client.log = function (text)
@@ -47,12 +44,19 @@ chat.client.appendChannel = function (channelname, channelid) {
     chat.server.send("7", channelid);
 }
 
-chat.client.setChannel = function (channel) {
+chat.client.setChannel = function (channel, areUserQuestioning) {
     $("#CurrentChannelId").html(channel);
-    $("div#ChannelList > a.active").removeClass("active", 400);
+    $("div#ChannelList > a").stop().removeClass("active").attr("style", "");
     setTimeout(function() {
         $("#" + channel).addClass("active", 400);
     }, 100);
+    if (areUserQuestioning) {
+        console.log("User are questing");
+        setQuestionLayout(3);
+    } else {
+        console.log("User are not questing");
+        setQuestionLayout(1);
+    }
 }
 
 chat.client.updateChannelCount = function(activeUsers, connectedUsers, channelId) {
@@ -64,11 +68,48 @@ chat.client.errorChannelAlreadyMade = function() {
     alert("This channel already exists");
 }
 
+chat.client.sendQuestion = function(question) {
+    $("#newQuestionText").val(question);
+}
+
 chat.client.exitChannel = function (e) {
     var tmpid = $("#" + e);
     tmpid.hide("blind", function () {
         tmpid.remove();
+        tmpid = $("#ChannelList a:first-child").attr("id");
+        console.log(tmpid);
+        if (tmpid == undefined) {
+            setQuestionLayout(2);
+            $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
+            $("#HelpList").children().each(function(index) {
+                $(this).delay(index * 300).hide("blind", function() {
+                    $(this).remove();
+                });
+            });
+        } else {
+            chat.server.send("7", tmpid);
+        }
     });
+}
+
+chat.client.listChannels = function(channelsNames, channelIds, activeChannelId) {
+    var channelList = $("#ChannelList");
+    channelList.empty();
+
+    for (var i = 0; i < channelsNames.length; i++) {
+        var html = "<a href='#' style='display: none;' id='" + channelIds[i] + "' class='list-group-item'><span class='glyphicon glyphicon-remove text-danger channel-remove'></span><span class='badge'>0/0</span> " + channelsNames[i] + "</a>";
+        $("#ChannelList").append(html);
+        $("#" + channelIds[i]).delay(i * 200).show("blind");
+    }
+
+    console.log(activeChannelId);
+    if (activeChannelId != null) {
+        chat.server.send("7", activeChannelId);
+    }
+}
+
+chat.client.getUsername = function() {
+    chat.server.send("1", $("#CurrentUserName").html());
 }
 
 chat.client.channelsFound = function(ids, names) {
@@ -81,21 +122,55 @@ chat.client.channelsFound = function(ids, names) {
     }
 }
 
-chat.client.addQuestions = function (usernames, questions, questionIds) {
+chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     var helpList = $("#HelpList");
     helpList.empty();
     for (var i = 0; i < questionIds.length; i++) {
-        var html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div><div class=\"panel-body\">" + questions[i] + "</div></div>";
+        var html = "";
+        if (admin) {
+            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
+        } else {
+            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
+        }
+        if (questions[i] === "") {
+            html = html.replace("{0}", "");
+        } else {
+            html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
+        }
         helpList.append(html);
-        setTimeout(showId(questionIds[i]), 200*i);
+        var timeout = 200 * i;
+        console.log(timeout);
+        setTimeout(showId(questionIds[i], timeout));
     }
 }
 
-chat.client.addQuestion = function(username, question, questionId) {
+chat.client.addQuestion = function(username, question, questionId, admin) {
     var helpList = $("#HelpList");
-    var html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div><div class=\"panel-body\">" + question + "</div></div>";
+    var html = "";
+    if (admin) {
+        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div>{0}</div>";
+    } else {
+        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div>{0}</div>";
+    }
+    if (question === "") {
+        html = html.replace("{0}", "");
+    } else {
+        html = html.replace("{0}", "<div class=\"panel-body\">" + question + "</div>");
+    }
     helpList.append(html);
-    $("#" + questionId).show("drop");
+    $("#" + questionId).show("blind");
+}
+
+chat.client.userAreQuesting = function() {
+    setQuestionLayout(3);
+}
+
+chat.client.removeQuestion = function(questionId) {
+    var element = $("#" + questionId);
+    console.log(questionId);
+    element.hide("blind", function() {
+        element.remove();
+    });
 }
 
 var setQuestionLayout = function(layout) {
@@ -122,8 +197,8 @@ var setQuestionLayout = function(layout) {
     }
 }
 
-var showId = function(id) {
-    $("#" + id).show("drop");
+var showId = function(id, timeout) {
+    $("#" + id).delay(timeout).show("drop", {"direction": "up"});
 }
     
 $.connection.hub.start().done(function () {
@@ -156,6 +231,7 @@ $.connection.hub.start().done(function () {
 $(document).ready(function () {
     // Show the get username modal
     $("#usernameModal").modal("show");
+    $("#usernameModalInput").focus();
     //$("#modalForm").submit(function () {
 
     $("#usernameModalForm").submit(function () {
@@ -164,9 +240,8 @@ $(document).ready(function () {
 
     $("#requestHelpForm").submit(function () {
         var question = $("#question").val();
-        if (question !== "") {
-            
-        }
+        chat.server.send("2", question);
+        setQuestionLayout(3);
     });
 
     $("#CreateChannelForm").submit(function () {
@@ -180,5 +255,17 @@ $(document).ready(function () {
         if (value.length > 4) {
             chat.server.send("5", value);
         }
+    });
+
+    $("#removeQuestion").click(function () {
+        chat.server.send("8", null);
+        setQuestionLayout(1);
+    });
+
+    $("#editQuestion").click(function() {
+        console.log("edit");
+        $("#changeQuestionModal").modal("show");
+        $("#newQuestionText").focus();
+        chat.server.getData(1);
     });
 });

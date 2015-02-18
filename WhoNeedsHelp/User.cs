@@ -10,7 +10,12 @@ namespace WhoNeedsHelp
         public string ConnectionId { get; set; }
         public string Name { get; set; }
         public Channel CurrentChannel { get; set; }
-        private Dictionary<Channel, string> Questions { get; set; } 
+        private Dictionary<Channel, string> Questions { get; set; }
+
+        public User()
+        {
+            Questions = new Dictionary<Channel, string>();
+        }
 
         public bool RequestHelp(string question = null)
         {
@@ -25,14 +30,13 @@ namespace WhoNeedsHelp
 
         public string GetQuestion(Channel c)
         {
-            return Questions[c];
+            return Questions.ContainsKey(c) ? Questions[c] : "";
         }
 
-        public bool AskQuestion(Channel c, string question)
+        private void AskQuestion(Channel c, string question)
         {
-            if (Questions.ContainsKey(c)) return false;
-            Questions.Add(c, question);
-            return true;
+            if (Questions.ContainsKey(c)) return;
+            Questions.Add(c, String.IsNullOrWhiteSpace(question) ? null : "");
         }
 
         public bool UpdateQuestion(Channel c, string question)
@@ -40,6 +44,11 @@ namespace WhoNeedsHelp
             if (!Questions.ContainsKey(c)) return false;
             Questions[c] = question;
             return true;
+        }
+
+        public void RemoveQuestion()
+        {
+            Questions.Remove(CurrentChannel);
         }
     }
 }

@@ -20,133 +20,161 @@
 
 </head>
 <body>
-<div class="container">
-    <div data-backdrop="static" data-keyboard="false" class="modal fade" id="usernameModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Navn</h4>
-                </div>
-                <div class="modal-body">
-                    <form onsubmit="return false;" id="usernameModalForm">
-                        <div class="form-group" id="usernameGroup">
-                            <label for="usernameModal">Navn</label>
-                            <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Start</button>
-                        </div>
-                    </form>
-                </div>
-            </div> <!--</modal-content>-->
-        </div> <!--</modal-dialog>-->
-    </div> <!--</modal>-->
+    <div class="container">
+        <div data-backdrop="static" data-keyboard="false" class="modal fade" id="usernameModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Navn</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form onsubmit="return false;" id="usernameModalForm">
+                            <div class="form-group" id="usernameGroup">
+                                <label for="usernameModal">Navn</label>
+                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Start</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!--</modal-content>-->
+            </div> <!--</modal-dialog>-->
+        </div> <!--</modal>-->
 
-    <div class="row">
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
-                </div>
+        <div class="modal fade" id="changeQuestionModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Nyt Spørgsmål</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label for="newQuestionText"></label>
+                        <input type="text" class="form-control" id="newQuestionText"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Luk</button>
+                        <button type="button" class="btn btn-primary">Rediger</button>
+                    </div>
+                </div> <!--</modal-content>-->
+            </div> <!--</modal-dialog>-->
+        </div> <!--</modal>-->
 
-                <div class="collapse navbar-collapse" id="navbar">
-                    <ul class="nav navbar-nav">
-                        <li>
-                            <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <p class="navbar-text">Forbundet med navn: <span id="CurrentUserName">Navn endnu ikke valgt</span></p>
-                        </li>
-                    </ul>
+        <div class="row">
+            <nav class="navbar navbar-default">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="navbar">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <p class="navbar-text">Forbundet med navn: <span id="CurrentUserName">Navn endnu ikke valgt</span></p>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+            </nav>
+            <!--Put all userinformation here.
+            Userid
+            -->
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <!--Put some additional channel selection here-->
+                <div class="list-group ChannelList" id="ChannelList">
+                    <!--Current channels will appear here-->
+                </div>
+                <!--Join channel form-->
+                <!-- Live søgning efter 5 tegn.
+                Dette betyder at der først bliver søgt når
+                    man har valgt en bruger at søge efter -->
+                <form onsubmit=" return false; " class="form-inline" id="SearchChannelForm">
+                    <div class="form-group">
+                        <label for="SearchChannelName">Søg efter kanal</label>
+                        <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control" />
+                    </div>
+                </form>
+                <div class="list-group ChannelList" id="SearchChannelResults">
+                    <!--Searched for channels will appear here-->
+                </div>
+                <!--Create new channel form-->
+                <form onsubmit="return false; " class="form-inline" id="CreateChannelForm">
+                    <div class="form-group">
+                        <label for="newChannelName">Ny kanal</label>
+                        <input type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
+                    </div>
+                </form>
+                <!--Have a join hidden channel bar-->
+                <!--Have a search par thing for channels-->
             </div>
-        </nav>
-        <!--Put all userinformation here.
-        Userid
-        -->
+            <div class="col-md-6">
+                <!--Have a table with the current list of people-->
+                <div id="HelpList">
+                    <!--Help panels will appear here-->
+                </div>
+                <!--<div class="panel panel-primary" id="ConnectionId-ChannelId">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Some username</h3>
+                    </div>
+                    <div class="panel-body">
+                        Some extra question
+                    </div>
+                </div>-->
+                <!--Have a button that says "Request help"
+                Update said button to say "awaiting help" when a help
+                request is in the list.
+                Also a "Cancel request" button-->
+                <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
+                    <div class="form-group">
+                        <label for="question"></label>
+                        <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
+                    </div>
+                </form>
+                <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit="return false;">
+                    <div class="form-group">
+                        <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
+                    </div>
+                    <div class="form-group">
+                        <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
+                    </div>
+                </form>
+                <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+            </div>
+            <div class="col-md-3">
+                <!--Put some chat function thingy here-->
+                <!--Chat channel should follow help channel-->
+                <div id="Chat">
+                    <!--Chat messages will appear here-->
+                </div>
+                <!--Chat input-->
+                <form onsubmit=" return false; " id="chatForm">
+                    <div class="form-group">
+                        <textarea style="-moz-resize: vertical; -ms-resize: vertical; -o-resize: vertical; resize: vertical" id="chatMessageInput" placeholder="Chat" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <footer>&copy; Rasmus Hansen 2015</footer>
     </div>
-    <div class="row">
-        <div class="col-md-3">
-            <!--Put some additional channel selection here-->
-            <div class="list-group ChannelList" id="ChannelList">
-                <!--Current channels will appear here-->
-            </div>
-            <!--Join channel form-->
-            <!-- Live søgning efter 5 tegn.
-            Dette betyder at der først bliver søgt når 
-                man har valgt en bruger at søge efter -->
-            <form onsubmit=" return false; " class="form-inline" id="SearchChannelForm">
-                <div class="form-group">
-                    <label for="SearchChannelName">Søg efter kanal</label>
-                    <input type="text" name="SearchChannelName" placeholder="Søg efter kanel" id="SearchChannelName" class="form-control"/>
-                </div>
-            </form>
-            <div class="list-group ChannelList" id="SearchChannelResults">
-                <!--Searched for channels will appear here-->
-            </div>
-            <!--Create new channel form-->
-            <form onsubmit="return false; " class="form-inline" id="CreateChannelForm">
-                <div class="form-group">
-                    <label for="newChannelName">Ny kanal</label>
-                    <input type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
-                </div>
-            </form>
-            <!--Have a join hidden channel bar-->
-            <!--Have a search par thing for channels-->
-        </div>
-        <div class="col-md-6">
-            <!--Have a table with the current list of people-->
-            <div id="HelpList">
-            <!--Help panels will appear here-->
-            </div>
-            <!--<div class="panel panel-primary" id="ConnectionId-ChannelId">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Some username</h3>
-                </div>
-                <div class="panel-body">
-                    Some extra question
-                </div>
-            </div>-->
-            <!--Have a button that says "Request help"
-            Update said button to say "awaiting help" when a help
-            request is in the list.
-            Also a "Cancel request" button-->
-            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
-                <div class="form-group">
-                    <label for="question"></label>
-                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
-                </div>
-            </form>
-            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit="return false;">
-                <div class="form-group">
-                    <button type="button" class="btn btn-primary">Fjern Spørgsmål</button>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-primary">Ændre Spørgsmål</button>
-                </div>
-            </form>
-            <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
-        </div>
-        <div class="col-md-3">
-            <!--Put some chat function thingy here-->
-            <!--Chat channel should follow help channel-->
-        </div>
-    </div>
-    <footer>&copy; Rasmus Hansen 2015</footer>
-</div>
 </body>
 </html>

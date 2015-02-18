@@ -22,8 +22,8 @@ namespace WhoNeedsHelp
                     SetUsername(parameters);
                     break;
                 case "2":
-                    // parameter is ignored.
-                    RequestHelp();
+                    // Param should be the question to ask
+                    RequestHelp(parameters);
                     break;
                 case "3":
                     // param should be the new channel name
@@ -45,6 +45,23 @@ namespace WhoNeedsHelp
                     // Param should be the channel to change to
                     ChangeToChannel(parameters);
                     break;
+                case "8":
+                    // Param are ignored
+                    RemoveQuestion();
+                    break;
+            }
+        }
+
+        private void RemoveQuestion()
+        {
+            User u = Users[Context.ConnectionId];
+            Channel c = u.CurrentChannel;
+            string questionId = u.ConnectionId + "-" + c.ChannelId;
+            u.RemoveQuestion();
+            c.UsersRequestingHelp.Remove(u);
+            foreach (User user in c.GetActiveUsers())
+            {
+                Clients.Client(user.ConnectionId).RemoveQuestion(questionId);
             }
         }
 
@@ -54,7 +71,7 @@ namespace WhoNeedsHelp
             int activeUsers = 0;
             if (u.CurrentChannel != null)
             {
-                activeUsers = u.CurrentChannel.GetActiveUsers()-1;
+                activeUsers = u.CurrentChannel.GetActiveUserCount()-1;
                 foreach (KeyValuePair<string, User> userPair in u.CurrentChannel.Users)
                 {
                     Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, u.CurrentChannel.Users.Count, u.CurrentChannel.ChannelId);
@@ -65,11 +82,20 @@ namespace WhoNeedsHelp
                 Channel c = Channels[channelId];
                 u.CurrentChannel = c;
                 Clients.Caller.SetChannel(channelId);
-                activeUsers = c.GetActiveUsers();
+                activeUsers = c.GetActiveUserCount();
                 foreach (KeyValuePair<string, User> userPair in c.Users)
                 {
                     Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, c.Users.Count, channelId);
                 }
+                List<User> questionUsers = c.UsersRequestingHelp;
+                List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
+                foreach (User user in questionUsers)
+                {
+                    usernames.Add(user.Name);
+                    questions.Add(user.GetQuestion(c));
+                    questionIds.Add(user.ConnectionId + "-" + c.ChannelId);
+                }
+                Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), c.Administrator == u);
             }
         }
 
@@ -116,7 +142,7 @@ namespace WhoNeedsHelp
                 {
                     c.RemoveUser(u);
                     Clients.Caller.ExitChannel(c.ChannelId);
-                    int activeUsers = c.GetActiveUsers();
+                    int activeUsers = c.GetActiveUserCount();
                     foreach (string connectionId in Channels[channelId].Users.Keys)
                     {
                         Clients.Client(connectionId).UpdateChannelCount(activeUsers, c.Users.Count, c.ChannelId);
@@ -154,19 +180,22 @@ namespace WhoNeedsHelp
             Clients.Caller.Log(Context.ConnectionId);
         }
 
-        // TODO Add counter to specific rooms
-
-        private void RequestHelp()
+        private void RequestHelp(string question)
         {
+            if (String.IsNullOrWhiteSpace(question))
+            {
+                question = "";
+            }
             User u = Users[Context.ConnectionId];
-            bool succesfuldRequest = u.RequestHelp();
+            bool succesfuldRequest = u.RequestHelp(question);
             if (succesfuldRequest)
             {
-                List<User> usersInChannel = u.CurrentChannel.GetUsers();
-                String table = u.CurrentChannel.CreateTable();
-                foreach (User b in usersInChannel)
+                Channel c = u.CurrentChannel;
+                List<User> usersInChannel = c.GetActiveUsers();
+                string questionId = Context.ConnectionId + "-" + c.ChannelId;
+                foreach (User user in usersInChannel)
                 {
-                    Clients.Client(b.ConnectionId).BroadcastTable(table);
+                    Clients.Client(user.ConnectionId).AddQuestion(u.Name, question, questionId, c.Administrator == user);
                 }
             }
             
@@ -178,21 +207,25 @@ namespace WhoNeedsHelp
             switch (action)
             {
                 case 1:
-                    ListHelp();
+                    // Request question text in current channel
+                    GetQuestion();
                     break;
             }
         }
 
-        private void ListHelp()
+        private void GetQuestion()
         {
-            User u = Users[Context.ConnectionId];
-            //string table = u.CurrentChannel.CreateTable();
-            //Clients.Caller.BroadcastTable(table);
+            string question = Users[Context.ConnectionId].GetQuestion(Users[Context.ConnectionId].CurrentChannel);
+            if (!String.IsNullOrWhiteSpace(question))
+            {
+                Clients.Caller.SendQuestion(question);
+            }
         }
 
         public override Task OnConnected()
         {
-            Debug.WriteLine(Context.ConnectionId);
+            Clients.Caller.Log("Connected");
+            Debug.WriteLine("Connected: " + Context.ConnectionId);
             Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId});
 
             return base.OnConnected();
@@ -201,43 +234,66 @@ namespace WhoNeedsHelp
         public override Task OnDisconnected(bool stopCalled)
         {
             User u = Users[Context.ConnectionId];
+            Debug.WriteLine("Disconnected: " + Context.ConnectionId);
             var channelsToClear = from channel in Channels.Values
                 where channel.Administrator == u
                 select channel;
-            foreach (Channel channel in channelsToClear)
+            var ctc = channelsToClear.ToList();
+            for (int i = 0; i < ctc.Count(); i++)
             {
-                foreach (string connectionId in channel.Users.Keys)
-                {
-                    Clients.Client(connectionId).ExitChannel(channel.ChannelId);
-                }
+                ExitChannel(ctc[i].ChannelId);
             }
             Users.Remove(Context.ConnectionId);
-
             return base.OnDisconnected(stopCalled);
         }
 
         public override Task OnReconnected()
         {
+            Clients.Caller.Log("Reconnected");
+            Debug.WriteLine("Reconnected: " + Context.ConnectionId);
             if (!Users.ContainsKey(Context.ConnectionId))
             {
                 Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId});
             }
 
+            var channels = from channel in Channels.Values
+                where channel.Users.ContainsKey(Context.ConnectionId)
+                orderby channel.ChannelName
+                select channel;
+            var cs = channels.ToList();
+            List<string> channelNames = new List<string>(), channelIds = new List<string>();
+            foreach (Channel c in cs)
+            {
+                channelNames.Add(c.ChannelName);
+                channelIds.Add(c.ChannelId);
+            }
+
+            Clients.Caller.ListChannels(channelNames.ToArray(), channelIds.ToArray(),
+                Users[Context.ConnectionId].CurrentChannel != null
+                    ? Users[Context.ConnectionId].CurrentChannel.ChannelId
+                    : null);
+            Clients.Caller.GetUsername();
+
             return base.OnReconnected();
         }
+
+
     }
 
     public interface IClient
     {
-        void BroadcastTable(string table);
         void AppendChannel(string channelname, string channelid);
-        void AppendUserQuestion(string html);
-        void RemoveUserQuestion(string userId);
+        void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
+        void AddQuestion(string username, string question, string questionId, bool admin = false);
+        void RemoveQuestion(string questionId);
         void ErrorChannelAlreadyMade();
         void Log(string text);
         void ExitChannel(string channelId);
         void ChannelsFound(string[] channelId, string[] channelName);
         void SetChannel(string channel);
         void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
+        void ListChannels(string[] channelNames, string[] channelIds, string activeChannelId);
+        void GetUsername();
+        void SendQuestion(string question);
     }
 }
