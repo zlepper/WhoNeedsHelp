@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNet.SignalR;
 
 namespace WhoNeedsHelp
@@ -47,7 +48,7 @@ namespace WhoNeedsHelp
                     break;
                 case "8":
                     // Param are ignored
-                    RemoveQuestion();
+                    RemoveQuestion(parameters);
                     break;
                 case "9":
                     // Param are the new question
@@ -67,16 +68,34 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void RemoveQuestion()
+        private void RemoveQuestion(string questionId)
         {
-            User u = Users[Context.ConnectionId];
-            Channel c = u.CurrentChannel;
-            string questionId = u.ConnectionId + "-" + c.ChannelId;
-            u.RemoveQuestion();
-            c.UsersRequestingHelp.Remove(u);
-            foreach (User user in c.GetActiveUsers())
+            if (String.IsNullOrWhiteSpace(questionId))
             {
-                Clients.Client(user.ConnectionId).RemoveQuestion(questionId);
+                User u = Users[Context.ConnectionId];
+                Channel c = u.CurrentChannel;
+                questionId = u.ConnectionId + "-" + c.ChannelId;
+                u.RemoveQuestion();
+                c.UsersRequestingHelp.Remove(u);
+                foreach (User user in c.GetActiveUsers())
+                {
+                    Clients.Client(user.ConnectionId).RemoveQuestion(questionId);
+                }
+            }
+            else
+            {
+                Channel c = Users[Context.ConnectionId].CurrentChannel;
+                string userId = questionId.Substring(0, 36);
+                Debug.WriteLine(questionId);
+                Debug.WriteLine(userId);
+                User u = Users[userId];
+                u.RemoveQuestion(c);
+                c.UsersRequestingHelp.Remove(u);
+                foreach (User user in c.GetActiveUsers())
+                {
+                    Clients.Client(user.ConnectionId).RemoveQuestion(questionId);
+                }
+                Clients.Client(u.ConnectionId).SetLayout(1);
             }
         }
 
@@ -246,46 +265,26 @@ namespace WhoNeedsHelp
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            User u = Users[Context.ConnectionId];
-            Debug.WriteLine("Disconnected: " + Context.ConnectionId);
-            var channelsToClear = from channel in Channels.Values
-                where channel.Administrator == u
-                select channel;
-            var ctc = channelsToClear.ToList();
-            for (int i = 0; i < ctc.Count(); i++)
+            if (Users.ContainsKey(Context.ConnectionId))
             {
-                ExitChannel(ctc[i].ChannelId);
+                User u = Users[Context.ConnectionId];
+                Debug.WriteLine("Disconnected: " + Context.ConnectionId);
+                var channelsToClear = from channel in Channels.Values
+                    where channel.Administrator == u
+                    select channel;
+                var ctc = channelsToClear.ToList();
+                for (int i = 0; i < ctc.Count(); i++)
+                {
+                    ExitChannel(ctc[i].ChannelId);
+                }
+                Users.Remove(Context.ConnectionId);
             }
-            Users.Remove(Context.ConnectionId);
             return base.OnDisconnected(stopCalled);
         }
 
         public override Task OnReconnected()
         {
-            Clients.Caller.Log("Reconnected");
-            Debug.WriteLine("Reconnected: " + Context.ConnectionId);
-            if (!Users.ContainsKey(Context.ConnectionId))
-            {
-                Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId});
-            }
-
-            var channels = from channel in Channels.Values
-                where channel.Users.ContainsKey(Context.ConnectionId)
-                orderby channel.ChannelName
-                select channel;
-            var cs = channels.ToList();
-            List<string> channelNames = new List<string>(), channelIds = new List<string>();
-            foreach (Channel c in cs)
-            {
-                channelNames.Add(c.ChannelName);
-                channelIds.Add(c.ChannelId);
-            }
-
-            Clients.Caller.ListChannels(channelNames.ToArray(), channelIds.ToArray(),
-                Users[Context.ConnectionId].CurrentChannel != null
-                    ? Users[Context.ConnectionId].CurrentChannel.ChannelId
-                    : null);
-            Clients.Caller.GetUsername();
+            Clients.Caller.ReloadPage();
 
             return base.OnReconnected();
         }
@@ -305,9 +304,9 @@ namespace WhoNeedsHelp
         void ChannelsFound(string[] channelId, string[] channelName);
         void SetChannel(string channel);
         void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
-        void ListChannels(string[] channelNames, string[] channelIds, string activeChannelId);
-        void GetUsername();
         void SendQuestion(string question);
         void UpdateQuestion(string question, string questionId);
+        void ReloadPage();
+        void SetLayout(int layout);
     }
 }

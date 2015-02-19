@@ -147,8 +147,10 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     for (var i = 0; i < questionIds.length; i++) {
         var html = "";
         if (admin) {
-            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
+            console.log("Admin");
+            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\"  aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
         } else {
+            console.log("not admin");
             html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
         }
         if (questions[i] === "") {
@@ -167,7 +169,7 @@ chat.client.addQuestion = function(username, question, questionId, admin) {
     var helpList = $("#HelpList");
     var html = "";
     if (admin) {
-        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div>{0}</div>";
+        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\" aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + username + "</h3></div>{0}</div>";
     } else {
         html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionId + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + username + "</h3></div>{0}</div>";
     }
@@ -190,6 +192,14 @@ chat.client.removeQuestion = function(questionId) {
     element.hide("blind", function() {
         element.remove();
     });
+}
+
+chat.client.reloadPage = function() {
+    location.reload(true);
+}
+
+chat.client.setLayout = function(layout) {
+    setQuestionLayout(layout);
 }
 
 var setQuestionLayout = function(layout) {
@@ -219,14 +229,14 @@ var setQuestionLayout = function(layout) {
 var showId = function(id, timeout) {
     $("#" + id).delay(timeout).show("drop", {"direction": "up"});
 }
-    
-$.connection.hub.start().done(function () {
+
+$.connection.hub.start().done(function() {
     console.log("connected");
     fetchTables = function() {
         chat.server.getData(1);
     }
 
-    $(document).on("click", "span.channel-remove", function () {
+    $(document).on("click", "span.channel-remove", function() {
         var tmpid = $(this).parent().attr("id");
         chat.server.send("4", tmpid);
     });
@@ -243,6 +253,12 @@ $.connection.hub.start().done(function () {
         var tmpid = $(this).attr("id");
         console.log(tmpid);
         chat.server.send("7", tmpid);
+    });
+
+    $(document).on("click", "#closeBox", function(){
+        var tmpid = $(this).parent().parent().attr("id");
+        console.log(tmpid);
+        chat.server.send("8", tmpid);
     });
 });
 

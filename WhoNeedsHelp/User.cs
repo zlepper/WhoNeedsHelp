@@ -61,5 +61,10 @@ namespace WhoNeedsHelp
         {
             Questions.Remove(CurrentChannel);
         }
+
+        public void RemoveQuestion(Channel c)
+        {
+            Questions.Remove(c);
+        }
     }
 }
