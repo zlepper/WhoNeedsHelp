@@ -175,6 +175,10 @@ namespace WhoNeedsHelp
                 else
                 {
                     c.RemoveUser(u);
+                    if (c.UsersRequestingHelp.Contains(u))
+                    {
+                        c.UsersRequestingHelp.Remove(u);
+                    }
                     Clients.Caller.ExitChannel(c.ChannelId);
                     int activeUsers = c.GetActiveUserCount();
                     foreach (string connectionId in Channels[channelId].Users.Keys)
