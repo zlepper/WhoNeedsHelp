@@ -64,6 +64,24 @@ chat.client.updateChannelCount = function(activeUsers, connectedUsers, channelId
     $("a#" + channelId + " .badge").html(badge);
 }
 
+chat.client.updateQuestion = function (question, questionId) {
+    console.log("updating question");
+    var panel = $("#" + questionId + " .panel-body");
+    if (question === "") {
+        panel.hide("blind", function() {
+            $(this).remove();
+        });
+    } else {
+        if (panel.length > 0) {
+            panel.html(question);
+        } else {
+            var html = "<div style=\"display: none;\" class=\"panel-body\">" + question + "</div>";
+            $("#" + questionId).append(html);
+            $("#" + questionId + " .panel-body").show("blind");
+        }
+    }
+}
+
 chat.client.errorChannelAlreadyMade = function() {
     alert("This channel already exists");
 }
@@ -270,8 +288,11 @@ $(document).ready(function () {
         chat.server.getData(1);
     });
 
-    $("#newQuestionForm").submit(function() {
+    $("#newQuestionSubmit").click(function () {
+        console.log("submit");
         var question = $("#newQuestionText").val();
-
+        console.log(question);
+        chat.server.send("9", question);
+        $("#changeQuestionModal").modal("hide");
     });
 });

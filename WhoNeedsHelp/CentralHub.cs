@@ -60,9 +60,10 @@ namespace WhoNeedsHelp
         {
             User u = Users[Context.ConnectionId];
             u.UpdateQuestion(u.CurrentChannel, question);
+            string questionId = u.ConnectionId + "-" + u.CurrentChannel.ChannelId;
             foreach (User user in u.CurrentChannel.GetActiveUsers())
             {
-                
+                Clients.Client(user.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(question) ? "" : question, questionId);
             }
         }
 
@@ -231,10 +232,7 @@ namespace WhoNeedsHelp
         {
             string question = Users[Context.ConnectionId].GetQuestion(Users[Context.ConnectionId].CurrentChannel);
             Debug.WriteLine(question);
-            if (!String.IsNullOrWhiteSpace(question))
-            {
-                Clients.Caller.SendQuestion(question);
-            }
+            Clients.Caller.SendQuestion(String.IsNullOrWhiteSpace(question) ? "" : question);
         }
 
         public override Task OnConnected()
