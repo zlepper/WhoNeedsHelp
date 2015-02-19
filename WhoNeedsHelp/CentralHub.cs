@@ -49,6 +49,20 @@ namespace WhoNeedsHelp
                     // Param are ignored
                     RemoveQuestion();
                     break;
+                case "9":
+                    // Param are the new question
+                    ChangeQuestion(parameters);
+                    break;
+            }
+        }
+
+        private void ChangeQuestion(string question)
+        {
+            User u = Users[Context.ConnectionId];
+            u.UpdateQuestion(u.CurrentChannel, question);
+            foreach (User user in u.CurrentChannel.GetActiveUsers())
+            {
+                
             }
         }
 
@@ -216,6 +230,7 @@ namespace WhoNeedsHelp
         private void GetQuestion()
         {
             string question = Users[Context.ConnectionId].GetQuestion(Users[Context.ConnectionId].CurrentChannel);
+            Debug.WriteLine(question);
             if (!String.IsNullOrWhiteSpace(question))
             {
                 Clients.Caller.SendQuestion(question);
@@ -295,5 +310,6 @@ namespace WhoNeedsHelp
         void ListChannels(string[] channelNames, string[] channelIds, string activeChannelId);
         void GetUsername();
         void SendQuestion(string question);
+        void UpdateQuestion(string question, string questionId);
     }
 }

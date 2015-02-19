@@ -68,7 +68,8 @@ chat.client.errorChannelAlreadyMade = function() {
     alert("This channel already exists");
 }
 
-chat.client.sendQuestion = function(question) {
+chat.client.sendQuestion = function (question) {
+    console.log(question);
     $("#newQuestionText").val(question);
 }
 
@@ -267,5 +268,10 @@ $(document).ready(function () {
         $("#changeQuestionModal").modal("show");
         $("#newQuestionText").focus();
         chat.server.getData(1);
+    });
+
+    $("#newQuestionForm").submit(function() {
+        var question = $("#newQuestionText").val();
+
     });
 });

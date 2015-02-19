@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.UI.WebControls.Expressions;
 
 namespace WhoNeedsHelp
 {
@@ -36,12 +37,22 @@ namespace WhoNeedsHelp
         private void AskQuestion(Channel c, string question)
         {
             if (Questions.ContainsKey(c)) return;
-            Questions.Add(c, String.IsNullOrWhiteSpace(question) ? null : "");
+            Questions.Add(c, String.IsNullOrWhiteSpace(question) ? "" : question);
         }
 
+        /// <summary>
+        /// Updates the question for the selected channel
+        /// </summary>
+        /// <param name="c">The channel to change question in</param>
+        /// <param name="question">The question to change to</param>
+        /// <returns>true if the question was changed. false if the question was added</returns>
         public bool UpdateQuestion(Channel c, string question)
         {
-            if (!Questions.ContainsKey(c)) return false;
+            if (!Questions.ContainsKey(c))
+            {
+                Questions.Add(c, String.IsNullOrWhiteSpace(question) ? "" : question);
+                return false;
+            }
             Questions[c] = question;
             return true;
         }

@@ -28,10 +28,10 @@
                         <h4 class="modal-title">Navn</h4>
                     </div>
                     <div class="modal-body">
-                        <form onsubmit="return false;" id="usernameModalForm">
+                        <form onsubmit=" return false; " id="usernameModalForm">
                             <div class="form-group" id="usernameGroup">
                                 <label for="usernameModal">Navn</label>
-                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
+                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Start</button>
@@ -50,12 +50,16 @@
                         <h4 class="modal-title">Nyt Spørgsmål</h4>
                     </div>
                     <div class="modal-body">
-                        <label for="newQuestionText"></label>
-                        <input type="text" class="form-control" id="newQuestionText"/>
+                        <form onsubmit=" return false; " id="newQuestionForm">
+                            <div class="form-group">
+                                <label for="newQuestionText"></label>
+                                <input type="text" class="form-control" id="newQuestionText" />
+                            </div>
+                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Luk</button>
-                        <button type="button" class="btn btn-primary">Rediger</button>
+                        <input form="newQuestionForm" type="submit" class="btn btn-primary" value="Rediger"/>
                     </div>
                 </div> <!--</modal-content>-->
             </div> <!--</modal-dialog>-->
