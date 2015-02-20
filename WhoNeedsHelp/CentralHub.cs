@@ -54,6 +54,25 @@ namespace WhoNeedsHelp
                     // Param are the new question
                     ChangeQuestion(parameters);
                     break;
+                case "10":
+                    // Param should be the new message
+                    Chat(parameters);
+                    break;
+            }
+        }
+
+        private void Chat(string message)
+        {
+            if (String.IsNullOrWhiteSpace(message)) return;
+            User u = Users[Context.ConnectionId];
+            Channel c = u.CurrentChannel;
+            ChatMessage chatMessage = c.AddChatMessage(u, message);
+            if (chatMessage != null)
+            {
+                foreach (User user in c.GetActiveUsers())
+                {
+                    Clients.Client(user.ConnectionId).SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), user.Name, chatMessage.Author == user || c.Administrator == user, c.appendMessageToLast(chatMessage));
+                }
             }
         }
 
@@ -312,5 +331,7 @@ namespace WhoNeedsHelp
         void UpdateQuestion(string question, string questionId);
         void ReloadPage();
         void SetLayout(int layout);
+        void SendChatMessage(string text, string time, string author, bool sender, bool appendToLast);
+        void SendChatMessages(string[] text, string[] time, string[] author, bool[] sender, bool[] appendToLast);
     }
 }

@@ -12,7 +12,7 @@ namespace WhoNeedsHelp
         public readonly User Administrator;
         public string ChannelName;
         public string ChannelId;
-        public List<string> chatMessages = new List<string>(); 
+        public List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
 
         public Channel(User u)
         {
@@ -74,6 +74,23 @@ namespace WhoNeedsHelp
             {
                 Users.Remove(u.ConnectionId);
             }
+        }
+
+        public ChatMessage AddChatMessage(User author, string text)
+        {
+            if (!String.IsNullOrWhiteSpace(text))
+            {
+                ChatMessage message = new ChatMessage(text, author);
+                ChatMessages.Add(message);
+                return message;
+            }
+            return null;
+        }
+
+        public bool appendMessageToLast(ChatMessage message)
+        {
+            ChatMessage lastChatMessage = ChatMessages[ChatMessages.Count - 2];
+            return lastChatMessage.Author == message.Author;
         }
     }
 }

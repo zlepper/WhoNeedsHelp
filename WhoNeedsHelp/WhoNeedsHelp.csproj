@@ -148,14 +148,10 @@
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
     <Compile Include="Channel.cs" />
-    <Compile Include="ChannelHandler.cs" />
-    <Compile Include="ChannelHub.cs" />
-    <Compile Include="ChatHandler.cs" />
     <Compile Include="ChatMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="User.cs" />
-    <Compile Include="UserHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

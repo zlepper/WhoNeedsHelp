@@ -18,9 +18,11 @@ namespace WhoNeedsHelp
             this.DateTime = dt;
         }
 
-        public ChatMessage()
+        public ChatMessage(string text, User user)
         {
-
+            this.Text = text;
+            this.Author = user;
+            this.DateTime = DateTime.Now;
         }
     }
 }

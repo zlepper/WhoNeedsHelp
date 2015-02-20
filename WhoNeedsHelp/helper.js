@@ -202,6 +202,10 @@ chat.client.setLayout = function(layout) {
     setQuestionLayout(layout);
 }
 
+chat.client.sendChatMessage = function(text, time, author, sender) {
+    
+}
+
 var setQuestionLayout = function(layout) {
     switch (layout) {
         // Standard Layout
@@ -228,6 +232,11 @@ var setQuestionLayout = function(layout) {
 
 var showId = function(id, timeout) {
     $("#" + id).delay(timeout).show("drop", {"direction": "up"});
+}
+
+var isNullOrWhitespace = function(input) {
+    if (typeof input === "undefined" || input == null) return true;
+    return input.replace(/\s/g, "").length < 1;
 }
 
 $.connection.hub.start().done(function() {
@@ -310,5 +319,12 @@ $(document).ready(function () {
         console.log(question);
         chat.server.send("9", question);
         $("#changeQuestionModal").modal("hide");
+    });
+
+    $("#chatForm").submit(function() {
+        var message = $("#chatMessageInput").val();
+        if (!isNullOrWhitespace(message)) {
+            chat.serverS.send("10");
+        }
     });
 });
