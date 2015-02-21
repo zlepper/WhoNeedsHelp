@@ -3,6 +3,7 @@
 /// <reference path="Client/IServer.ts"/>
 /// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="Scripts/typings/jqueryui/jqueryui.d.ts"/>
+
 "use strict";
 // The pattern for the username
 var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
@@ -11,10 +12,10 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 // In this case the CentralHub which handles this application.
 var chat = $.connection.centralHub;
 var fetchTables;
-
 //var setUserName;
 //var setUserName2;
 //var validate;
+
 var setUserName2 = function () {
     var input = $("#usernameModalInput");
     var name = input.val();
@@ -26,7 +27,7 @@ var setUserName2 = function () {
     $("#usernameModal").modal("hide");
     $("#SearchChannelName").focus();
     return false;
-};
+}
 
 var validate = function () {
     var t = $("#usernameModalInput").val();
@@ -35,18 +36,18 @@ var validate = function () {
     } else {
         $("#usernameGroup").addClass("has-error").removeClass("has-success");
     }
-};
+}
 
 chat.client.log = function (text) {
     console.log(text);
-};
+}
 
 chat.client.appendChannel = function (channelname, channelid) {
     var html = "<a href='#' style='display: none;' id='" + channelid + "' class='list-group-item'><span class='glyphicon glyphicon-remove text-danger channel-remove'></span><span class='badge'>0/0</span> " + channelname + "</a>";
     $("#ChannelList").append(html);
     $("#" + channelid).show("blind");
     chat.server.send("7", channelid);
-};
+}
 
 chat.client.setChannel = function (channel, areUserQuestioning) {
     $("#CurrentChannelId").html(channel);
@@ -61,12 +62,12 @@ chat.client.setChannel = function (channel, areUserQuestioning) {
         console.log("User are not questing");
         setQuestionLayout(1);
     }
-};
+}
 
 chat.client.updateChannelCount = function (activeUsers, connectedUsers, channelId) {
     var badge = activeUsers + "/" + connectedUsers;
     $("a#" + channelId + " .badge").html(badge);
-};
+}
 
 chat.client.updateQuestion = function (question, questionId) {
     console.log("updating question");
@@ -84,20 +85,20 @@ chat.client.updateQuestion = function (question, questionId) {
             $("#" + questionId + " .panel-body").show("blind");
         }
     }
-};
+}
 
 chat.client.errorChannelAlreadyMade = function () {
     alert("This channel already exists");
-};
+}
 
 chat.client.sendQuestion = function (question) {
     console.log(question);
     $("#newQuestionText").val(question);
-};
+}
 
 chat.client.exitChannel = function (e) {
     var tmpid = $("#" + e);
-    tmpid.hide("blind", function () {
+    tmpid.hide("blind", () => {
         tmpid.remove();
         var id = $("#ChannelList a:first-child").attr("id");
         console.log(tmpid);
@@ -113,7 +114,7 @@ chat.client.exitChannel = function (e) {
             chat.server.send("7", id);
         }
     });
-};
+}
 
 chat.client.channelsFound = function (ids, names) {
     var resultList = $("#SearchChannelResults");
@@ -125,7 +126,7 @@ chat.client.channelsFound = function (ids, names) {
         resultList.append(html);
         $("#" + ids[i]).show("clip");
     }
-};
+}
 
 chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     var helpList = $("#HelpList");
@@ -133,25 +134,25 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     for (var i = 0; i < questionIds.length; i++) {
         /*var html = "";
         if (admin) {
-        console.log("Admin");
-        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\"  aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
+            console.log("Admin");
+            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\"  aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
         } else {
-        console.log("not admin");
-        html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
+            console.log("not admin");
+            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
         }
         if (questions[i] === "") {
-        html = html.replace("{0}", "");
+            html = html.replace("{0}", "");
         } else {
-        html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
+            html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
         }*/
-        var span, button = $();
+        var span, button: JQuery = $();
         if (admin) {
             span = $("<span />").attr("aria-hidden", "true").html("&times;");
             button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeBox").attr("aria-label", "luk").html(span);
         }
         var h3 = $("<h3 />").addClass("panel-title").text(usernames[i]).prop("outerHTML");
         var heading = $("<div />").addClass("panel-heading").html(h3).prepend(button).prop("outerHTML");
-        var body = $();
+        var body: JQuery = $();
         if (!isNullOrWhitespace(questions[i])) {
             body = $("<div />").addClass("panel-body").text(questions[i]).prop("outerHTML");
         }
@@ -160,7 +161,7 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
         var timeout = 200 * i;
         setTimeout(showId(questionIds[i], timeout));
     }
-};
+}
 
 chat.client.addQuestion = function (username, question, questionId, admin) {
     var helpList = $("#HelpList");
@@ -178,11 +179,11 @@ chat.client.addQuestion = function (username, question, questionId, admin) {
     var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionId).html(heading).append(body);
     helpList.append(html);
     $("#" + questionId).show("blind");
-};
+}
 
 chat.client.userAreQuesting = function () {
     setQuestionLayout(3);
-};
+}
 
 chat.client.removeQuestion = function (questionId) {
     var element = $("#" + questionId);
@@ -190,41 +191,43 @@ chat.client.removeQuestion = function (questionId) {
     element.hide("blind", function () {
         element.remove();
     });
-};
+}
 
 chat.client.reloadPage = function () {
     location.reload(true);
-};
+}
 
 chat.client.setLayout = function (layout) {
     setQuestionLayout(layout);
-};
+}
 
 chat.client.sendChatMessage = function (text, time, author, sender) {
     if (sender) {
+        
     }
-};
+}
 
 chat.client.checkVersion = function (version) {
     if (version !== 1) {
         location.reload(true);
     }
-};
+}
 
 var setQuestionLayout = function (layout) {
     switch (layout) {
+        // Standard Layout
         case 1:
             $("#requestingHelp").hide();
             $("#noChannelsSelected").hide();
             $("#requestHelpForm").show();
             break;
-
+        // No channel selected
         case 2:
             $("#requestingHelp").hide();
             $("#noChannelsSelected").show();
             $("#requestHelpForm").hide();
             break;
-
+        // Have question in current channel
         case 3:
             $("#requestingHelp").show();
             $("#noChannelsSelected").hide();
@@ -232,17 +235,16 @@ var setQuestionLayout = function (layout) {
             break;
         default:
     }
-};
+}
 
 var showId = function (id, timeout) {
     jQuery("#" + id).delay(timeout).show("drop", { "direction": "up" });
-};
+}
 
 var isNullOrWhitespace = function (input) {
-    if (typeof input === "undefined" || input == null)
-        return true;
+    if (typeof input === "undefined" || input == null) return true;
     return input.replace(/\s/g, "").length < 1;
-};
+}
 
 $.connection.hub.start().done(function () {
     console.log("connected");
@@ -275,15 +277,14 @@ $.connection.hub.start().done(function () {
 });
 
 $(document).ready(function () {
-    setInterval(function () {
+    setInterval(function() {
         chat.server.getData(2);
     }, 1000 * 60 * 10);
-
     // Show the get username modal
     $("#usernameModal").modal("show");
     $("#usernameModalInput").focus();
-
     //$("#modalForm").submit(function () {
+
     $("#usernameModalForm").submit(function () {
         setUserName2();
     });
@@ -333,5 +334,4 @@ $(document).ready(function () {
             chat.server.send("10", message);
         }
     });
-});
-//# sourceMappingURL=helper.js.map
+}); 

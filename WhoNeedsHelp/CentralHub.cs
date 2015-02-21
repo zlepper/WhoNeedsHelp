@@ -134,7 +134,7 @@ namespace WhoNeedsHelp
             {
                 Channel c = Channels[channelId];
                 u.CurrentChannel = c;
-                Clients.Caller.SetChannel(channelId);
+                Clients.Caller.SetChannel(channelId, u.AreUserQuestioning(c));
                 activeUsers = c.GetActiveUserCount();
                 foreach (KeyValuePair<string, User> userPair in c.Users)
                 {
@@ -267,6 +267,10 @@ namespace WhoNeedsHelp
                     // Request question text in current channel
                     GetQuestion();
                     break;
+                case 2:
+                    // Request a version number from the server
+                    Clients.Caller.CheckVersion(1);
+                    break;
             }
         }
 
@@ -313,25 +317,5 @@ namespace WhoNeedsHelp
         }
 
 
-    }
-
-    public interface IClient
-    {
-        void AppendChannel(string channelname, string channelid);
-        void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
-        void AddQuestion(string username, string question, string questionId, bool admin = false);
-        void RemoveQuestion(string questionId);
-        void ErrorChannelAlreadyMade();
-        void Log(string text);
-        void ExitChannel(string channelId);
-        void ChannelsFound(string[] channelId, string[] channelName);
-        void SetChannel(string channel);
-        void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
-        void SendQuestion(string question);
-        void UpdateQuestion(string question, string questionId);
-        void ReloadPage();
-        void SetLayout(int layout);
-        void SendChatMessage(string text, string time, string author, bool sender, bool appendToLast);
-        void SendChatMessages(string[] text, string[] time, string[] author, bool[] sender, bool[] appendToLast);
     }
 }

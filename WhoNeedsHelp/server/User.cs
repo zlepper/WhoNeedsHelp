@@ -66,5 +66,10 @@ namespace WhoNeedsHelp
         {
             Questions.Remove(c);
         }
+
+        public bool AreUserQuestioning(Channel c)
+        {
+            return Questions.ContainsKey(c);
+        }
     }
 }
