@@ -89,8 +89,12 @@ namespace WhoNeedsHelp
 
         public bool appendMessageToLast(ChatMessage message)
         {
-            ChatMessage lastChatMessage = ChatMessages[ChatMessages.Count - 2];
-            return lastChatMessage.Author == message.Author;
+            if (ChatMessages.Count > 1)
+            {
+                ChatMessage lastChatMessage = ChatMessages[ChatMessages.Count - 2];
+                return lastChatMessage.Author == message.Author;
+            }
+            return false;
         }
     }
 }

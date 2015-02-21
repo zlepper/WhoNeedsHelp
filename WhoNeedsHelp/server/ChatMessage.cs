@@ -24,5 +24,10 @@ namespace WhoNeedsHelp
             this.Author = user;
             this.DateTime = DateTime.Now;
         }
+
+        public string GetMessageId()
+        {
+            return Author.ConnectionId + "-" + DateTime.Millisecond;
+        }
     }
 }

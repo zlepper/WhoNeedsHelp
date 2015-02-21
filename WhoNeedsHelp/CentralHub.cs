@@ -63,15 +63,21 @@ namespace WhoNeedsHelp
 
         private void Chat(string message)
         {
-            if (String.IsNullOrWhiteSpace(message)) return;
             User u = Users[Context.ConnectionId];
-            Channel c = u.CurrentChannel;
-            ChatMessage chatMessage = c.AddChatMessage(u, message);
-            if (chatMessage != null)
+            if (u.CurrentChannel != null)
             {
-                foreach (User user in c.GetActiveUsers())
+                if (String.IsNullOrWhiteSpace(message)) return;
+                Channel c = u.CurrentChannel;
+                ChatMessage chatMessage = c.AddChatMessage(u, message);
+                if (chatMessage != null)
                 {
-                    Clients.Client(user.ConnectionId).SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), user.Name, chatMessage.Author == user || c.Administrator == user, c.appendMessageToLast(chatMessage));
+                    foreach (User user in c.GetActiveUsers())
+                    {
+                        Clients.Client(user.ConnectionId)
+                            .SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), user.Name,
+                                chatMessage.GetMessageId(), chatMessage.Author == u, c.appendMessageToLast(chatMessage),
+                                chatMessage.Author == user || c.Administrator == user);
+                    }
                 }
             }
         }

@@ -201,9 +201,28 @@ chat.client.setLayout = layout => {
     setQuestionLayout(layout);
 }
 
-chat.client.sendChatMessage = (text, time, author, sender) => {
-    if (sender) {
+chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLast, canEdit) => {
+    var span, button = $();
+    if (canEdit) {
+        span = $("<span />").attr("aria-hidden", "true").html("&times;");
+        button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
+    }
+    var p: JQuery = $("<p />").text(text).attr("id", messageId).prepend(button);
+    if (appendToLast) {
+        var location: JQuery = $(".chat li:last-child div");
+        location.append(p);
+    } else {
         
+        var strong: JQuery = $("<strong />").addClass("pull-right").addClass("primary-font").text(author);
+        var header: JQuery = $("<div />").addClass("header").append(strong);
+        var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
+        var li: JQuery = $("<li />").addClass("clearfix").append(chatBody);
+        if (sender) {
+            li = li.addClass("left");
+        } else {
+            li = li.addClass("right");
+        }
+        $(".chat").append(li);
     }
 }
 
@@ -216,24 +235,24 @@ chat.client.checkVersion = version => {
 var setQuestionLayout = layout => {
     switch (layout) {
         // Standard Layout
-    case 1:
-        $("#requestingHelp").hide();
-        $("#noChannelsSelected").hide();
-        $("#requestHelpForm").show();
-        break;
-    // No channel selected
-    case 2:
-        $("#requestingHelp").hide();
-        $("#noChannelsSelected").show();
-        $("#requestHelpForm").hide();
-        break;
-    // Have question in current channel
-    case 3:
-        $("#requestingHelp").show();
-        $("#noChannelsSelected").hide();
-        $("#requestHelpForm").hide();
-        break;
-    default:
+        case 1:
+            $("#requestingHelp").hide();
+            $("#noChannelsSelected").hide();
+            $("#requestHelpForm").show();
+            break;
+        // No channel selected
+        case 2:
+            $("#requestingHelp").hide();
+            $("#noChannelsSelected").show();
+            $("#requestHelpForm").hide();
+            break;
+        // Have question in current channel
+        case 3:
+            $("#requestingHelp").show();
+            $("#noChannelsSelected").hide();
+            $("#requestHelpForm").hide();
+            break;
+        default:
     }
 }
 
@@ -330,6 +349,7 @@ $(document).ready(() => {
 
     $("#chatForm").submit(() => {
         var message = $("#chatMessageInput").val();
+        console.log(message);
         if (!isNullOrWhitespace(message)) {
             chat.server.send("10", message);
         }

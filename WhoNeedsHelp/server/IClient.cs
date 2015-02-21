@@ -16,7 +16,7 @@ namespace WhoNeedsHelp
         void UpdateQuestion(string question, string questionId);
         void ReloadPage();
         void SetLayout(int layout);
-        void SendChatMessage(string text, string time, string author, bool sender, bool appendToLast);
+        void SendChatMessage(string text, string time, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
         void SendChatMessages(string[] text, string[] time, string[] author, bool[] sender, bool[] appendToLast);
         void CheckVersion(int version);
     }

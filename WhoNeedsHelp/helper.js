@@ -200,8 +200,27 @@ chat.client.setLayout = function (layout) {
     setQuestionLayout(layout);
 };
 
-chat.client.sendChatMessage = function (text, time, author, sender) {
-    if (sender) {
+chat.client.sendChatMessage = function (text, time, author, messageId, sender, appendToLast, canEdit) {
+    var span, button = $();
+    if (canEdit) {
+        span = $("<span />").attr("aria-hidden", "true").html("&times;");
+        button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
+    }
+    var p = $("<p />").text(text).attr("id", messageId).prepend(button);
+    if (appendToLast) {
+        var location = $(".chat li:last-child div");
+        location.append(p);
+    } else {
+        var strong = $("<strong />").addClass("pull-right").addClass("primary-font").text(author);
+        var header = $("<div />").addClass("header").append(strong);
+        var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
+        var li = $("<li />").addClass("clearfix").append(chatBody);
+        if (sender) {
+            li = li.addClass("left");
+        } else {
+            li = li.addClass("right");
+        }
+        $(".chat").append(li);
     }
 };
 
@@ -329,6 +348,7 @@ $(document).ready(function () {
 
     $("#chatForm").submit(function () {
         var message = $("#chatMessageInput").val();
+        console.log(message);
         if (!isNullOrWhitespace(message)) {
             chat.server.send("10", message);
         }
