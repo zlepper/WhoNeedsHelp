@@ -29,7 +29,7 @@ var setUserName2 = function () {
     return false;
 }
 
-var validate = function () {
+var validate = () => {
     var t = $("#usernameModalInput").val();
     if (patt.test(t)) {
         $("#usernameGroup").addClass("has-success").removeClass("has-error");
@@ -38,21 +38,21 @@ var validate = function () {
     }
 }
 
-chat.client.log = function (text) {
+chat.client.log = text => {
     console.log(text);
 }
 
-chat.client.appendChannel = function (channelname, channelid) {
+chat.client.appendChannel = (channelname, channelid) => {
     var html = "<a href='#' style='display: none;' id='" + channelid + "' class='list-group-item'><span class='glyphicon glyphicon-remove text-danger channel-remove'></span><span class='badge'>0/0</span> " + channelname + "</a>";
     $("#ChannelList").append(html);
     $("#" + channelid).show("blind");
     chat.server.send("7", channelid);
 }
 
-chat.client.setChannel = function (channel, areUserQuestioning) {
+chat.client.setChannel = (channel, areUserQuestioning) => {
     $("#CurrentChannelId").html(channel);
     $("div#ChannelList > a").stop().removeClass("active").attr("style", "");
-    setTimeout(function () {
+    setTimeout(() => {
         $("#" + channel).addClass("active", 400);
     }, 100);
     if (areUserQuestioning) {
@@ -64,12 +64,12 @@ chat.client.setChannel = function (channel, areUserQuestioning) {
     }
 }
 
-chat.client.updateChannelCount = function (activeUsers, connectedUsers, channelId) {
+chat.client.updateChannelCount = (activeUsers, connectedUsers, channelId) => {
     var badge = activeUsers + "/" + connectedUsers;
     $("a#" + channelId + " .badge").html(badge);
 }
 
-chat.client.updateQuestion = function (question, questionId) {
+chat.client.updateQuestion = (question, questionId) => {
     console.log("updating question");
     var panel = $("#" + questionId + " .panel-body");
     if (question === "") {
@@ -87,16 +87,16 @@ chat.client.updateQuestion = function (question, questionId) {
     }
 }
 
-chat.client.errorChannelAlreadyMade = function () {
+chat.client.errorChannelAlreadyMade = () => {
     alert("This channel already exists");
 }
 
-chat.client.sendQuestion = function (question) {
+chat.client.sendQuestion = question => {
     console.log(question);
     $("#newQuestionText").val(question);
 }
 
-chat.client.exitChannel = function (e) {
+chat.client.exitChannel = e => {
     var tmpid = $("#" + e);
     tmpid.hide("blind", () => {
         tmpid.remove();
@@ -116,7 +116,7 @@ chat.client.exitChannel = function (e) {
     });
 }
 
-chat.client.channelsFound = function (ids, names) {
+chat.client.channelsFound = (ids, names) => {
     var resultList = $("#SearchChannelResults");
 
     for (var i = 0; i < ids.length; i++) {
@@ -128,7 +128,7 @@ chat.client.channelsFound = function (ids, names) {
     }
 }
 
-chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
+chat.client.addQuestions = (usernames, questions, questionIds, admin) => {
     var helpList = $("#HelpList");
     helpList.empty();
     for (var i = 0; i < questionIds.length; i++) {
@@ -163,7 +163,7 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     }
 }
 
-chat.client.addQuestion = function (username, question, questionId, admin) {
+chat.client.addQuestion = (username, question, questionId, admin) => {
     var helpList = $("#HelpList");
     var span, button = $();
     if (admin) {
@@ -181,72 +181,72 @@ chat.client.addQuestion = function (username, question, questionId, admin) {
     $("#" + questionId).show("blind");
 }
 
-chat.client.userAreQuesting = function () {
+chat.client.userAreQuesting = () => {
     setQuestionLayout(3);
 }
 
-chat.client.removeQuestion = function (questionId) {
+chat.client.removeQuestion = questionId => {
     var element = $("#" + questionId);
     console.log(questionId);
-    element.hide("blind", function () {
+    element.hide("blind", () => {
         element.remove();
     });
 }
 
-chat.client.reloadPage = function () {
+chat.client.reloadPage = () => {
     location.reload(true);
 }
 
-chat.client.setLayout = function (layout) {
+chat.client.setLayout = layout => {
     setQuestionLayout(layout);
 }
 
-chat.client.sendChatMessage = function (text, time, author, sender) {
+chat.client.sendChatMessage = (text, time, author, sender) => {
     if (sender) {
         
     }
 }
 
-chat.client.checkVersion = function (version) {
+chat.client.checkVersion = version => {
     if (version !== 1) {
         location.reload(true);
     }
 }
 
-var setQuestionLayout = function (layout) {
+var setQuestionLayout = layout => {
     switch (layout) {
         // Standard Layout
-        case 1:
-            $("#requestingHelp").hide();
-            $("#noChannelsSelected").hide();
-            $("#requestHelpForm").show();
-            break;
-        // No channel selected
-        case 2:
-            $("#requestingHelp").hide();
-            $("#noChannelsSelected").show();
-            $("#requestHelpForm").hide();
-            break;
-        // Have question in current channel
-        case 3:
-            $("#requestingHelp").show();
-            $("#noChannelsSelected").hide();
-            $("#requestHelpForm").hide();
-            break;
-        default:
+    case 1:
+        $("#requestingHelp").hide();
+        $("#noChannelsSelected").hide();
+        $("#requestHelpForm").show();
+        break;
+    // No channel selected
+    case 2:
+        $("#requestingHelp").hide();
+        $("#noChannelsSelected").show();
+        $("#requestHelpForm").hide();
+        break;
+    // Have question in current channel
+    case 3:
+        $("#requestingHelp").show();
+        $("#noChannelsSelected").hide();
+        $("#requestHelpForm").hide();
+        break;
+    default:
     }
 }
 
-var showId = function (id, timeout) {
+var showId = (id, timeout) => {
     jQuery("#" + id).delay(timeout).show("drop", { "direction": "up" });
 }
 
-var isNullOrWhitespace = function (input) {
+var isNullOrWhitespace = input => {
     if (typeof input === "undefined" || input == null) return true;
     return input.replace(/\s/g, "").length < 1;
 }
 
-$.connection.hub.start().done(function () {
+$.connection.hub.start().done(() => {
     console.log("connected");
     chat.server.getData(2);
 
@@ -276,8 +276,8 @@ $.connection.hub.start().done(function () {
     });
 });
 
-$(document).ready(function () {
-    setInterval(function() {
+$(document).ready(() => {
+    setInterval(() => {
         chat.server.getData(2);
     }, 1000 * 60 * 10);
     // Show the get username modal
@@ -285,17 +285,17 @@ $(document).ready(function () {
     $("#usernameModalInput").focus();
     //$("#modalForm").submit(function () {
 
-    $("#usernameModalForm").submit(function () {
+    $("#usernameModalForm").submit(() => {
         setUserName2();
     });
 
-    $("#requestHelpForm").submit(function () {
+    $("#requestHelpForm").submit(() => {
         var question = $("#question").val();
         chat.server.send("2", question);
         setQuestionLayout(3);
     });
 
-    $("#CreateChannelForm").submit(function () {
+    $("#CreateChannelForm").submit(() => {
         var channelName = $("#newChannelName").val();
         chat.server.send("3", channelName);
     });
@@ -308,19 +308,19 @@ $(document).ready(function () {
         }
     });
 
-    $("#removeQuestion").click(function () {
+    $("#removeQuestion").click(() => {
         chat.server.send("8", null);
         setQuestionLayout(1);
     });
 
-    $("#editQuestion").click(function () {
+    $("#editQuestion").click(() => {
         console.log("edit");
         $("#changeQuestionModal").modal("show");
         $("#newQuestionText").focus();
         chat.server.getData(1);
     });
 
-    $("#newQuestionSubmit").click(function () {
+    $("#newQuestionSubmit").click(() => {
         console.log("submit");
         var question = $("#newQuestionText").val();
         console.log(question);
@@ -328,7 +328,7 @@ $(document).ready(function () {
         $("#changeQuestionModal").modal("hide");
     });
 
-    $("#chatForm").submit(function () {
+    $("#chatForm").submit(() => {
         var message = $("#chatMessageInput").val();
         if (!isNullOrWhitespace(message)) {
             chat.server.send("10", message);
