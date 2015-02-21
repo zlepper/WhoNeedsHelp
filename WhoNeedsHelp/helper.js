@@ -206,12 +206,15 @@ chat.client.sendChatMessage = function (text, time, author, messageId, sender, a
         span = $("<span />").attr("aria-hidden", "true").html("&times;");
         button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
     }
-    var p = $("<p />").text(text).attr("id", messageId).prepend(button);
+    var intter = $("<p />").text(text).prop("outerHTML");
+    var p = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
+    console.log(p);
     if (appendToLast) {
-        var location = $(".chat li:last-child div");
+        var location = $(".chat li:last-child > div");
+        console.log(location);
         location.append(p);
     } else {
-        var strong = $("<strong />").addClass("pull-right").addClass("primary-font").text(author);
+        var strong = $("<strong />").addClass("primary-font").text(author);
         var header = $("<div />").addClass("header").append(strong);
         var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
         var li = $("<li />").addClass("clearfix").append(chatBody);
@@ -220,6 +223,7 @@ chat.client.sendChatMessage = function (text, time, author, messageId, sender, a
         } else {
             li = li.addClass("right");
         }
+        console.log(li);
         $(".chat").append(li);
     }
 };

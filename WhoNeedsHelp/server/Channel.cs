@@ -87,7 +87,7 @@ namespace WhoNeedsHelp
             return null;
         }
 
-        public bool appendMessageToLast(ChatMessage message)
+        public bool AppendMessageToLast(ChatMessage message)
         {
             if (ChatMessages.Count > 1)
             {

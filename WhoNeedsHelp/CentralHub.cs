@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNet.SignalR;
 
 namespace WhoNeedsHelp
@@ -74,8 +73,8 @@ namespace WhoNeedsHelp
                     foreach (User user in c.GetActiveUsers())
                     {
                         Clients.Client(user.ConnectionId)
-                            .SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), user.Name,
-                                chatMessage.GetMessageId(), chatMessage.Author == u, c.appendMessageToLast(chatMessage),
+                            .SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), u.Name,
+                                chatMessage.GetMessageId(), chatMessage.Author == user, c.AppendMessageToLast(chatMessage),
                                 chatMessage.Author == user || c.Administrator == user);
                     }
                 }
@@ -127,7 +126,7 @@ namespace WhoNeedsHelp
         private void ChangeToChannel(string channelId)
         {
             User u = Users[Context.ConnectionId];
-            int activeUsers = 0;
+            int activeUsers;
             if (u.CurrentChannel != null)
             {
                 activeUsers = u.CurrentChannel.GetActiveUserCount()-1;
@@ -136,7 +135,7 @@ namespace WhoNeedsHelp
                     Clients.Client(userPair.Key).UpdateChannelCount(activeUsers, u.CurrentChannel.Users.Count, u.CurrentChannel.ChannelId);
                 }
             }
-            if (Channels.ContainsKey(channelId))
+            if (!string.IsNullOrWhiteSpace(channelId) && Channels.ContainsKey(channelId))
             {
                 Channel c = Channels[channelId];
                 u.CurrentChannel = c;

@@ -207,13 +207,15 @@ chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLa
         span = $("<span />").attr("aria-hidden", "true").html("&times;");
         button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
     }
-    var p: JQuery = $("<p />").text(text).attr("id", messageId).prepend(button);
+    var intter = $("<p />").text(text).prop("outerHTML");
+    var p: JQuery = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
+    console.log(p);
     if (appendToLast) {
-        var location: JQuery = $(".chat li:last-child div");
+        var location: JQuery = $(".chat li:last-child > div");
+        console.log(location);
         location.append(p);
     } else {
-        
-        var strong: JQuery = $("<strong />").addClass("pull-right").addClass("primary-font").text(author);
+        var strong: JQuery = $("<strong />").addClass("primary-font").text(author);
         var header: JQuery = $("<div />").addClass("header").append(strong);
         var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
         var li: JQuery = $("<li />").addClass("clearfix").append(chatBody);
@@ -222,6 +224,7 @@ chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLa
         } else {
             li = li.addClass("right");
         }
+        console.log(li);
         $(".chat").append(li);
     }
 }

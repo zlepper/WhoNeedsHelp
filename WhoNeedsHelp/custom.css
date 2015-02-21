@@ -21,6 +21,7 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    max-height: 800px;
 }
 
     .chat li {
@@ -54,4 +55,8 @@
     resize: vertical;
     max-height: 200px;
     min-height: 2.5em;
+}
+
+.header {
+    display: block;
 }
