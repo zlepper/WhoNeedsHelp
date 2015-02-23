@@ -230,7 +230,12 @@ chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, ca
 }
 
 chat.client.removeChatMessage = messageId => {
-    
+    var message = $("#" + messageId);
+    var parent = message.parent().parent();
+    message.remove();
+    if (parent.length <= 1) {
+        parent.remove();
+    }
 }
 
 chat.client.sendChatMessages = (text, author, messageId, sender, appendToLast, canEdit) => {

@@ -229,6 +229,12 @@ chat.client.sendChatMessage = function (text, author, messageId, sender, appendT
 };
 
 chat.client.removeChatMessage = function (messageId) {
+    var message = $("#" + messageId);
+    var parent = message.parent().parent();
+    message.remove();
+    if (parent.length <= 1) {
+        parent.remove();
+    }
 };
 
 chat.client.sendChatMessages = function (text, author, messageId, sender, appendToLast, canEdit) {
