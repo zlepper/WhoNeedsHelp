@@ -58,15 +58,15 @@ namespace WhoNeedsHelp
                     Chat(parameters);
                     break;
                 case "11":
-                    RemoveMessage(parameters);
+                    RemoveChatMessage(parameters);
                     break;
             }
         }
 
-        private void RemoveMessage(string messageId)
+        private void RemoveChatMessage(string messageId)
         {
             Channel c = Users[Context.ConnectionId].CurrentChannel;
-            var messages = from message in c.ChatMessages
+            var messages = from message in c.ChatMessages.Values
                 where message.MessageId == messageId
                 select message;
             var messagesList = messages.ToList();
@@ -75,9 +75,12 @@ namespace WhoNeedsHelp
                 foreach (ChatMessage message in messagesList)
                 {
                     Clients.Client(user.ConnectionId).RemoveChatMessage(message.MessageId);
+                    c.ChatMessages.Remove(message.MessageId);
                 }
             }
+            
         }
+
 
         private void Chat(string message)
         {
@@ -188,7 +191,7 @@ namespace WhoNeedsHelp
                     questionIds.Add(user.ConnectionId + "-" + c.ChannelId);
                 }
                 Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), c.Administrator == u);
-                List<ChatMessage> chatMessages = c.ChatMessages;
+                List<ChatMessage> chatMessages = c.ChatMessages.Values.ToList();
                 List<string> textList = new List<string>();
                 List<string> authorList = new List<string>();
                 List<string> messageIdsList = new List<string>();

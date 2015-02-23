@@ -12,7 +12,8 @@ namespace WhoNeedsHelp
         public readonly User Administrator;
         public string ChannelName;
         public string ChannelId;
-        public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
+        public readonly  Dictionary<string, ChatMessage> ChatMessages = new Dictionary<string, ChatMessage>(); 
+        //public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
 
         public Channel(User u)
         {
@@ -81,7 +82,7 @@ namespace WhoNeedsHelp
             if (!String.IsNullOrWhiteSpace(text))
             {
                 ChatMessage message = new ChatMessage(text, author);
-                ChatMessages.Add(message);
+                ChatMessages.Add(message.MessageId, message);
                 return message;
             }
             return null;
@@ -91,7 +92,7 @@ namespace WhoNeedsHelp
         {
             if (ChatMessages.Count > 1)
             {
-                ChatMessage lastChatMessage = ChatMessages[ChatMessages.Count - 2];
+                var lastChatMessage = ChatMessages.Values.ToArray()[ChatMessages.Count - 2];
                 return lastChatMessage.Author == message.Author;
             }
             return false;
@@ -103,7 +104,7 @@ namespace WhoNeedsHelp
             {
                 return false;
             }
-            ChatMessage previousMessage = ChatMessages[index - 1];
+            ChatMessage previousMessage = ChatMessages.Values.ToArray()[index - 1];
             return previousMessage.Author == author;
         }
     }
