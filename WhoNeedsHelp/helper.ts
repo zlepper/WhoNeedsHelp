@@ -322,12 +322,14 @@ $(document).ready(() => {
     $("#requestHelpForm").submit(() => {
         var question = $("#question").val();
         chat.server.send("2", question);
+        $("#question").val("");
         setQuestionLayout(3);
     });
 
     $("#CreateChannelForm").submit(() => {
         var channelName = $("#newChannelName").val();
         chat.server.send("3", channelName);
+        $("#newChannelName").val("");
     });
 
     $("#SearchChannelName").keyup(function () {
@@ -363,6 +365,7 @@ $(document).ready(() => {
         console.log(message);
         if (!isNullOrWhitespace(message)) {
             chat.server.send("10", message);
+            $("#chatMessageInput").val("");
         }
     });
 }); 
