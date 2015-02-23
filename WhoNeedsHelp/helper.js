@@ -102,11 +102,10 @@ chat.client.exitChannel = function (e) {
     tmpid.hide("blind", function () {
         tmpid.remove();
         var id = $("#ChannelList a:first-child").attr("id");
-        console.log(tmpid);
-        if (tmpid == undefined) {
+        if (id == undefined) {
             setQuestionLayout(2);
             $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
-            $("#HelpList").children().each(function (index) {
+            $("#HelpList > div").each(function (index) {
                 $(this).delay(index * 300).hide("blind", function () {
                     $(this).remove();
                 });
