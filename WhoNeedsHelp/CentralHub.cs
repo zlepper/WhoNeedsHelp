@@ -73,7 +73,7 @@ namespace WhoNeedsHelp
                     foreach (User user in c.GetActiveUsers())
                     {
                         Clients.Client(user.ConnectionId)
-                            .SendChatMessage(chatMessage.Text, chatMessage.DateTime.ToShortTimeString(), u.Name,
+                            .SendChatMessage(chatMessage.Text, u.Name,
                                 chatMessage.GetMessageId(), chatMessage.Author == user, c.AppendMessageToLast(chatMessage),
                                 chatMessage.Author == user || c.Administrator == user);
                     }
@@ -154,6 +154,24 @@ namespace WhoNeedsHelp
                     questionIds.Add(user.ConnectionId + "-" + c.ChannelId);
                 }
                 Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), c.Administrator == u);
+                List<ChatMessage> chatMessages = c.ChatMessages;
+                List<string> textList = new List<string>();
+                List<string> authorList = new List<string>();
+                List<string> messageIdsList = new List<string>();
+                List<bool> senderList = new List<bool>();
+                List<bool> appendToLastList = new List<bool>();
+                List<bool> canEditList = new List<bool>();
+                for (int index = 0; index < chatMessages.Count; index++)
+                {
+                    ChatMessage chatMessage = chatMessages[index];
+                    textList.Add(chatMessage.Text);
+                    authorList.Add(chatMessage.Author.Name);
+                    messageIdsList.Add(chatMessage.GetMessageId());
+                    senderList.Add(chatMessage.Author == u);
+                    appendToLastList.Add(c.AppendMessageToLast(index, chatMessage.Author));
+                    canEditList.Add(chatMessage.Author == u || c.Administrator == u);
+                }
+                Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
             }
         }
 

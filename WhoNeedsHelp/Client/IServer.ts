@@ -23,8 +23,8 @@ interface ICentralClient {
     updateQuestion: (question: string, questionId: string) => void;
     reloadPage: () => void;
     setLayout: (layout: number) => void;
-    sendChatMessage: (text: string, time: string, author: string, messageId: string, sender: boolean, appendToLast: boolean, canEdit: boolean) => void;
-    sendChatMessages: (text: string[], time: string[], author: string[], sender: boolean[], appendToLast: boolean[]) => void;
+    sendChatMessage: (text: string, author: string, messageId: string, sender: boolean, appendToLast: boolean, canEdit: boolean) => void;
+    sendChatMessages: (text: string[], author: string[], messageId: string[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
 }
 

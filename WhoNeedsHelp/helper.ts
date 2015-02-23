@@ -16,7 +16,7 @@ var fetchTables;
 //var setUserName2;
 //var validate;
 
-var setUserName2 = function () {
+var setUserName2 = () => {
     var input = $("#usernameModalInput");
     var name = input.val();
     name = name.replace(/[\s]+/g, " ");
@@ -43,6 +43,7 @@ chat.client.log = text => {
 }
 
 chat.client.appendChannel = (channelname, channelid) => {
+    // TODO Prevent scripting injection attacks in the channel name
     var html = "<a href='#' style='display: none;' id='" + channelid + "' class='list-group-item'><span class='glyphicon glyphicon-remove text-danger channel-remove'></span><span class='badge'>0/0</span> " + channelname + "</a>";
     $("#ChannelList").append(html);
     $("#" + channelid).show("blind");
@@ -70,6 +71,7 @@ chat.client.updateChannelCount = (activeUsers, connectedUsers, channelId) => {
 }
 
 chat.client.updateQuestion = (question, questionId) => {
+    // TODO Prevent scripting injection attacks
     console.log("updating question");
     var panel = $("#" + questionId + " .panel-body");
     if (question === "") {
@@ -145,10 +147,10 @@ chat.client.addQuestions = (usernames, questions, questionIds, admin) => {
         } else {
             html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
         }*/
-        var span, button: JQuery = $();
+        var span: JQuery, button: JQuery = $();
         if (admin) {
             span = $("<span />").attr("aria-hidden", "true").html("&times;");
-            button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeBox").attr("aria-label", "luk").html(span);
+            button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeBox").attr("aria-label", "luk").append(span);
         }
         var h3 = $("<h3 />").addClass("panel-title").text(usernames[i]).prop("outerHTML");
         var heading = $("<div />").addClass("panel-heading").html(h3).prepend(button).prop("outerHTML");
@@ -201,7 +203,7 @@ chat.client.setLayout = layout => {
     setQuestionLayout(layout);
 }
 
-chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLast, canEdit) => {
+chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, canEdit) => {
     var span, button = $();
     if (canEdit) {
         span = $("<span />").attr("aria-hidden", "true").html("&times;");
@@ -209,7 +211,6 @@ chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLa
     }
     var intter = $("<p />").text(text).prop("outerHTML");
     var p: JQuery = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
-    console.log(p);
     if (appendToLast) {
         var location: JQuery = $(".chat li:last-child > div");
         console.log(location);
@@ -224,8 +225,42 @@ chat.client.sendChatMessage = (text, time, author, messageId, sender, appendToLa
         } else {
             li = li.addClass("right");
         }
-        console.log(li);
         $(".chat").append(li);
+    }
+}
+
+chat.client.sendChatMessages = (text, author, messageId, sender, appendToLast, canEdit) => {
+    console.log("sendChatMessages");
+    $(".chat").empty();
+    for (var i = 0; i < text.length; i++) {
+        console.log("1");
+        var span, button = $();
+        if (canEdit[i]) {
+            span = $("<span />").attr("aria-hidden", "true").html("&times;");
+            button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
+        }
+        var intter = $("<p />").text(text[i]).prop("outerHTML");
+        var p: JQuery = $("<p />").html(intter).attr("id", messageId[i]).prepend(button).addClass("clearfix");
+        if (appendToLast[i]) {
+            console.log("2");
+            var location: JQuery = $(".chat li:last-child > div");
+            console.log(location);
+            location.append(p);
+        } else {
+            var strong: JQuery = $("<strong />").addClass("primary-font").text(author[i]);
+            var header: JQuery = $("<div />").addClass("header").append(strong);
+            var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
+            var li: JQuery = $("<li />").addClass("clearfix").append(chatBody);
+            console.log("3");
+            if (sender[i]) {
+                li = li.addClass("left");
+            } else {
+                li = li.addClass("right");
+            }
+            console.log("4");
+            $(".chat").append(li);
+            console.log("5");
+        }
     }
 }
 

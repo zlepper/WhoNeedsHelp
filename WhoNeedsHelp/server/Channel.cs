@@ -12,7 +12,7 @@ namespace WhoNeedsHelp
         public readonly User Administrator;
         public string ChannelName;
         public string ChannelId;
-        public List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
+        public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
 
         public Channel(User u)
         {
@@ -95,6 +95,16 @@ namespace WhoNeedsHelp
                 return lastChatMessage.Author == message.Author;
             }
             return false;
+        }
+
+        public bool AppendMessageToLast(int index, User author)
+        {
+            if (index < 1)
+            {
+                return false;
+            }
+            ChatMessage previousMessage = ChatMessages[index - 1];
+            return previousMessage.Author == author;
         }
     }
 }
