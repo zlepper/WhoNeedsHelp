@@ -26,6 +26,7 @@ interface ICentralClient {
     sendChatMessage: (text: string, author: string, messageId: string, sender: boolean, appendToLast: boolean, canEdit: boolean) => void;
     sendChatMessages: (text: string[], author: string[], messageId: string[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
+    removeChatMessage:(messageId: string) => void ;
 }
 
 interface ICentralServer {

@@ -7,15 +7,17 @@ namespace WhoNeedsHelp
 {
     public class ChatMessage
     {
-        public String Text { get; set; }
+        public string Text { get; set; }
         public User Author { get; set; }
         public DateTime DateTime { get; set; }
+        public string MessageId { get; set; }
 
         public ChatMessage(string text, User user, DateTime dt)
         {
             this.Text = text;
             this.Author = user;
             this.DateTime = dt;
+            MessageId = Author.ConnectionId + "-" + DateTime.Millisecond;
         }
 
         public ChatMessage(string text, User user)
@@ -23,11 +25,12 @@ namespace WhoNeedsHelp
             this.Text = text;
             this.Author = user;
             this.DateTime = DateTime.Now;
+            MessageId = Author.ConnectionId + "-" + DateTime.Millisecond;
         }
 
         public string GetMessageId()
         {
-            return Author.ConnectionId + "-" + DateTime.Millisecond;
+            return MessageId;
         }
     }
 }

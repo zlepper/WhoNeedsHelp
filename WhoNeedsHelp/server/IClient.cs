@@ -19,5 +19,6 @@ namespace WhoNeedsHelp
         void SendChatMessage(string text, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
         void SendChatMessages(string[] text, string[] author, string[] messageIds, bool[] sender, bool[] appendToLast, bool[] canEdit);
         void CheckVersion(int version);
+        void RemoveChatMessage(string messageId);
     }
 }

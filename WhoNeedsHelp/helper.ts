@@ -229,6 +229,10 @@ chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, ca
     }
 }
 
+chat.client.removeChatMessage = messageId => {
+    
+}
+
 chat.client.sendChatMessages = (text, author, messageId, sender, appendToLast, canEdit) => {
     console.log("sendChatMessages");
     $(".chat").empty();
@@ -303,6 +307,12 @@ $.connection.hub.start().done(() => {
         var tmpid = $(this).parent().parent().attr("id");
         console.log(tmpid);
         chat.server.send("8", tmpid);
+    });
+
+    $(document).on("click", "#closeChatMessage", function() {
+        var tmpid = $(this).parent().attr("id");
+        console.log(tmpid);
+        chat.server.send("11", tmpid);
     });
 });
 

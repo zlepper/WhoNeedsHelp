@@ -57,6 +57,25 @@ namespace WhoNeedsHelp
                     // Param should be the new message
                     Chat(parameters);
                     break;
+                case "11":
+                    RemoveMessage(parameters);
+                    break;
+            }
+        }
+
+        private void RemoveMessage(string messageId)
+        {
+            Channel c = Users[Context.ConnectionId].CurrentChannel;
+            var messages = from message in c.ChatMessages
+                where message.MessageId == messageId
+                select message;
+            var messagesList = messages.ToList();
+            foreach (User user in c.GetActiveUsers())
+            {
+                foreach (ChatMessage message in messagesList)
+                {
+                    Clients.Client(user.ConnectionId).RemoveChatMessage(message.MessageId);
+                }
             }
         }
 
