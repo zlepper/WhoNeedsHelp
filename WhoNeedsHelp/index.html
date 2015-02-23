@@ -98,76 +98,83 @@
         </div>
         <div class="row">
             <div class="col-md-3">
-                <!--Put some additional channel selection here-->
-                <div class="list-group ChannelList" id="ChannelList">
-                    <!--Current channels will appear here-->
-                </div>
-                <!--Join channel form-->
-                <!-- Live søgning efter 5 tegn.
-                Dette betyder at der først bliver søgt når
-                    man har valgt en bruger at søge efter -->
-                <form onsubmit=" return false; " class="form-inline" id="SearchChannelForm">
-                    <div class="form-group">
-                        <label for="SearchChannelName">Søg efter kanal</label>
-                        <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control" />
-                    </div>
-                </form>
-                <div class="list-group ChannelList" id="SearchChannelResults">
-                    <!--Searched for channels will appear here-->
-                </div>
-                <!--Create new channel form-->
-                <form onsubmit="return false; " class="form-inline" id="CreateChannelForm">
-                    <div class="form-group">
-                        <label for="newChannelName">Ny kanal</label>
-                        <input type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
-                    </div>
-                </form>
-                <!--Have a join hidden channel bar-->
-                <!--Have a search par thing for channels-->
-            </div>
-            <div class="col-md-6">
-                <!--Have a table with the current list of people-->
-                <div id="HelpList">
-                    <!--Help panels will appear here-->
-                </div>
-                <!--<div class="panel panel-primary" id="ConnectionId-ChannelId">
+                <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Some username</h3>
+                        <h3 class="panel-title">Nuværende kanaler</h3>
                     </div>
                     <div class="panel-body">
-                        Some extra question
+                        <div class="list-group ChannelList" id="ChannelList">
+                            <!--Current channels will appear here-->
+                        </div>
                     </div>
-                </div>-->
-                <!--Have a button that says "Request help"
-                Update said button to say "awaiting help" when a help
-                request is in the list.
-                Also a "Cancel request" button-->
-                <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
-                    <div class="form-group">
-                        <label for="question"></label>
-                        <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
+
+                    <div class="panel-footer">
+                        <!--Create new channel form-->
+                        <form onsubmit=" return false; " class="form" id="CreateChannelForm">
+                            <div class="form-group">
+                                <label class="sr-only" for="newChannelName">Ny kanal</label>
+                                <input type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control"/>
+                            </div>
+                            <div class="form-group hidden">
+                                <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Søg efter kanal</h3>
                     </div>
-                </form>
-                <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit="return false;">
-                    <div class="form-group">
-                        <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
+                    <div class="panel-body">
+                        <div class="list-group ChannelList" id="SearchChannelResults">
+                            <!--Searched for channels will appear here-->
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
+                    <div class="panel-footer">
+                        <!--Join channel form-->
+                        <form onsubmit=" return false; " class="form" id="SearchChannelForm">
+                            <div class="form-group">
+                                <label class="sr-only" for="SearchChannelName">Søg efter kanal</label>
+                                <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control"/>
+                            </div>
+                        </form>
                     </div>
-                </form>
-                <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Hj&aelig;lpeliste</h3>
+                    </div>
+                    <div class="panel-body" id="HelpList">
+                        <!--Help panels will appear here-->
+                    </div>
+                    <div class="panel-footer">
+                        <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
+                            <div class="form-group">
+                                <label for="question"></label>
+                                <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
+                            </div>
+                        </form>
+                        <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; ">
+                            <div class="form-group">
+                                <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
+                            </div>
+                            <div class="form-group">
+                                <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
+                            </div>
+                        </form>
+                        <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+                    </div>
+                </div>
             </div>
             <div class="col-md-3">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <p><span class="glyphicon glyphicon-comment"></span> Chat</p>
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat</h3>
                     </div>
                     <!--Put some chat function thingy here-->
                     <!--Chat channel should follow help channel-->
