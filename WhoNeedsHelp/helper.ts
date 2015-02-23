@@ -231,10 +231,11 @@ chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, ca
 
 chat.client.removeChatMessage = messageId => {
     var message = $("#" + messageId);
-    var parent = message.parent().parent();
+    var parent = message.parent();
     message.remove();
-    if (parent.length <= 1) {
-        parent.remove();
+    console.log(parent.children().length);
+    if (parent.children().length <= 1) {
+        parent.parent().remove();
     }
 }
 
