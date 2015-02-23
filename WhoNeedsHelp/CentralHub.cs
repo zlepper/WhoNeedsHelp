@@ -123,6 +123,21 @@ namespace WhoNeedsHelp
             }
         }
 
+        private void RemoveQuestion(User u, Channel c)
+        {
+            if (u == null || c == null)
+            {
+                return;
+            }
+            string questionId = u.ConnectionId + "-" + c.ChannelId;
+            u.RemoveQuestion(c);
+            c.UsersRequestingHelp.Remove(u);
+            foreach (User user in c.GetActiveUsers())
+            {
+                Clients.Client(user.ConnectionId).RemoveQuestion(questionId);
+            }
+        }
+
         private void ChangeToChannel(string channelId)
         {
             User u = Users[Context.ConnectionId];
@@ -318,7 +333,7 @@ namespace WhoNeedsHelp
             if (Users.ContainsKey(Context.ConnectionId))
             {
                 User u = Users[Context.ConnectionId];
-                Debug.WriteLine("Disconnected: " + Context.ConnectionId);
+                Debug.WriteLine("Disconnecting: " + Context.ConnectionId);
                 var channelsToClear = from channel in Channels.Values
                     where channel.Administrator == u
                     select channel;
@@ -327,7 +342,23 @@ namespace WhoNeedsHelp
                 {
                     ExitChannel(ctc[i].ChannelId);
                 }
-                Users.Remove(Context.ConnectionId);
+                var channelsToLeave = from channel in Channels.Values
+                    where channel.Users.ContainsKey(u.ConnectionId)
+                    select channel;
+                ctc = channelsToLeave.ToList();
+                foreach (Channel channel in ctc)
+                {
+                    if (channel.UsersRequestingHelp.Contains(u))
+                    {
+                        RemoveQuestion(u, channel);
+                    }
+                    ExitChannel(channel.ChannelId);
+                }
+                if (Users.ContainsKey(Context.ConnectionId))
+                {
+                    Users.Remove(Context.ConnectionId);
+                }
+                Debug.WriteLine("Disconnected: " + Context.ConnectionId);
             }
             return base.OnDisconnected(stopCalled);
         }
