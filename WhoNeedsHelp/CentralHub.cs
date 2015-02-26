@@ -265,6 +265,28 @@ namespace WhoNeedsHelp
                         Clients.Client(user.ConnectionId).ExitChannel(c.ChannelId);
                     }
                     Channels.Remove(channelId);
+                    string ip = GetIpAddress();
+                    var users = from user in Users.Values
+                                where user.ip.Equals(ip)
+                                select user;
+
+                    var channels = from channel in Channels.Values
+                                   where channel.Administrator.ip.Equals(ip)
+                                   select channel;
+
+                    List<string> channelIds = new List<string>();
+                    List<string> channelNames = new List<string>();
+                    foreach (Channel ch in channels)
+                    {
+                        channelIds.Add(ch.ChannelId);
+                        channelNames.Add(ch.ChannelName);
+                    }
+                    string[] cIds = channelIds.ToArray();
+                    string[] cNames = channelNames.ToArray();
+                    foreach (User us in users)
+                    {
+                        Clients.Client(us.ConnectionId).IpDiscover(cIds, cNames);
+                    }
                 }
                 else
                 {
@@ -279,9 +301,13 @@ namespace WhoNeedsHelp
                     {
                         Clients.Client(connectionId).UpdateChannelCount(activeUsers, c.Users.Count, c.ChannelId);
                     }
+
+
                 }
                 
             }
+
+
         }
 
         private void CreateNewChannel(string channelName)
