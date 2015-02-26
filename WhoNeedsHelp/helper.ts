@@ -123,7 +123,7 @@ chat.client.channelsFound = (ids, names) => {
     for (var i = 0; i < ids.length; i++) {
         //var html = "<a href='#' style='display: none;' id='" + ids[i] + "' class='list-group-item'>" + names[i] + "</a>";
         var html = $("<a />");
-        html = html.attr("style", "display: none;").attr("id", ids[i]).attr("class", "list-group-item").text(names[i]);
+        html = html.attr("style", "display: none;").attr("id", ids[i]).attr("class", "list-group-item").attr("href", "#").text(names[i]);
         resultList.append(html);
         $("#" + ids[i]).show("clip");
     }
