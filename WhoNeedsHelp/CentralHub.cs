@@ -412,6 +412,7 @@ namespace WhoNeedsHelp
             Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId, ip = GetIpAddress()});
 
             string ip = GetIpAddress();
+            Clients.Caller.Log(ip);
             var channels = from channel in Channels.Values
                            where channel.Administrator.ip.Equals(ip)
                            select channel;
