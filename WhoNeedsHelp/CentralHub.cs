@@ -225,8 +225,11 @@ namespace WhoNeedsHelp
 
         private void JoinChannel(string channelId)
         {
-            Channels[channelId].AddUser(Users[Context.ConnectionId]);
-            Clients.Caller.AppendChannel(Channels[channelId].ChannelName, channelId);
+            if (!Channels[channelId].Users.ContainsValue(Users[Context.ConnectionId]))
+            {
+                Channels[channelId].AddUser(Users[Context.ConnectionId]);
+                Clients.Caller.AppendChannel(Channels[channelId].ChannelName, channelId);
+            }
         }
 
         private void SearchForChannel(string parameter)
