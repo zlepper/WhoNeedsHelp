@@ -33,4 +33,6 @@ interface ICentralClient {
 interface ICentralServer {
     send(action: string, parameters: string): JQueryPromise<void>;
     getData(action: number): JQueryPromise<void>;
+    setUsername(name: string): JQueryPromise<void>;
+    createNewChannel(channelName: string): JQueryPromise<void>;
 }

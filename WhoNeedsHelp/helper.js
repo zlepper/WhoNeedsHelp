@@ -21,7 +21,9 @@ var setUserName2 = function () {
     name = name.replace(/[\s]+/g, " ");
     var n = name.match(patt);
     console.log(n[0]);
-    chat.server.send("1", n[0]);
+
+    //chat.server.send("1", n[0]);
+    chat.server.setUsername(n[0]);
     $("#CurrentUserName").html(n[0]);
     $("#usernameModal").modal("hide");
     $("#SearchChannelName").focus();
@@ -356,7 +358,9 @@ $(document).ready(function () {
 
     $("#CreateChannelForm").submit(function () {
         var channelName = $("#newChannelName").val();
-        chat.server.send("3", channelName);
+
+        //chat.server.send("3", channelName);
+        chat.server.createNewChannel(channelName);
         $("#newChannelName").val("");
     });
 

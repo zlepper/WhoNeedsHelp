@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls.Expressions;
@@ -8,11 +9,16 @@ namespace WhoNeedsHelp
 {
     public class User
     {
-        public string ConnectionId { get; set; }
+        
+        public string UserName { get; set; }
+
+        public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
         public Channel CurrentChannel { get; set; }
         private Dictionary<Channel, string> Questions { get; set; }
         public string ip { get; set; }
+        [Key]
+        public string ConnectionId { get; set; }
 
         public User()
         {

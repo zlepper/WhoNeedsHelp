@@ -40,6 +40,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.1.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
@@ -149,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
+    <Compile Include="Connection.cs" />
     <Compile Include="server\Channel.cs" />
     <Compile Include="server\ChatMessage.cs" />
     <Compile Include="server\IClient.cs" />
@@ -157,6 +164,7 @@
     <Compile Include="server\QuestionComment.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="server\User.cs" />
+    <Compile Include="HelpContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

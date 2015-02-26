@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -9,9 +10,11 @@ namespace WhoNeedsHelp
     {
         public readonly Dictionary<string, User> Users = new Dictionary<string, User>();
         public readonly List<User> UsersRequestingHelp = new List<User>();
-        public readonly User Administrator;
-        public string ChannelName;
-        public string ChannelId;
+        public User Administrator { get; set; }
+        public string ChannelName { get; set; }
+
+        [Key]
+        public string ChannelId { get; set; }
         public readonly  Dictionary<string, ChatMessage> ChatMessages = new Dictionary<string, ChatMessage>(); 
         //public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
 

@@ -32,12 +32,15 @@
                         <form onsubmit=" return false; " id="usernameModalForm">
                             <div class="form-group" id="usernameGroup">
                                 <label for="usernameModal">Navn</label>
-                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
+                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary" id="selectUsernameButton">Start</button>
                             </div>
                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="LoginFromModalButton">Log in</button>
                     </div>
                 </div> <!--</modal-content>-->
             </div> <!--</modal-dialog>-->
@@ -89,6 +92,11 @@
                             <li>
                                 <p class="navbar-text">Forbundet med navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
                             </li>
+                            <!--Should only be shown when the user is not logged in-->
+                            <li><a id="CreateUserButton" href="#">Opret Bruger</a></li>
+                            <li><a id="LoginButton" href="#">Log in</a></li>
+                            <!--Should only be shown when the user is logged in-->
+                            <li><a id="logoutButton" href="#">Log ud</a></li>
                         </ul>
                     </div>
                 </div>
