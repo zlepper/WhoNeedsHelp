@@ -111,7 +111,7 @@
 
                     <div class="panel-footer">
                         <!--Create new channel form-->
-                        <form onsubmit=" return false; " class="form-inline" id="CreateChannelForm">
+                        <form onsubmit=" return false; " class="form" id="CreateChannelForm">
                             <div class="form-group">
                                 <label class="sr-only" for="newChannelName">Ny kanal</label>
                                 <input pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control" />
@@ -133,7 +133,7 @@
                     </div>
                     <div class="panel-footer">
                         <!--Join channel form-->
-                        <form onsubmit=" return false; " class="form-inline" id="SearchChannelForm">
+                        <form onsubmit=" return false; " class="form" id="SearchChannelForm">
                             <div class="form-group">
                                 <label class="sr-only" for="SearchChannelName">Søg efter kanal</label>
                                 <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control"/>
@@ -151,7 +151,7 @@
                         <!--Help panels will appear here-->
                     </div>
                     <div class="panel-footer">
-                        <form style="display: none;" class="form" id="requestHelpForm" onsubmit=" return false; ">
+                        <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
                             <div class="form-group">
                                 <label for="question"></label>
                                 <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
@@ -160,7 +160,7 @@
                                 <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
                             </div>
                         </form>
-                        <form style="display: none;" class="form" id="requestingHelp" onsubmit=" return false; ">
+                        <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; ">
                             <div class="form-group">
                                 <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
                             </div>
