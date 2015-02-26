@@ -396,4 +396,10 @@ $(document).ready(() => {
             $("#chatMessageInput").val("");
         }
     });
+
+    $("#editUsername").click(() => {
+        $("#usernameModal").attr("ata-backdrop", "").attr("data-keyboard", "");
+        $("#selectUsernameButton").text("Gem");
+        $("#usernameModal").modal("show");
+    });
 }); 

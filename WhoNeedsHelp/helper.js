@@ -396,5 +396,11 @@ $(document).ready(function () {
             $("#chatMessageInput").val("");
         }
     });
+
+    $("#editUsername").click(function () {
+        $("#usernameModal").attr("ata-backdrop", "").attr("data-keyboard", "");
+        $("#selectUsernameButton").text("Gem");
+        $("#usernameModal").modal("show");
+    });
 });
 //# sourceMappingURL=helper.js.map
