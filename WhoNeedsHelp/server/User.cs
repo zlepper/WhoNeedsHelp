@@ -12,6 +12,7 @@ namespace WhoNeedsHelp
         public string Name { get; set; }
         public Channel CurrentChannel { get; set; }
         private Dictionary<Channel, string> Questions { get; set; }
+        public string ip { get; set; }
 
         public User()
         {

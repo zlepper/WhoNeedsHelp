@@ -20,5 +20,6 @@ namespace WhoNeedsHelp
         void SendChatMessages(string[] text, string[] author, string[] messageIds, bool[] sender, bool[] appendToLast, bool[] canEdit);
         void CheckVersion(int version);
         void RemoveChatMessage(string messageId);
+        void IpDiscover(string[] channelIds, string[] channelNames);
     }
 }

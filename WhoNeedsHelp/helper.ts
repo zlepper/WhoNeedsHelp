@@ -44,9 +44,9 @@ chat.client.log = text => {
 
 chat.client.appendChannel = (channelname, channelid) => {
     // TODO Prevent scripting injection attacks in the channel name
-    var html = "<a href='#' style='display: none;' id='" + channelid + "' class='list-group-item'><span class='glyphicon glyphicon-remove text-danger channel-remove'></span><span class='badge'>0/0</span> " + channelname + "</a>";
+    var html = "<a href='#' style='display: none;' id='" + channelid + "' class='list-group-item'><span class='glyphicon glyphicon-remove close channel-remove'></span><span class='badge'>0/0</span> " + channelname + "</a>";
     $("#ChannelList").append(html);
-    $("#" + channelid).show("blind");
+    $("#" + channelid).show("slide", 400);
     chat.server.send("7", channelid);
 }
 
@@ -100,14 +100,14 @@ chat.client.sendQuestion = question => {
 
 chat.client.exitChannel = e => {
     var tmpid = $("#" + e);
-    tmpid.hide("blind", () => {
+    tmpid.hide("slide", {}, 400, () => {
         tmpid.remove();
         var id = $("#ChannelList a:first-child").attr("id");
         if (id == undefined) {
             setQuestionLayout(2);
             $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
             $("#HelpList > div").each(function (index) {
-                $(this).delay(index * 300).hide("blind", function () {
+                $(this).delay(index * 300).hide("blind", {}, 400, function () {
                     $(this).remove();
                 });
             });
@@ -126,6 +126,17 @@ chat.client.channelsFound = (ids, names) => {
         html = html.attr("style", "display: none;").attr("id", ids[i]).attr("class", "list-group-item").attr("href", "#").text(names[i]);
         resultList.append(html);
         $("#" + ids[i]).show("clip");
+    }
+}
+
+chat.client.ipDiscover = (ids, names) => {
+    var discoverElement = $("#ip-discovery");
+    discoverElement.empty();
+
+    for (var i = 0; i < ids.length; i++) {
+        var html = $("<a />");
+        html = html.attr("href", "#").attr("id", ids[i]).attr("class", "list-group-item").text(names[i]);
+        discoverElement.append(html);
     }
 }
 
@@ -294,12 +305,14 @@ $.connection.hub.start().done(() => {
         chat.server.send("4", tmpid);
     });
 
-    $(document).on("click", "div#SearchChannelResults > a", function () {
+    $(document).on("click", "div.joinChannel > a", function () {
         var tmpid = $(this).attr("id");
         chat.server.send("6", tmpid);
-        $(this).hide("blind", function () {
-            $(this).remove();
-        });
+        if ($(this).parent().attr("id") === "SearchChannelResults") {
+            $(this).hide("slide", {}, 400, function() {
+                $(this).remove();
+            });
+        }
     });
 
     $(document).on("click", "div#ChannelList > a", function () {

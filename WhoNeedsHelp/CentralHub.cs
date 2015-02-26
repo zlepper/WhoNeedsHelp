@@ -10,7 +10,18 @@ namespace WhoNeedsHelp
     public class CentralHub : Hub<IClient>
     {
         private static readonly Dictionary<string, User> Users = new Dictionary<string, User>();
-        private static readonly Dictionary<string, Channel> Channels = new Dictionary<string, Channel>(); 
+        private static readonly Dictionary<string, Channel> Channels = new Dictionary<string, Channel>();
+
+        private string GetIpAddress()
+        {
+            object temp;
+
+            Context.Request.Environment.TryGetValue("server.RemoteIpAddress", out temp);
+
+            var ip = temp != null ? temp as string : "";
+
+            return ip;
+        }
 
         public void Send(string action, string parameters)
         {
@@ -283,6 +294,28 @@ namespace WhoNeedsHelp
                 Channels[channelId].AddUser(Users[Context.ConnectionId]);
                 Clients.Caller.AppendChannel(channelName, channelId);
             }
+            string ip = GetIpAddress();
+            var users = from user in Users.Values
+                where user.ip.Equals(ip)
+                select user;
+
+            var channels = from channel in Channels.Values
+                where channel.Administrator.ip.Equals(ip)
+                select channel;
+
+            List<string> channelIds = new List<string>();
+            List<string> channelNames = new List<string>();
+            foreach (Channel c in channels)
+            {
+                channelIds.Add(c.ChannelId);
+                channelNames.Add(c.ChannelName);
+            }
+            string[] cIds = channelIds.ToArray();
+            string[] cNames = channelNames.ToArray();
+            foreach (User u in users)
+            {
+                Clients.Client(u.ConnectionId).IpDiscover(cIds, cNames);
+            }
         }
 
         private void SetUsername(string name)
@@ -290,10 +323,11 @@ namespace WhoNeedsHelp
             if (Users.ContainsKey(Context.ConnectionId))
             {
                 Users[Context.ConnectionId].Name = name;
+                //Users[Context.ConnectionId].ip = GetIpAddress();
             }
             else
             {
-                Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId, Name = name});
+                Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId, Name = name, ip = GetIpAddress()});
             }
             Clients.Caller.Log(Context.ConnectionId);
         }
@@ -346,7 +380,23 @@ namespace WhoNeedsHelp
         {
             Clients.Caller.Log("Connected");
             Debug.WriteLine("Connected: " + Context.ConnectionId);
-            Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId});
+            Users.Add(Context.ConnectionId, new User() {ConnectionId = Context.ConnectionId, ip = GetIpAddress()});
+
+            string ip = GetIpAddress();
+            var channels = from channel in Channels.Values
+                           where channel.Administrator.ip.Equals(ip)
+                           select channel;
+
+            List<string> channelIds = new List<string>();
+            List<string> channelNames = new List<string>();
+            foreach (Channel c in channels)
+            {
+                channelIds.Add(c.ChannelId);
+                channelNames.Add(c.ChannelName);
+            }
+            string[] cIds = channelIds.ToArray();
+            string[] cNames = channelNames.ToArray();
+            Clients.Caller.IpDiscover(cIds, cNames);
 
             return base.OnConnected();
         }
