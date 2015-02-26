@@ -220,6 +220,7 @@ namespace WhoNeedsHelp
 
         private void SearchForChannel(string parameter)
         {
+            parameter = parameter.ToLower();
             var matching = from channel in Channels.Values
                 where channel.ChannelId.StartsWith(parameter)
                 && !channel.Users.ContainsKey(Context.ConnectionId)
