@@ -2,38 +2,51 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.server
 {
     public class Channel
     {
-        public readonly Dictionary<string, User> Users = new Dictionary<string, User>();
-        public readonly List<User> UsersRequestingHelp = new List<User>();
-        public User Administrator { get; set; }
-        public string ChannelName { get; set; }
-
         [Key]
-        public string ChannelId { get; set; }
-        public readonly  Dictionary<string, ChatMessage> ChatMessages = new Dictionary<string, ChatMessage>(); 
-        //public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>(); 
+        public Guid Id { get; set; }
+        public readonly List<Guid> Users = new List<Guid>();
+        public readonly List<Guid> UsersRequestingHelp = new List<Guid>();
+        private readonly List<Guid> _administrators = new List<Guid>();
+        public string ChannelName { get; set; }
+        //public readonly List<string> ChatMessages = new List<string>();
 
-        public Channel(User u)
+        public Channel() { }
+
+        public Channel(Guid userId)
         {
-            Administrator = u;
+            _administrators.Add(userId);
+            using (var db = new HelpContext())
+            {
+                Id = db.GenerateNewGuid(HelpContext.Modes.Channel);
+            }
+        }
+
+        public bool IsUserAdministrator(Guid u)
+        {
+            return _administrators.Contains(u);
+        }
+
+        public void AddAdministrator(Guid u)
+        {
+            _administrators.Add(u);
         }
 
         public int GetActiveUserCount()
         {
-            return Users.Values.Count(user => user.Channel == this);
+            return UsersRequestingHelp.Count;
         }
 
-        public List<User> GetActiveUsers()
+        public List<Guid> GetActiveUsers()
         {
-            return Users.Values.Where(user => user.Channel == this).ToList();
+            return UsersRequestingHelp;
         }
 
-        public bool RequestHelp(User user)
+        public bool RequestHelp(Guid user)
         {
             if (UsersRequestingHelp.Contains(user))
             {
@@ -41,67 +54,70 @@ namespace WhoNeedsHelp
             }
             UsersRequestingHelp.Add(user);
             return true;
+
         }
 
-        public string CreateTable()
+        public bool AddUser(Guid u)
         {
-            string table = "";
-            foreach (User u in UsersRequestingHelp)
-            {
-                string question = u.GetQuestion(this);
-                table +=
-                    String.Format(
-                        "<div class='panel panel-primary'><div class='panel-heading'><h3 class='panel-title'>{0}</h3>" +
-                        "</div><div class='panel-body'>{1}</div></div>", u.Name, question);
-            }
-            return table;
-        }
-
-        public List<User> GetUsers()
-        {
-            return Users.Select(u => u.Value).ToList();
-        }
-
-        public bool AddUser(User u)
-        {
-            if (Users.ContainsKey(u.ConnectionId))
+            if (Users.Contains(u))
             {
                 return false;
             }
-            Users.Add(u.ConnectionId, u);
+            Users.Add(u);
             return true;
         }
 
-        public void RemoveUser(User u)
+        public void RemoveUser(Guid u)
         {
-            if (Users.ContainsKey(u.ConnectionId))
+            if (Users.Contains(u))
             {
-                Users.Remove(u.ConnectionId);
+                Users.Remove(u);
             }
         }
 
-        public ChatMessage AddChatMessage(User author, string text)
+        /// <summary>
+        /// Adds the chat message to the channel
+        /// </summary>
+        /// <param name="author">The Guid of the author user</param>
+        /// <param name="text">The text in the message</param>
+        /// <returns>The Guid of the new message</returns>
+        public Guid AddChatMessage(Guid author, string text)
         {
             if (!String.IsNullOrWhiteSpace(text))
             {
-                ChatMessage message = new ChatMessage(text, author);
-                ChatMessages.Add(message.MessageId, message);
-                return message;
+                ChatMessage message = new ChatMessage(text, author, Id);
+                using (var db = new HelpContext())
+                {
+                    db.ChatMessages.Add(message);
+                    db.SaveChanges();
+                }
+                return message.MessageId;
             }
-            return null;
+            return Guid.Empty;
         }
 
-        public bool AppendMessageToLast(ChatMessage message)
+        public bool AppendMessageToLast(Guid messageId)
         {
-            if (ChatMessages.Count > 1)
+            /*if (ChatMessages.Count > 1)
             {
                 var lastChatMessage = ChatMessages.Values.ToArray()[ChatMessages.Count - 2];
-                return lastChatMessage.Author == message.Author;
+                return lastChatMessage.Author == messageId.Author;
+            }
+            return false;*/
+            using (var db = new HelpContext())
+            {
+                ChatMessage lastChatMessage = db.ChatMessages.Where(c => c.Channel == Id).Reverse().Skip(1).Take(1).SingleOrDefault();
+                ChatMessage message = db.ChatMessages.Find(messageId);
+                if (lastChatMessage != null && message != null)
+                {
+                    return lastChatMessage.Author.Equals(message.Author);
+                }
             }
             return false;
+
         }
 
-        public bool AppendMessageToLast(int index, User author)
+        /*public bool AppendMessageToLast(int index, User author)
         {
             if (index < 1)
             {
@@ -109,6 +125,20 @@ namespace WhoNeedsHelp
             }
             ChatMessage previousMessage = ChatMessages.Values.ToArray()[index - 1];
             return previousMessage.Author == author;
-        }
+            if (index < 1)
+            {
+                return false;
+            }
+            using (var db = new HelpContext())
+            {
+                ChatMessage lastChatMessage = db.ChatMessages.Where(c => c.Channel == Id).Reverse().Skip(1).Take(1).SingleOrDefault();
+                ChatMessage message = db.ChatMessages.Find(messageId);
+                if (lastChatMessage != null && message != null)
+                {
+                    return lastChatMessage.Author.Equals(message.Author);
+                }
+            }
+            return false;
+        }*/
     }
 }

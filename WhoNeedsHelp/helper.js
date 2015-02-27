@@ -358,9 +358,9 @@ $(document).ready(function () {
 
     $("#CreateChannelForm").submit(function () {
         var channelName = $("#newChannelName").val();
+        chat.server.send("3", channelName);
 
-        //chat.server.send("3", channelName);
-        chat.server.createNewChannel(channelName);
+        //chat.server.createNewChannel(channelName);
         $("#newChannelName").val("");
     });
 

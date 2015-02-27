@@ -1,45 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
-using System.Web.UI.WebControls.Expressions;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.server
 {
     public class User
     {
-        
+        [Key]
+        public Guid Id { get; set; }
         public string UserName { get; set; }
 
-        public ICollection<Connection> Connections { get; set; } 
+        //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        public Channel Channel { get; set; }
-        [ForeignKey("Channel")]
-        public string ChannelId { get; set; }
-        private Dictionary<Channel, string> Questions { get; set; }
-        public string ip { get; set; }
-        [Key]
+        public Guid ChannelId { get; set; }
+        /// <summary>
+        /// Key is the channel Guid
+        /// Value is the question text
+        /// </summary>
+        private readonly Dictionary<Guid, Question> _questions = new Dictionary<Guid, Question>();
+        public string Ip { get; set; }
         public string ConnectionId { get; set; }
 
         public User()
         {
-            Questions = new Dictionary<Channel, string>();
+            using (var db = new HelpContext())
+            {
+                Id = db.GenerateNewGuid(HelpContext.Modes.User);
+            }
         }
 
         public bool RequestHelp(string question = null)
         {
             using (var db = new HelpContext())
             {
-                Channel channel = db.Channels.Find(Channel);
+                Channel channel = db.Channels.Find(ChannelId);
                 if (channel != null)
                 {
-                    bool help = channel.RequestHelp(this);
+                    bool help = channel.RequestHelp(Id);
                     if (!help) return false;
                     if (!String.IsNullOrWhiteSpace(question))
                     {
-                        AskQuestion(channel, question);
+                        AskQuestion(channel.Id, question);
                     }
 
                     return true;
@@ -48,47 +49,53 @@ namespace WhoNeedsHelp
             return false;
         }
 
-        public string GetQuestion(Channel c)
+        public Question GetQuestion(Guid c)
         {
-            return Questions.ContainsKey(c) ? Questions[c] : "";
+            return _questions.ContainsKey(c) ? _questions[c] : null;
         }
 
-        private void AskQuestion(Channel c, string question)
+        private void AskQuestion(Guid c, string question)
         {
-            if (Questions.ContainsKey(c)) return;
-            Questions.Add(c, String.IsNullOrWhiteSpace(question) ? "" : question);
+            if (_questions.ContainsKey(c)) return;
+            Question q = new Question(c, question, Id);
+            _questions.Add(c, q);
         }
 
         /// <summary>
         /// Updates the question for the selected channel
         /// </summary>
-        /// <param name="c">The channel to change question in</param>
+        /// <param name="c">The channel Guid to change question in</param>
         /// <param name="question">The question to change to</param>
         /// <returns>true if the question was changed. false if the question was added</returns>
-        public bool UpdateQuestion(Channel c, string question)
+        public bool UpdateQuestion(Guid c, string question)
         {
-            if (!Questions.ContainsKey(c))
+            if (!_questions.ContainsKey(c))
             {
-                Questions.Add(c, String.IsNullOrWhiteSpace(question) ? "" : question);
                 return false;
             }
-            Questions[c] = question;
+            Question q = _questions[c];
+            q.Text = question;
+            _questions[c] = q;
             return true;
         }
 
         public void RemoveQuestion()
         {
-            Questions.Remove(Channel);
+            using (var db = new HelpContext())
+            {
+                Guid channel = db.Channels.Find(ChannelId).Id;
+                _questions.Remove(channel);
+            }
         }
 
-        public void RemoveQuestion(Channel c)
+        public void RemoveQuestion(Guid c)
         {
-            Questions.Remove(c);
+            _questions.Remove(c);
         }
 
-        public bool AreUserQuestioning(Channel c)
+        public bool AreUserQuestioning(Guid c)
         {
-            return Questions.ContainsKey(c);
+            return _questions.ContainsKey(c);
         }
     }
 }
