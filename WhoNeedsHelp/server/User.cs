@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls.Expressions;
@@ -14,7 +15,7 @@ namespace WhoNeedsHelp
 
         public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        public Channel CurrentChannel { get; set; }
+        public string CurrentChannelId { get; set; }
         private Dictionary<Channel, string> Questions { get; set; }
         public string ip { get; set; }
         [Key]
@@ -27,13 +28,22 @@ namespace WhoNeedsHelp
 
         public bool RequestHelp(string question = null)
         {
-            bool help = CurrentChannel.RequestHelp(this);
-            if (!help) return false;
-            if (!String.IsNullOrWhiteSpace(question))
+            using (var db = new HelpContext())
             {
-                AskQuestion(CurrentChannel, question);
+                Channel channel = db.Channels.Find(CurrentChannelId);
+                if (channel != null)
+                {
+                    bool help = channel.RequestHelp(this);
+                    if (!help) return false;
+                    if (!String.IsNullOrWhiteSpace(question))
+                    {
+                        AskQuestion(channel, question);
+                    }
+
+                    return true;
+                }
             }
-            return true;
+            
         }
 
         public string GetQuestion(Channel c)
