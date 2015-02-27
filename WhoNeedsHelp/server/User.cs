@@ -15,7 +15,9 @@ namespace WhoNeedsHelp
 
         public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        public string CurrentChannelId { get; set; }
+        public Channel Channel { get; set; }
+        [ForeignKey("Channel")]
+        public string ChannelId { get; set; }
         private Dictionary<Channel, string> Questions { get; set; }
         public string ip { get; set; }
         [Key]
@@ -30,7 +32,7 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                Channel channel = db.Channels.Find(CurrentChannelId);
+                Channel channel = db.Channels.Find(Channel);
                 if (channel != null)
                 {
                     bool help = channel.RequestHelp(this);
@@ -43,7 +45,7 @@ namespace WhoNeedsHelp
                     return true;
                 }
             }
-            
+            return false;
         }
 
         public string GetQuestion(Channel c)
@@ -76,7 +78,7 @@ namespace WhoNeedsHelp
 
         public void RemoveQuestion()
         {
-            Questions.Remove(CurrentChannel);
+            Questions.Remove(Channel);
         }
 
         public void RemoveQuestion(Channel c)

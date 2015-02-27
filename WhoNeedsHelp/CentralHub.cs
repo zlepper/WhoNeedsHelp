@@ -93,7 +93,7 @@ namespace WhoNeedsHelp
             if (String.IsNullOrWhiteSpace(messageId)) return;
             using (var db = new HelpContext())
             {
-                Channel channel = db.Users.Find(Context.ConnectionId).CurrentChannel;
+                Channel channel = db.Users.Find(Context.ConnectionId).Channel;
                 var message = channel.ChatMessages.Values.SingleOrDefault(m => m.MessageId.Equals(messageId));
                 var user = db.Users.Find(Context.ConnectionId);
                 if (message != null && (channel.Administrator == user || message.Author == user))
@@ -132,9 +132,9 @@ namespace WhoNeedsHelp
             using (var db = new HelpContext())
             {
                 var user = db.Users.Find(Context.ConnectionId);
-                if (user != null && user.CurrentChannel != null)
+                if (user != null && user.Channel != null)
                 {
-                    Channel channel = user.CurrentChannel;
+                    Channel channel = user.Channel;
                     ChatMessage chatMessage = channel.AddChatMessage(user, message);
                     if (chatMessage != null)
                     {
@@ -163,9 +163,9 @@ namespace WhoNeedsHelp
             using (var db = new HelpContext())
             {
                 var user = db.Users.Find(Context.ConnectionId);
-                user.UpdateQuestion(user.CurrentChannel, question);
-                string questionId = user.ConnectionId + "-" + user.CurrentChannel.ChannelId;
-                foreach (User u in user.CurrentChannel.GetActiveUsers())
+                user.UpdateQuestion(user.Channel, question);
+                string questionId = user.ConnectionId + "-" + user.Channel.ChannelId;
+                foreach (User u in user.Channel.GetActiveUsers())
                 {
                     Clients.Client(u.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(question) ? "" : question, questionId);
                 }
@@ -209,7 +209,7 @@ namespace WhoNeedsHelp
                     var user = db.Users.Find(Context.ConnectionId);
                     if (user != null)
                     {
-                        Channel channel = user.CurrentChannel;
+                        Channel channel = user.Channel;
                         questionId = user.ConnectionId + "-" + channel.ChannelId;
                         user.RemoveQuestion();
                         channel.UsersRequestingHelp.Remove(user);
@@ -225,7 +225,7 @@ namespace WhoNeedsHelp
             {
                 using (var db = new HelpContext())
                 {
-                    var channel = db.Users.Find(Context.ConnectionId).CurrentChannel;
+                    var channel = db.Users.Find(Context.ConnectionId).Channel;
                     string userId = questionId.Substring(0, 36);
                     var user = db.Users.Find(userId);
                     user.RemoveQuestion(channel);
@@ -310,9 +310,9 @@ namespace WhoNeedsHelp
                 if (user != null)
                 {
                     Channel channel;
-                    if (user.CurrentChannel != null)
+                    if (user.Channel != null)
                     {
-                        channel = user.CurrentChannel;
+                        channel = user.Channel;
                         int activeUsers = channel.GetActiveUserCount();
                         foreach (KeyValuePair<string, User> userPair in channel.Users)
                         {
@@ -323,7 +323,7 @@ namespace WhoNeedsHelp
                         channel = db.Channels.Find(channelId);
                         if (channel != null)
                         {
-                            user.CurrentChannel = channel;
+                            user.Channel = channel;
                             Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
                             int activeUsers = channel.GetActiveUserCount();
                             foreach (KeyValuePair<string, User> userPair in channel.Users)

@@ -25,12 +25,12 @@ namespace WhoNeedsHelp
 
         public int GetActiveUserCount()
         {
-            return Users.Values.Count(user => user.CurrentChannel == this);
+            return Users.Values.Count(user => user.Channel == this);
         }
 
         public List<User> GetActiveUsers()
         {
-            return Users.Values.Where(user => user.CurrentChannel == this).ToList();
+            return Users.Values.Where(user => user.Channel == this).ToList();
         }
 
         public bool RequestHelp(User user)
