@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace WhoNeedsHelp.server
 {
@@ -9,69 +11,109 @@ namespace WhoNeedsHelp.server
     {
         [Key]
         public Guid Id { get; set; }
-        public readonly List<Guid> Users = new List<Guid>();
-        public readonly List<Guid> UsersRequestingHelp = new List<Guid>();
-        private readonly List<Guid> _administrators = new List<Guid>();
+        //public virtual List<Guid> Users { get; set; }
+        //public virtual List<Guid> UsersRequestingHelp { get; set; }
+        //public virtual List<Guid> Administrators { get; set; }
+        public string Users { get; set; }
+        public string UsersRequestingHelp { get; set; }
+        public string Administrators { get; set; }
         public string ChannelName { get; set; }
         //public readonly List<string> ChatMessages = new List<string>();
 
-        public Channel() { }
+        public Channel()
+        {
+        }
 
         public Channel(Guid userId)
         {
-            _administrators.Add(userId);
+            //Users = new List<Guid>();
+            //UsersRequestingHelp = new List<Guid>();
+            //Administrators = new List<Guid> { userId };
+            Users = "";
+            UsersRequestingHelp = "";
+            Administrators = "";
+            AddAdministrator(userId);
+            //Administrators.Add(userId);
             using (var db = new HelpContext())
             {
                 Id = db.GenerateNewGuid(HelpContext.Modes.Channel);
             }
         }
 
+        public void RemoveUserRequestingHelp(Guid u)
+        {
+            var usrh = Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
+            usrh.Remove(u);
+            UsersRequestingHelp = Serialiser.SerialiseList(usrh);
+        }
+
+        public List<Guid> GetUsers()
+        {
+            return Serialiser.DesiraliseGuidStringList(Users);
+        }
+
+        public List<Guid> GetUsersRequestingHelp()
+        {
+            return Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
+        } 
+
         public bool IsUserAdministrator(Guid u)
         {
-            return _administrators.Contains(u);
+            return Administrators.Contains(u.ToString());
         }
 
         public void AddAdministrator(Guid u)
         {
-            _administrators.Add(u);
+            List<Guid> a = Serialiser.DesiraliseGuidStringList(Administrators);
+            a.Add(u);
+            Administrators = Serialiser.SerialiseList(a);
         }
 
-        public int GetActiveUserCount()
+        public int GetQuestingUserCount()
         {
-            return UsersRequestingHelp.Count;
+            return Serialiser.DesiraliseGuidStringList(UsersRequestingHelp).Count;
+
         }
 
         public List<Guid> GetActiveUsers()
         {
-            return UsersRequestingHelp;
+            using (var db = new HelpContext())
+            {
+                return db.Users.Where(u => u.ChannelId.Equals(Id)).Select(user => user.Id).ToList();
+            }
         }
 
         public bool RequestHelp(Guid user)
         {
-            if (UsersRequestingHelp.Contains(user))
+            if (UsersRequestingHelp.Contains(user.ToString()))
             {
                 return false;
             }
-            UsersRequestingHelp.Add(user);
+            List<Guid> l = Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
+            l.Add(user);
+            UsersRequestingHelp = Serialiser.SerialiseList(l);
             return true;
-
         }
 
         public bool AddUser(Guid u)
         {
-            if (Users.Contains(u))
+            if (Users.Contains(u.ToString()))
             {
                 return false;
             }
-            Users.Add(u);
+            List<Guid> l = Serialiser.DesiraliseGuidStringList(Users);
+            l.Add(u);
+            Users = Serialiser.SerialiseList(l);
             return true;
         }
 
         public void RemoveUser(Guid u)
         {
-            if (Users.Contains(u))
+            if (Users.Contains(u.ToString()))
             {
-                Users.Remove(u);
+                List<Guid> l = Serialiser.DesiraliseGuidStringList(Users);
+                l.Remove(u);
+                Users = Serialiser.SerialiseList(l);
             }
         }
 
@@ -91,26 +133,26 @@ namespace WhoNeedsHelp.server
                     db.ChatMessages.Add(message);
                     db.SaveChanges();
                 }
-                return message.MessageId;
+                return message.Id;
             }
             return Guid.Empty;
         }
 
         public bool AppendMessageToLast(Guid messageId)
         {
-            /*if (ChatMessages.Count > 1)
-            {
-                var lastChatMessage = ChatMessages.Values.ToArray()[ChatMessages.Count - 2];
-                return lastChatMessage.Author == messageId.Author;
-            }
-            return false;*/
             using (var db = new HelpContext())
             {
-                ChatMessage lastChatMessage = db.ChatMessages.Where(c => c.Channel == Id).Reverse().Skip(1).Take(1).SingleOrDefault();
-                ChatMessage message = db.ChatMessages.Find(messageId);
-                if (lastChatMessage != null && message != null)
+                var bunch = db.ChatMessages.Where(c => c.Channel.Equals(Id));
+                var bunchArray = bunch.ToArray();
+                if (bunchArray.Length > 1)
                 {
-                    return lastChatMessage.Author.Equals(message.Author);
+                    //var stuffs = bunch.ToList();
+                    ChatMessage lastChatMessage = bunchArray[bunchArray.Length - 2];
+                    ChatMessage message = db.ChatMessages.Find(messageId);
+                    if (lastChatMessage != null && message != null)
+                    {
+                        return lastChatMessage.Author.Equals(message.Author);
+                    }
                 }
             }
             return false;

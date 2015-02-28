@@ -9,10 +9,12 @@ namespace WhoNeedsHelp
     public class ChatMessage
     {
         [Key]
-        public Guid MessageId { get; set; }
+        public Guid Id { get; set; }
         public string Text { get; set; }
         public Guid Author { get; set; }
         public Guid Channel { get; set; }
+
+        public ChatMessage() { }
 
         public ChatMessage(string text, Guid user, Guid channel)
         {
@@ -21,7 +23,7 @@ namespace WhoNeedsHelp
             Channel = channel;
             using (var db = new HelpContext())
             {
-                MessageId = db.GenerateNewGuid(HelpContext.Modes.ChatMessage);
+                Id = db.GenerateNewGuid(HelpContext.Modes.ChatMessage);
             }
         }
     }

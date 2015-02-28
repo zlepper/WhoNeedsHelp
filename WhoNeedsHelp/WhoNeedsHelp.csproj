@@ -159,12 +159,30 @@
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.cs" />
+    <Compile Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.Designer.cs">
+      <DependentUpon>201502281943297_TrySerialisationToStoreDataInChannels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.cs" />
+    <Compile Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.Designer.cs">
+      <DependentUpon>201502282008048_ChangeQuestionCommentsToSerial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502282028226_ChangeQuestionToPublic.cs" />
+    <Compile Include="Migrations\201502282028226_ChangeQuestionToPublic.Designer.cs">
+      <DependentUpon>201502282028226_ChangeQuestionToPublic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201502282104348_ChangeMessageIdToId.cs" />
+    <Compile Include="Migrations\201502282104348_ChangeMessageIdToId.Designer.cs">
+      <DependentUpon>201502282104348_ChangeMessageIdToId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="server\Channel.cs" />
     <Compile Include="server\ChatMessage.cs" />
     <Compile Include="server\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="server\Question.cs" />
     <Compile Include="server\QuestionComment.cs" />
+    <Compile Include="server\Serialiser.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="server\User.cs" />
     <Compile Include="HelpContext.cs" />
@@ -189,6 +207,20 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.resx">
+      <DependentUpon>201502281943297_TrySerialisationToStoreDataInChannels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.resx">
+      <DependentUpon>201502282008048_ChangeQuestionCommentsToSerial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502282028226_ChangeQuestionToPublic.resx">
+      <DependentUpon>201502282028226_ChangeQuestionToPublic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201502282104348_ChangeMessageIdToId.resx">
+      <DependentUpon>201502282104348_ChangeMessageIdToId.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -205,7 +237,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>49195</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:49195/</IISUrl>
+          <IISUrl>http://localhost:49194/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

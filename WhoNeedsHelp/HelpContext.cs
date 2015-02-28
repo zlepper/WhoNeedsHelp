@@ -39,28 +39,28 @@ namespace WhoNeedsHelp
                     return g;
                 case Modes.ChatMessage:
                     g = Guid.NewGuid();
-                    var cm = ChatMessages.SingleOrDefault(chatMessage => chatMessage.MessageId.Equals(g));
+                    var cm = ChatMessages.SingleOrDefault(chatMessage => chatMessage.Id.Equals(g));
                     while (cm != null)
                     {
                         g = Guid.NewGuid();
-                        cm = ChatMessages.SingleOrDefault(chatMessage => chatMessage.MessageId.Equals(g));
+                        cm = ChatMessages.SingleOrDefault(chatMessage => chatMessage.Id.Equals(g));
                     }
                     return g;
                 case Modes.Question:
-                    g = new Guid();
-                    var q = Questions.SingleOrDefault(question => question.id.Equals(g));
+                    g = Guid.NewGuid();
+                    var q = Questions.SingleOrDefault(question => question.Id.Equals(g));
                     while (q != null)
                     {
-                        g = new Guid();
-                        q = Questions.SingleOrDefault(question => question.id.Equals(g));
+                        g = Guid.NewGuid();
+                        q = Questions.SingleOrDefault(question => question.Id.Equals(g));
                     }
                     return g;
                 case Modes.QuestionComment:
-                    g = new Guid();
+                    g = Guid.NewGuid();
                     var qc = QuestionComments.SingleOrDefault(questionComment => questionComment.id.Equals(g));
                     while (qc != null)
                     {
-                        g = new Guid();
+                        g = Guid.NewGuid();
                         qc = QuestionComments.SingleOrDefault(questionComment => questionComment.id.Equals(g));
                     }
                     return g;
