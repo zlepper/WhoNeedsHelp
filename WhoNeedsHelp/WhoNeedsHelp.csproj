@@ -40,10 +40,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core">
@@ -69,12 +71,17 @@
     <Reference Include="MySql.Data">
       <HintPath>..\packages\MySql.Data.6.9.5\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data.Entity.EF6">
+      <HintPath>..\packages\MySql.Data.Entity.6.9.5\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -93,10 +100,6 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\HelpContext.mdf" />
-    <Content Include="App_Data\HelpContext_log.ldf">
-      <DependentUpon>HelpContext.mdf</DependentUpon>
-    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -154,28 +157,21 @@
     <Content Include="Scripts\jquery.signalR-2.1.2.js" />
     <Content Include="Scripts\jquery.signalR-2.1.2.min.js" />
     <Content Include="Scripts\npm.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
     <Compile Include="Connection.cs" />
-    <Compile Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.cs" />
-    <Compile Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.Designer.cs">
-      <DependentUpon>201502281943297_TrySerialisationToStoreDataInChannels.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.cs" />
-    <Compile Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.Designer.cs">
-      <DependentUpon>201502282008048_ChangeQuestionCommentsToSerial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502282028226_ChangeQuestionToPublic.cs" />
-    <Compile Include="Migrations\201502282028226_ChangeQuestionToPublic.Designer.cs">
-      <DependentUpon>201502282028226_ChangeQuestionToPublic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201502282104348_ChangeMessageIdToId.cs" />
-    <Compile Include="Migrations\201502282104348_ChangeMessageIdToId.Designer.cs">
-      <DependentUpon>201502282104348_ChangeMessageIdToId.cs</DependentUpon>
+    <Compile Include="Migrations\201503011306474_test.cs" />
+    <Compile Include="Migrations\201503011306474_test.Designer.cs">
+      <DependentUpon>201503011306474_test.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="MySqlConfiguration.cs" />
+    <Compile Include="MySqlHistoryContext.cs" />
+    <Compile Include="MySqlInitializer.cs" />
     <Compile Include="server\Channel.cs" />
     <Compile Include="server\ChatMessage.cs" />
     <Compile Include="server\IClient.cs" />
@@ -208,17 +204,11 @@
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201502281943297_TrySerialisationToStoreDataInChannels.resx">
-      <DependentUpon>201502281943297_TrySerialisationToStoreDataInChannels.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502282008048_ChangeQuestionCommentsToSerial.resx">
-      <DependentUpon>201502282008048_ChangeQuestionCommentsToSerial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502282028226_ChangeQuestionToPublic.resx">
-      <DependentUpon>201502282028226_ChangeQuestionToPublic.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201502282104348_ChangeMessageIdToId.resx">
-      <DependentUpon>201502282104348_ChangeMessageIdToId.cs</DependentUpon>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201503011306474_test.resx">
+      <DependentUpon>201503011306474_test.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

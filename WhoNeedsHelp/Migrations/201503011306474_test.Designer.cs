@@ -7,13 +7,13 @@ namespace WhoNeedsHelp.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.2-31219")]
-    public sealed partial class TrySerialisationToStoreDataInChannels : IMigrationMetadata
+    public sealed partial class test : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(TrySerialisationToStoreDataInChannels));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(test));
         
         string IMigrationMetadata.Id
         {
-            get { return "201502281943297_TrySerialisationToStoreDataInChannels"; }
+            get { return "201503011306474_test"; }
         }
         
         string IMigrationMetadata.Source

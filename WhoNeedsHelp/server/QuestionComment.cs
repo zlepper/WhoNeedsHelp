@@ -12,6 +12,10 @@ namespace WhoNeedsHelp.server
         public string Text;
         public DateTime Time;
 
+        public QuestionComment()
+        {
+        }
+
         public QuestionComment(Guid user, string text)
         {
             User = user;

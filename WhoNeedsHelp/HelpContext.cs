@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Data.Common;
 using System.Data.Entity;
 using System.Linq;
+using MySql.Data.Entity;
 using WhoNeedsHelp.server;
+using MySql.Data;
 
 namespace WhoNeedsHelp
 {
+    [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class HelpContext : DbContext
     {
         public DbSet<User> Users { get; set; }
@@ -13,6 +17,11 @@ namespace WhoNeedsHelp
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionComment> QuestionComments { get; set; }
+
+        public HelpContext() : base()
+        {
+            Database.SetInitializer(new MySqlInitializer());
+        }
 
         public Guid GenerateNewGuid(Modes m)
         {

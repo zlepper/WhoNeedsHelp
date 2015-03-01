@@ -10,7 +10,6 @@ namespace WhoNeedsHelp.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
-            ContextKey = "WhoNeedsHelp.HelpContext";
         }
 
         protected override void Seed(WhoNeedsHelp.HelpContext context)
