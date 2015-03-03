@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace WhoNeedsHelp.server
@@ -20,8 +21,13 @@ namespace WhoNeedsHelp.server
         [Key]
         public int Id { get; set; }
 
+        [InverseProperty("ChannelsIn")]
         public virtual ICollection<User> Users { get; set; }
+
+        [InverseProperty("ChannelsRequestingHelpIn")]
         public virtual ICollection<User> UsersRequestingHelp { get; set; }
+
+        [InverseProperty("AreAdministratorIn")]
         public virtual ICollection<User> Administrators { get; set; }
         //public string Users { get; set; }
         //public string UsersRequestingHelp { get; set; }
