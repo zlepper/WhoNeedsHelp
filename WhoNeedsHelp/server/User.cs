@@ -22,32 +22,25 @@ namespace WhoNeedsHelp.server
             }
         }
 
-        [Key]
+        //[Key]
         public int Id { get; set; }
 
-        [UniqueKey]
+        //[UniqueKey]
         public string UserName { get; set; }
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-
-        public int ChannelId { get; set; }
-
-        [ForeignKey("ChannelId")]
+        //public int ChannelId { get; set; }
+        public string Pw { get; set; }
+        //[ForeignKey("ChannelId")]
         public Channel Channel { get; set; }
-
         public virtual ICollection<Question> Questions { get; set; }
-
-        [InverseProperty("Users")]
+        //[InverseProperty("Users")]
         public virtual ICollection<Channel> ChannelsIn { get; set; }
-
-        [InverseProperty("UsersRequestingHelp")]
+        //[InverseProperty("UsersRequestingHelp")]
         public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
-
-        [InverseProperty("Administrators")]
+        //[InverseProperty("Administrators")]
         public virtual ICollection<Channel> AreAdministratorIn { get; set; }
-
-        //public string Questions { get; set; }
         public string Ip { get; set; }
         public string ConnectionId { get; set; }
 

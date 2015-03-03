@@ -538,7 +538,7 @@ namespace WhoNeedsHelp
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user != null)
                 {
-                    var channel = new Channel(user) { ChannelName = channelName };
+                    var channel = new Channel(user, channelName);
                     channel.AddUser(user);
                     user.Channel = channel;
                     db.Channels.Add(channel);

@@ -9,7 +9,7 @@ namespace WhoNeedsHelp.server
     {
         public int Id { get; set; }
 
-
+        public int ChannelId { get; set; }
         public virtual Channel Channel { get; set; }
         public virtual User User { get; set; }
         public string Text { get; set; }

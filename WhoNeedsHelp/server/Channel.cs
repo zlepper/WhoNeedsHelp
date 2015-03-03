@@ -18,32 +18,28 @@ namespace WhoNeedsHelp.server
             return Id;
         }
 
-        [Key]
+        //[Key]
         public int Id { get; set; }
-
-        [InverseProperty("ChannelsIn")]
+        //[InverseProperty("ChannelsIn")]
         public virtual ICollection<User> Users { get; set; }
-
-        [InverseProperty("ChannelsRequestingHelpIn")]
+        //[InverseProperty("ChannelsRequestingHelpIn")]
         public virtual ICollection<User> UsersRequestingHelp { get; set; }
-
-        [InverseProperty("AreAdministratorIn")]
+        //[InverseProperty("AreAdministratorIn")]
         public virtual ICollection<User> Administrators { get; set; }
-        //public string Users { get; set; }
-        //public string UsersRequestingHelp { get; set; }
-        //public string Administrators { get; set; }
+        public virtual ICollection<Question> Questions { get; set; } 
+
         public string ChannelName { get; set; }
-        //public readonly List<string> ChatMessages = new List<string>();
 
         public Channel()
         {
-            Users = new List<User>();
+            /*Users = new List<User>();
             UsersRequestingHelp = new List<User>();
-            Administrators = new List<User>();
+            Administrators = new List<User>();*/
         }
 
-        public Channel(User user)
+        public Channel(User user, string channelName)
         {
+            ChannelName = channelName;
             Users = new List<User>();
             UsersRequestingHelp = new List<User>();
             Administrators = new List<User>();
