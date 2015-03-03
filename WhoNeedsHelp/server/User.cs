@@ -1,48 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Data;
 
 namespace WhoNeedsHelp.server
 {
     public class User
     {
+        protected bool Equals(User other)
+        {
+            return Id == other.Id && string.Equals(UserName, other.UserName);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Id*397) ^ (UserName != null ? UserName.GetHashCode() : 0);
+            }
+        }
+
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
+
+        [UniqueKey]
         public string UserName { get; set; }
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        public Guid ChannelId { get; set; }
-        public string Questions { get; set; }
+
+        public int ChannelId { get; set; }
+
+        [ForeignKey("ChannelId")]
+        public Channel Channel { get; set; }
+
+        public virtual ICollection<Question> Questions { get; set; }
+
+        [InverseProperty("Users")]
+        public virtual ICollection<Channel> ChannelsIn { get; set; }
+
+        [InverseProperty("UsersRequestingHelp")]
+        public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
+
+        [InverseProperty("Administrators")]
+        public virtual ICollection<Channel> AreAdministratorIn { get; set; }
+
+        //public string Questions { get; set; }
         public string Ip { get; set; }
         public string ConnectionId { get; set; }
 
         public User()
         {
-            Questions = "";
-            using (var db = new HelpContext())
-            {
-                Id = db.GenerateNewGuid(HelpContext.Modes.User);
-            }
+            Questions = new List<Question>();
         }
 
         public bool RequestHelp(string question = null)
         {
             using (var db = new HelpContext())
             {
-                Channel channel = db.Channels.Find(ChannelId);
-                if (channel != null)
+                if (Channel != null)
                 {
-                    bool help = channel.RequestHelp(Id);
+                    bool help = Channel.RequestHelp(this);
                     if (!help) return false;
-                    //AskQuestion(channel.Id, question);
-                    if (Questions.Contains(channel.Id + ":"))
+                    if(AreUserQuestioning(Channel))
                         return false;
-                    Question q = new Question(channel.Id, question, Id);
+                    Question q = new Question(Channel, question, this);
                     db.Questions.Add(q);
-                    var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-                    qu.Add(channel.Id, q.Id);
-                    Questions = Serialiser.SerialiseDictionary(qu);
+                    Questions.Add(q);
                     db.SaveChanges();
                     return true;
                 }
@@ -50,27 +76,19 @@ namespace WhoNeedsHelp.server
             return false;
         }
 
-        public Guid GetQuestion(Guid c)
+        public Question GetQuestion(Channel c)
         {
-            if (Questions.Contains(c + ":"))
-            {
-                var g = Serialiser.DesiraliseGuidStringDictionary(Questions);
-                return g[c];
-            }
-            return Guid.Empty;
+            return Questions.SingleOrDefault(q => q.Channel.Equals(c));
         }
 
-        private void AskQuestion(Guid c, string question)
+        private void AskQuestion(Channel c, string question)
         {
-            if (Questions.Contains(c + ":")) 
+            if (AreUserQuestioning(c)) 
                 return;
-            Question q = new Question(c, question, Id);
+            Question q = new Question(c, question, this);
             using (var db = new HelpContext())
             {
                 db.Questions.Add(q);
-                var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-                qu.Add(c, q.Id);
-                Questions = Serialiser.SerialiseDictionary(qu);
                 db.SaveChanges();
             }
         }
@@ -81,20 +99,22 @@ namespace WhoNeedsHelp.server
         /// <param name="c">The channel Guid to change question in</param>
         /// <param name="question">The question to change to</param>
         /// <returns>true if the question was changed. false if the question was added</returns>
-        public bool UpdateQuestion(Guid c, string question)
+        public bool UpdateQuestion(Channel c, string question)
         {
-            if (!Questions.Contains(c + ":"))
+            if (AreUserQuestioning(c))
             {
                 return false;
             }
-            var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-            Guid qGuid = qu[c];
             using (var db = new HelpContext())
             {
-                Question q = db.Questions.Find(qGuid);
-                q.Text = question;
-                db.SaveChanges();
-                return true;
+                Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(Channel));
+                if (q != null)
+                {
+                    q.Text = question;
+                    db.SaveChanges();
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -102,24 +122,47 @@ namespace WhoNeedsHelp.server
         {
             using (var db = new HelpContext())
             {
-                Guid channel = db.Channels.Find(ChannelId).Id;
-                var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-                qu.Remove(channel);
-                Questions = Serialiser.SerialiseDictionary(qu);
+                //Guid channel = db.Channels.Find(ChannelId).Id;
+                //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
+                //qu.Remove(channel);
+                //Questions = Serialiser.SerialiseDictionary(qu);
+                //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(Channel) && q.User.Equals(this));
+                var question = Questions.SingleOrDefault(q => q.Channel.Equals(Channel));
+                db.Questions.Remove(question);
+                db.SaveChanges();
             }
         }
 
-        public void RemoveQuestion(Guid c)
+        public void RemoveQuestion(Channel c)
         {
 
-            var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-            qu.Remove(c);
-            Questions = Serialiser.SerialiseDictionary(qu);
+            //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
+            //qu.Remove(c);
+            //Questions = Serialiser.SerialiseDictionary(qu);
+            using (var db = new HelpContext())
+            {
+                var question = Questions.SingleOrDefault(q => q.Channel.Equals(c));
+                db.Questions.Remove(question);
+                db.SaveChanges();
+            }
         }
 
-        public bool AreUserQuestioning(Guid c)
+        public bool AreUserQuestioning(Channel c)
         {
-            return Questions.Contains(c + ":");
+            using (var db = new HelpContext())
+            {
+                //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(c) && q.User.Equals(this));
+                var question = Questions.SingleOrDefault(q => q.Channel.Equals(c));
+                return question != null;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((User) obj);
         }
     }
 }

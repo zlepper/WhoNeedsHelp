@@ -1,3 +1,5 @@
+using MySql.Data.Entity;
+
 namespace WhoNeedsHelp.Migrations
 {
     using System;
@@ -9,7 +11,9 @@ namespace WhoNeedsHelp.Migrations
     {
         public Configuration()
         {
+            CodeGenerator = new MySqlMigrationCodeGenerator();
             AutomaticMigrationsEnabled = true;
+            SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 
         protected override void Seed(WhoNeedsHelp.HelpContext context)

@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Web;
 
 namespace WhoNeedsHelp.server
 {
-    public static class Serialiser
+    /*public static class Serialiser
     {
-        public static string SerialiseList(List<Guid> list)
+        public static string SerialiseList(List<User> list)
         {
             if (list.Count <= 0) return "";
             String s = list[0].ToString();
@@ -20,18 +19,18 @@ namespace WhoNeedsHelp.server
             return s;
         }
 
-        public static List<Guid> DesiraliseGuidStringList(string s)
+        public static List<User> DesiraliseGuidStringList(string s)
         {
-            if (String.IsNullOrWhiteSpace(s)) return new List<Guid>();
-            return s.Split(',').ToList().Select(str => new Guid(str)).ToList();
+            if (String.IsNullOrWhiteSpace(s)) return new List<int>();
+            return s.Split(',').ToList().Select(Int32.Parse).ToList();
         }
 
-        public static string SerialiseDictionary(Dictionary<Guid, Guid> dict)
+        public static string SerialiseDictionary(Dictionary<int, int> dict)
         {
             if (dict.Count <= 0) return "";
             String s = dict.Keys.ElementAt(0) + ":" + dict.Values.ElementAt(0);
             /*foreach (var pair in dict)
-                s = s + ("," + pair.Key + ":" + pair.Value);*/
+                s = s + ("," + pair.Key + ":" + pair.Value);
             for (int i = 1; i < dict.Count; i++)
             {
                 s += "," + dict.Keys.ElementAt(i) + ":" + dict.Values.ElementAt(i);
@@ -40,11 +39,11 @@ namespace WhoNeedsHelp.server
             return s;
         }
 
-        public static Dictionary<Guid, Guid> DesiraliseGuidStringDictionary(string s)
+        public static Dictionary<int, int> DesiraliseGuidStringDictionary(string s)
         {
-            if(String.IsNullOrWhiteSpace(s)) return new Dictionary<Guid, Guid>();
+            if(String.IsNullOrWhiteSpace(s)) return new Dictionary<int, int>();
             List<string> sl = s.Split(',').ToList();
-            return sl.Select(str => str.Split(':')).ToDictionary(sd => new Guid(sd[0]), sd => new Guid(sd[1]));
+            return sl.Select(str => str.Split(':')).ToDictionary(sd => Int32.Parse(sd[0]), sd => Int32.Parse(sd[1]));
         } 
-    }
+    }*/
 }

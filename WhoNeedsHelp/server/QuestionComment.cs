@@ -7,7 +7,7 @@ namespace WhoNeedsHelp.server
 {
     public class QuestionComment
     {
-        public Guid id { get; set; }
+        public int Id { get; set; }
         public Guid User;
         public string Text;
         public DateTime Time;
@@ -21,10 +21,6 @@ namespace WhoNeedsHelp.server
             User = user;
             Text = text;
             Time = DateTime.Now;
-            using (var db = new HelpContext())
-            {
-                id = db.GenerateNewGuid(HelpContext.Modes.QuestionComment);
-            }
         }
     }
 }

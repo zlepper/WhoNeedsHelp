@@ -365,7 +365,7 @@ $(document).ready(() => {
     $("#SearchChannelName").keyup(function () {
         $("#SearchChannelResults").empty();
         var value = $(this).val();
-        if (value.length > 4) {
+        if (value.length > 0) {
             chat.server.send("5", value);
         }
     });

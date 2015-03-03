@@ -93,16 +93,15 @@ namespace WhoNeedsHelp
             if (String.IsNullOrWhiteSpace(messageId)) return;
             using (var db = new HelpContext())
             {
-                Guid c = db.Users.Find(Context.ConnectionId).ChannelId;
-                Channel channel = db.Channels.Find(c);
-                if (channel == null) return;
-                //var message = channel.ChatMessages.Values.SingleOrDefault(m => m.Id.Equals(messageId));
-                var message = db.ChatMessages.Find(messageId);
+                var tu = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (tu == null) return;
+                Channel c = tu.Channel;
+                if (c == null) return;
+                var message = db.ChatMessages.Find(Int32.Parse(messageId));
                 var user = db.Users.Find(Context.ConnectionId);
-                if (message == null || (!channel.IsUserAdministrator(user.Id) && !message.Author.Equals(user.Id)))
+                if (message == null || (!c.IsUserAdministrator(user) && !message.User.Equals(user)))
                     return;
-                HashSet<Guid> userids = new HashSet<Guid>(channel.GetActiveUsers());
-                var users = db.Users.Where(u => userids.Contains(u.Id)).ToList();
+                List<User> users = c.GetActiveUsers();
                 foreach (User u in users)
                 {
                     Clients.Client(u.ConnectionId).RemoveChatMessage(message.Id.ToString());
@@ -119,20 +118,19 @@ namespace WhoNeedsHelp
             {
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user == null) return;
-                var channel = db.Channels.Find(user.ChannelId);
+                var channel = user.Channel;
                 if (channel == null) return;
-                Guid chatMessage = channel.AddChatMessage(user.Id, message);
-                if (!chatMessage.Equals(Guid.Empty))
+                int chatMessage = channel.AddChatMessage(user, message);
+                if (chatMessage != -1)
                 {
-                    HashSet<Guid> userids = new HashSet<Guid>(channel.GetActiveUsers());
-                    var users = db.Users.Where(u => userids.Contains(u.Id)).ToList();
+                    var users = channel.GetActiveUsers();
                     ChatMessage cm = db.ChatMessages.Find(chatMessage);
                     foreach (User u in users)
                     {
                         Clients.Client(u.ConnectionId)
                             .SendChatMessage(cm.Text, u.Name,
-                                cm.Id.ToString(), cm.Author.Equals(u.Id), channel.AppendMessageToLast(chatMessage),
-                                cm.Author.Equals(u.Id) || channel.IsUserAdministrator(u.Id));
+                                cm.Id.ToString(), cm.User.Equals(u), channel.AppendMessageToLast(cm),
+                                cm.User.Equals(u) || channel.IsUserAdministrator(u));
                     }
                 }
 
@@ -153,15 +151,14 @@ namespace WhoNeedsHelp
             {
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user == null) return;
-                Channel channel = db.Channels.Find(user.ChannelId);
+                Channel channel = db.Channels.Find(user.Channel);
                 if (channel == null) return;
-                user.UpdateQuestion(channel.Id, question);
-                Guid qGuid = user.GetQuestion(channel.Id);
-                Question q = db.Questions.Find(qGuid);
+                user.UpdateQuestion(channel, question);
+                Question q = user.GetQuestion(channel);
                 if (q == null) return;
-                foreach (Guid uGuid in channel.GetActiveUsers())
+                foreach (User use in channel.GetActiveUsers())
                 {
-                    Clients.Client(db.Users.Find(uGuid).ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id.ToString());
+                    Clients.Client(use.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id.ToString());
                 }
                 db.SaveChanges();
             }
@@ -176,13 +173,13 @@ namespace WhoNeedsHelp
                     var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                     if (user != null)
                     {
-                        Channel channel = db.Channels.Find(user.ChannelId);
-                        questionId = user.GetQuestion(channel.Id).ToString();
+                        Channel channel = user.Channel;
+                        questionId = user.GetQuestion(channel).ToString();
                         user.RemoveQuestion();
-                        channel.RemoveUserRequestingHelp(user.Id);
-                        foreach (Guid u in channel.GetActiveUsers())
+                        channel.RemoveUserRequestingHelp(user);
+                        foreach (User u in channel.GetActiveUsers())
                         {
-                            Clients.Client(db.Users.Find(u).ConnectionId).RemoveQuestion(questionId);
+                            Clients.Client(u.ConnectionId).RemoveQuestion(questionId);
                         }
                     }
                     db.SaveChanges();
@@ -194,40 +191,38 @@ namespace WhoNeedsHelp
                 {
                     var us = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                     if (us == null) return;
-                    var channel = db.Channels.Find(us.ChannelId);
+                    var channel = us.Channel;
                     if (channel == null) return;
-                    Guid questionGuid = new Guid(questionId);
-                    Question q = db.Questions.Find(questionGuid);
+                    Question q = db.Questions.Find(Int32.Parse(questionId));
                     User user = db.Users.Find(q.User);
                     if (user == null) return;
-                    user.RemoveQuestion(channel.Id);
-                    channel.RemoveUserRequestingHelp(user.Id);
-                    foreach (Guid uGuid in channel.GetActiveUsers())
+                    user.RemoveQuestion(channel);
+                    channel.RemoveUserRequestingHelp(user);
+                    foreach (User use in channel.GetActiveUsers())
                     {
-                        Clients.Client(db.Users.Find(uGuid).ConnectionId).RemoveQuestion(questionId);
+                        Clients.Client(use.ConnectionId).RemoveQuestion(questionId);
                     }
                     Clients.Client(user.ConnectionId).SetLayout(1);
                 }
             }
         }
 
-        private void RemoveQuestion(Guid u, Guid c)
+        private void RemoveQuestion(User u, Channel c)
         {
-            if (u.Equals(Guid.Empty) || c.Equals(Guid.Empty))
+            if (u == null || c == null)
             {
                 return;
             }
             using (var db = new HelpContext())
             {
-                User user = db.Users.Find(u);
-                Guid questionGuid = user.GetQuestion(c);
-                Question question = db.Questions.Find(questionGuid);
-                user.RemoveQuestion(c);
+                Question question = u.GetQuestion(c);
+                //Question question = db.Questions.Find(questionGuid);
+                u.RemoveQuestion(c);
                 Channel channel = db.Channels.Find(c);
                 channel.RemoveUserRequestingHelp(u);
-                foreach (Guid userGuid in channel.GetActiveUsers())
+                foreach (User use in channel.GetActiveUsers())
                 {
-                    Clients.Client(db.Users.Find(userGuid).ConnectionId).RemoveQuestion(question.Id.ToString());
+                    Clients.Client(use.ConnectionId).RemoveQuestion(question.Id.ToString());
                 }
 
             }
@@ -275,11 +270,11 @@ namespace WhoNeedsHelp
                 {
                     ChatMessage chatMessage = chatMessages[index];
                     textList.Add(chatMessage.Text);
-                    authorList.Add(chatMessage.Author.Name);
+                    authorList.Add(chatMessage.User.Name);
                     messageIdsList.Add(chatMessage.GetMessageId());
-                    senderList.Add(chatMessage.Author == u);
-                    appendToLastList.Add(c.AppendMessageToLast(index, chatMessage.Author));
-                    canEditList.Add(chatMessage.Author == u || c.Administrator == u);
+                    senderList.Add(chatMessage.User == u);
+                    appendToLastList.Add(c.AppendMessageToLast(index, chatMessage.User));
+                    canEditList.Add(chatMessage.User == u || c.Administrator == u);
                 }
                 Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
             }*/
@@ -288,60 +283,59 @@ namespace WhoNeedsHelp
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user != null)
                 {
-                    Channel channel = db.Channels.Find(user.ChannelId);
+                    Channel channel = user.Channel;
                     if (channel != null)
                     {
                         int activeUsers = channel.GetQuestingUserCount()-1;
                         int userCount = channel.GetUsers().Count;
-                        foreach (Guid userGuid in channel.GetUsers())
+                        foreach (User use in channel.GetUsers())
                         {
-                            Clients.Client(db.Users.Find(userGuid).ConnectionId).UpdateChannelCount(activeUsers, userCount, channel.Id.ToString());
+                            Clients.Client(use.ConnectionId).UpdateChannelCount(activeUsers, userCount, channel.Id.ToString());
                         }
                     }
                     channel = null;
                     if (String.IsNullOrWhiteSpace(channelId)) return;
-                    var cId = new Guid(channelId);
-                    channel = db.Channels.Find(cId);
+                    int id = Int32.Parse(channelId);
+                    channel = db.Channels.Find(id);
                     if (channel != null)
                     {
-                        user.ChannelId = channel.Id;
-                        Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel.Id));
+                        user.Channel = channel;
+                        Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
                         int activeUsers = channel.GetQuestingUserCount();
                         int userCount = channel.GetUsers().Count;
-                        foreach (Guid userGuid in channel.GetUsers())
+                        foreach (User use in channel.GetUsers())
                         {
-                            Clients.Client(db.Users.Find(userGuid).ConnectionId).UpdateChannelCount(activeUsers, userCount, channelId);
+                            Clients.Client(use.ConnectionId).UpdateChannelCount(activeUsers, userCount, channelId);
                         }
-                        List<Guid> questionUsers = channel.GetUsersRequestingHelp();
+                        List<User> questionUsers = channel.GetUsersRequestingHelp();
                         List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
-                        foreach (Guid uGuid in questionUsers)
+                        foreach (User us in questionUsers)
                         {
-                            var u = db.Users.Find(uGuid);
+                            var u = db.Users.Find(us);
                             usernames.Add(u.Name);
-                            Guid questionGuid = u.GetQuestion(channel.Id);
-                            Question question = db.Questions.Find(questionGuid);
+                            Question question = u.GetQuestion(channel);
+                            //Question question = db.Questions.Find(questionGuid);
                             questions.Add(question.Text);
                             questionIds.Add(question.Id.ToString());
                         }
-                        Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), channel.IsUserAdministrator(user.Id));
-                        var chatMessages = db.ChatMessages.Where(cm => cm.Channel.Equals(channel.Id)).ToArray();
+                        Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), channel.IsUserAdministrator(user));
+                        var chatMessages = db.ChatMessages.Where(cm => cm.Channel.Id.Equals(channel.Id));
                         List<string> textList = new List<string>();
                         List<string> authorList = new List<string>();
                         List<string> messageIdsList = new List<string>();
                         List<bool> senderList = new List<bool>();
                         List<bool> appendToLastList = new List<bool>();
                         List<bool> canEditList = new List<bool>();
-                        for (int index = 0; index < chatMessages.Length; index++)
+                        foreach (ChatMessage chatMessage in chatMessages)
                         {
-                            ChatMessage chatMessage = chatMessages[index];
-                            var chatMessageAuthor = db.Users.Find(chatMessage.Author);
+                            var chatMessageAuthor = db.Users.Find(chatMessage.User);
                             textList.Add(chatMessage.Text);
                             authorList.Add(chatMessageAuthor.Name);
-                            //authorList.Add(chatMessage.Author.Name);
+                            //authorList.Add(chatMessage.User.Name);
                             messageIdsList.Add(chatMessage.Id.ToString());
-                            senderList.Add(chatMessage.Author.Equals(user.Id));
-                            appendToLastList.Add(channel.AppendMessageToLast(chatMessage.Id));
-                            canEditList.Add(chatMessage.Author.Equals(user.Id) || channel.IsUserAdministrator(user.Id));
+                            senderList.Add(chatMessage.User.Equals(user));
+                            appendToLastList.Add(channel.AppendMessageToLast(chatMessage));
+                            canEditList.Add(chatMessage.User.Equals(user) || channel.IsUserAdministrator(user));
                         }
                         Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
 
@@ -361,15 +355,15 @@ namespace WhoNeedsHelp
             }*/
             using (var db = new HelpContext())
             {
-                var channel = db.Channels.Find(new Guid(channelId));
+                var channel = db.Channels.Find(Int32.Parse(channelId));
                 if (channel != null)
                 {
                     var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                     if (user != null)
                     {
-                        if (!channel.GetUsers().Contains(user.Id))
+                        if (!channel.GetUsers().Contains(user))
                         {
-                            channel.AddUser(user.Id);
+                            channel.AddUser(user);
                             Clients.Caller.AppendChannel(channel.ChannelName, channelId);
                             db.SaveChanges();
                         }
@@ -473,26 +467,26 @@ namespace WhoNeedsHelp
                     var channel = db.Channels.Find(new Guid(channelId));
                     if (channel != null)
                     {
-                        if (channel.IsUserAdministrator(user.Id))
+                        if (channel.IsUserAdministrator(user))
                         {
                             // Make everybody quit the channel
-                            foreach (Guid u in channel.GetUsers())
+                            foreach (User u in channel.GetUsers())
                             {
-                                Clients.Client(db.Users.Find(u).ConnectionId).ExitChannel(channelId);
+                                Clients.Client(u.ConnectionId).ExitChannel(channelId);
                             }
                             db.Channels.Remove(channel);
                         }
                         else
                         {
-                            channel.RemoveUser(user.Id);
-                            if (channel.GetUsersRequestingHelp().Contains(user.Id))
-                                channel.RemoveUserRequestingHelp(user.Id);
+                            channel.RemoveUser(user);
+                            if (channel.GetUsersRequestingHelp().Contains(user))
+                                channel.RemoveUserRequestingHelp(user);
                             Clients.Caller.ExitChannel(channelId);
                             int activeUsers = channel.GetQuestingUserCount();
                             int userCount = channel.GetUsers().Count;
-                            foreach (Guid us in channel.GetUsers())
+                            foreach (User us in channel.GetUsers())
                             {
-                                Clients.Client(db.Users.Find(us).ConnectionId).UpdateChannelCount(activeUsers, userCount, channelId);
+                                Clients.Client(us.ConnectionId).UpdateChannelCount(activeUsers, userCount, channelId);
                             }
                         }
                     }
@@ -544,8 +538,9 @@ namespace WhoNeedsHelp
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user != null)
                 {
-                    var channel = new Channel(user.Id) { ChannelName = channelName };
-                    channel.AddUser(user.Id);
+                    var channel = new Channel(user) { ChannelName = channelName };
+                    channel.AddUser(user);
+                    user.Channel = channel;
                     db.Channels.Add(channel);
                     db.SaveChanges();
                     Clients.Caller.AppendChannel(channelName, channel.Id.ToString());
@@ -615,19 +610,18 @@ namespace WhoNeedsHelp
                 question = "";
             using (var db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                bool successfuldRequest = user != null && user.RequestHelp(question);
+                var userFromDb = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                bool successfuldRequest = userFromDb != null && userFromDb.RequestHelp(question);
                 db.SaveChanges();
                 if (successfuldRequest)
                 {
-                    Channel channel = db.Channels.Find(user.ChannelId);
-                    Guid qGuid = user.GetQuestion(channel.Id);
-                    Question q = db.Questions.Find(qGuid);
+                    Channel channel = userFromDb.Channel;
+                    Question q = userFromDb.GetQuestion(channel);
                     db.SaveChanges();
-                    List<Guid> usersInChannel = channel.GetActiveUsers();
-                    foreach (Guid userGuid in usersInChannel)
+                    List<User> usersInChannel = channel.GetActiveUsers();
+                    foreach (User user in usersInChannel)
                     {
-                        Clients.Client(db.Users.Find(userGuid).ConnectionId).AddQuestion(user.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(userGuid));
+                        Clients.Client(user.ConnectionId).AddQuestion(user.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(user));
                     }
                 }
             }

@@ -11,6 +11,14 @@ namespace WhoNeedsHelp
     [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class HelpContext : DbContext
     {
+        private static int nextUserId = 0,
+            nextChannelId = 0,
+            nextChatMessageId = 0,
+            nextQuestionId = 0,
+            nextQuestionCommentId = 0;
+
+
+
         public DbSet<User> Users { get; set; }
         //public DbSet<Connection> Connections { get; set; }
         public DbSet<Channel> Channels { get; set; }
@@ -23,16 +31,17 @@ namespace WhoNeedsHelp
             Database.SetInitializer(new MySqlInitializer());
         }
 
-        public Guid GenerateNewGuid(Modes m)
+        /*public Guid GenerateNewGuid(Modes m)
         {
-            Guid g;
+            int g;
             switch (m)
             {
                 case Modes.User:
-                    g = Guid.NewGuid();
+                    g = nextUserId;
                     var u = Users.SingleOrDefault(user => user.Id.Equals(g));
                     while (u != null)
                     {
+                        u = Users.
                         g = Guid.NewGuid();
                         u = Users.SingleOrDefault(user => user.Id.Equals(g));
                     }
@@ -66,25 +75,25 @@ namespace WhoNeedsHelp
                     return g;
                 case Modes.QuestionComment:
                     g = Guid.NewGuid();
-                    var qc = QuestionComments.SingleOrDefault(questionComment => questionComment.id.Equals(g));
+                    var qc = QuestionComments.SingleOrDefault(questionComment => questionComment.Id.Equals(g));
                     while (qc != null)
                     {
                         g = Guid.NewGuid();
-                        qc = QuestionComments.SingleOrDefault(questionComment => questionComment.id.Equals(g));
+                        qc = QuestionComments.SingleOrDefault(questionComment => questionComment.Id.Equals(g));
                     }
                     return g;
                 default:
                     throw new ArgumentOutOfRangeException("m");
             }
-        }
+        }*/
 
-        public enum Modes
+        /*public enum Modes
         {
             User,
             Channel,
             ChatMessage,
             Question,
             QuestionComment
-        }
+        }*/
     }
 }

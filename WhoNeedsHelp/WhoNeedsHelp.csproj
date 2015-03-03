@@ -164,10 +164,6 @@
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
     <Compile Include="Connection.cs" />
-    <Compile Include="Migrations\201503011306474_test.cs" />
-    <Compile Include="Migrations\201503011306474_test.Designer.cs">
-      <DependentUpon>201503011306474_test.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlConfiguration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -182,6 +178,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="server\User.cs" />
     <Compile Include="HelpContext.cs" />
+    <Compile Include="UniqueKeyAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -205,11 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201503011306474_test.resx">
-      <DependentUpon>201503011306474_test.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

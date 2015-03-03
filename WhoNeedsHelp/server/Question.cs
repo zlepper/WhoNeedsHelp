@@ -7,9 +7,11 @@ namespace WhoNeedsHelp.server
 {
     public class Question
     {
-        public Guid Id { get; set; }
-        public Guid Channel { get; set; }
-        public Guid User { get; set; }
+        public int Id { get; set; }
+
+
+        public virtual Channel Channel { get; set; }
+        public virtual User User { get; set; }
         public string Text { get; set; }
         //public List<Guid> Comments = new List<Guid>(0);
         public string Comments { get; set; }
@@ -17,15 +19,11 @@ namespace WhoNeedsHelp.server
 
         public Question() { }
 
-        public Question(Guid channel, string text, Guid user)
+        public Question(Channel channel, string text, User user)
         {
             Channel = channel;
             Text = text;
             User = user;
-            using (var db = new HelpContext())
-            {
-                Id = db.GenerateNewGuid(HelpContext.Modes.Question);
-            }
             AskedTime = DateTime.Now;
             Comments = "";
         }
