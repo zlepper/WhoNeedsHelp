@@ -26,7 +26,8 @@ namespace WhoNeedsHelp.server
         public virtual ICollection<User> UsersRequestingHelp { get; set; }
         //[InverseProperty("AreAdministratorIn")]
         public virtual ICollection<User> Administrators { get; set; }
-        public virtual ICollection<Question> Questions { get; set; } 
+        public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<User> ActiveUsers { get; set; } 
 
         public string ChannelName { get; set; }
 
@@ -43,6 +44,7 @@ namespace WhoNeedsHelp.server
             Users = new List<User>();
             UsersRequestingHelp = new List<User>();
             Administrators = new List<User>();
+            ActiveUsers = new List<User>();
             //Users = "";
             //UsersRequestingHelp = "";
             //Administrators = "";
@@ -91,11 +93,12 @@ namespace WhoNeedsHelp.server
 
         public List<User> GetActiveUsers()
         {
-            using (var db = new HelpContext())
+            /*using (var db = new HelpContext())
             {
-                return db.Users.Where(u => u.Channel.Equals(this)).ToList();
-            }
-
+                List<User> l = db.Users.Where(u => u.Channel.Equals(this)).ToList();
+                return l;
+            }*/
+            return ActiveUsers.ToList();
         }
 
         public bool RequestHelp(User user)

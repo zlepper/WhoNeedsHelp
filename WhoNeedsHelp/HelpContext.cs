@@ -32,7 +32,7 @@ namespace WhoNeedsHelp
             // Configure the user model
             modelBuilder.Entity<User>().HasKey(u => u.Id);
             //modelBuilder.Entity<User>().Property(u => u.ChannelId).IsOptional();
-            modelBuilder.Entity<User>().HasOptional(u => u.Channel);//.WithMany().HasForeignKey(u => u.ChannelId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<User>().HasOptional<Channel>(u => u.Channel).WithMany(c => c.ActiveUsers).HasForeignKey(u => u.ChannelId).WillCascadeOnDelete(false);
             modelBuilder.Entity<User>().Property(u => u.Pw).IsOptional();
             // Map relation between "User.ChannelsIn" and "Channel.Users"
             modelBuilder.Entity<User>()
@@ -64,6 +64,7 @@ namespace WhoNeedsHelp
                     cu.MapRightKey("ChannelRefId");
                     cu.ToTable("AdministratorsInChannels");
                 });
+            //modelBuilder.Entity<User>().HasOptional()
 
 
             // Configure the channel model

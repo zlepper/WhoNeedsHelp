@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Data;
+using System.Data.Entity;
 
 namespace WhoNeedsHelp.server
 {
@@ -30,7 +31,7 @@ namespace WhoNeedsHelp.server
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        //public int ChannelId { get; set; }
+        public int? ChannelId { get; set; }
         public string Pw { get; set; }
         //[ForeignKey("ChannelId")]
         public Channel Channel { get; set; }
@@ -49,24 +50,24 @@ namespace WhoNeedsHelp.server
             Questions = new List<Question>();
         }
 
-        public bool RequestHelp(string question = null)
+        public Question RequestHelp(string question = null)
         {
             using (var db = new HelpContext())
             {
                 if (Channel != null)
                 {
                     bool help = Channel.RequestHelp(this);
-                    if (!help) return false;
+                    if (!help) return null;
                     if(AreUserQuestioning(Channel))
-                        return false;
+                        return null;
                     Question q = new Question(Channel, question, this);
-                    db.Questions.Add(q);
+                    //db.Questions.Add(q);
                     Questions.Add(q);
-                    db.SaveChanges();
-                    return true;
+                    //db.SaveChanges();
+                    return q;
                 }
             }
-            return false;
+            return null;
         }
 
         public Question GetQuestion(Channel c)
@@ -111,22 +112,27 @@ namespace WhoNeedsHelp.server
             }
         }
 
-        public void RemoveQuestion()
+        public void RemoveQuestion(Question q)
         {
-            using (var db = new HelpContext())
-            {
+            //using (var db = new HelpContext())
+            //{
                 //Guid channel = db.Channels.Find(ChannelId).Id;
                 //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
                 //qu.Remove(channel);
                 //Questions = Serialiser.SerialiseDictionary(qu);
                 //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(Channel) && q.User.Equals(this));
-                var question = Questions.SingleOrDefault(q => q.Channel.Equals(Channel));
-                db.Questions.Remove(question);
-                db.SaveChanges();
-            }
+                Questions.Remove(q);
+                /*var entry = db.Entry(question);
+                if (entry.State == EntityState.Detached)
+                {
+                    db.Questions.Attach(question);
+                    db.Questions.Remove(question);
+                    db.SaveChanges();
+                }*/
+            //}
         }
 
-        public void RemoveQuestion(Channel c)
+        /*public void RemoveQuestion(Channel c)
         {
 
             //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
@@ -138,7 +144,7 @@ namespace WhoNeedsHelp.server
                 db.Questions.Remove(question);
                 db.SaveChanges();
             }
-        }
+        }*/
 
         public bool AreUserQuestioning(Channel c)
         {

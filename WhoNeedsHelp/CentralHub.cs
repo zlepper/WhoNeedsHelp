@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using WhoNeedsHelp.server;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Linq;
 
 namespace WhoNeedsHelp
@@ -170,17 +171,19 @@ namespace WhoNeedsHelp
             {
                 using (var db = new HelpContext())
                 {
-                    var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                    var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                     if (user != null)
                     {
                         Channel channel = user.Channel;
-                        questionId = user.GetQuestion(channel).ToString();
-                        user.RemoveQuestion();
+                        Question question = user.GetQuestion(channel);
+                        user.RemoveQuestion(question);
                         channel.RemoveUserRequestingHelp(user);
+                        questionId = question.Id.ToString();
                         foreach (User u in channel.GetActiveUsers())
                         {
                             Clients.Client(u.ConnectionId).RemoveQuestion(questionId);
                         }
+                        db.Questions.Remove(question);
                     }
                     db.SaveChanges();
                 }
@@ -196,7 +199,7 @@ namespace WhoNeedsHelp
                     Question q = db.Questions.Find(Int32.Parse(questionId));
                     User user = db.Users.Find(q.User);
                     if (user == null) return;
-                    user.RemoveQuestion(channel);
+                    user.RemoveQuestion(q);
                     channel.RemoveUserRequestingHelp(user);
                     foreach (User use in channel.GetActiveUsers())
                     {
@@ -217,7 +220,7 @@ namespace WhoNeedsHelp
             {
                 Question question = u.GetQuestion(c);
                 //Question question = db.Questions.Find(questionGuid);
-                u.RemoveQuestion(c);
+                u.RemoveQuestion(question);
                 Channel channel = db.Channels.Find(c);
                 channel.RemoveUserRequestingHelp(u);
                 foreach (User use in channel.GetActiveUsers())
@@ -300,6 +303,8 @@ namespace WhoNeedsHelp
                     if (channel != null)
                     {
                         user.Channel = channel;
+                        db.Users.AddOrUpdate(user);
+                        db.SaveChanges();
                         Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
                         int activeUsers = channel.GetQuestingUserCount();
                         int userCount = channel.GetUsers().Count;
@@ -541,6 +546,7 @@ namespace WhoNeedsHelp
                     var channel = new Channel(user, channelName);
                     channel.AddUser(user);
                     user.Channel = channel;
+                    db.Users.AddOrUpdate(user);
                     db.Channels.Add(channel);
                     db.SaveChanges();
                     Clients.Caller.AppendChannel(channelName, channel.Id.ToString());
@@ -610,13 +616,16 @@ namespace WhoNeedsHelp
                 question = "";
             using (var db = new HelpContext())
             {
-                var userFromDb = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                bool successfuldRequest = userFromDb != null && userFromDb.RequestHelp(question);
+                var userFromDb = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (userFromDb == null)
+                {
+                    return;
+                }
+                Question q = userFromDb.RequestHelp(question);
                 db.SaveChanges();
-                if (successfuldRequest)
+                if (q != null)
                 {
                     Channel channel = userFromDb.Channel;
-                    Question q = userFromDb.GetQuestion(channel);
                     db.SaveChanges();
                     List<User> usersInChannel = channel.GetActiveUsers();
                     foreach (User user in usersInChannel)
