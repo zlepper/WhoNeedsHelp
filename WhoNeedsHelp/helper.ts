@@ -100,7 +100,7 @@ chat.client.sendQuestion = question => {
 }
 
 chat.client.exitChannel = e => {
-    var tmpid = $("#" + e);
+    var tmpid = $("#ChannelList #" + e);
     tmpid.hide("slide", {}, 400, () => {
         tmpid.remove();
         var id = $("#ChannelList a:first-child").attr("id");
@@ -199,7 +199,7 @@ chat.client.userAreQuesting = () => {
 }
 
 chat.client.removeQuestion = questionId => {
-    var element = $("#" + questionId);
+    var element = $("#HelpList #" + questionId);
     console.log(questionId);
     element.hide("blind", () => {
         element.remove();

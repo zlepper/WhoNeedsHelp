@@ -192,13 +192,19 @@ namespace WhoNeedsHelp
             {
                 using (var db = new HelpContext())
                 {
-                    var us = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                    /*var us = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                     if (us == null) return;
                     var channel = us.Channel;
-                    if (channel == null) return;
-                    Question q = db.Questions.Find(Int32.Parse(questionId));
-                    User user = db.Users.Find(q.User);
-                    if (user == null) return;
+                    if (channel == null) return;*/
+                    int qId = Int32.Parse(questionId);
+                    Question q = db.Questions.Include(qu => qu.User).Include(qu => qu.c).SingleOrDefault(qu => qu.Id.Equals(qId));
+                    if (q == null)  {
+                        Clients.Caller.RemoveQuestion(questionId);
+                        return;
+                    }
+                    User user = q.User;
+                    Channel channel = q.Channel;
+                    if (channel == null || user == null) return;
                     user.RemoveQuestion(q);
                     channel.RemoveUserRequestingHelp(user);
                     foreach (User use in channel.GetActiveUsers())
@@ -206,6 +212,7 @@ namespace WhoNeedsHelp
                         Clients.Client(use.ConnectionId).RemoveQuestion(questionId);
                     }
                     Clients.Client(user.ConnectionId).SetLayout(1);
+                    db.Questions.Remove(q);
                 }
             }
         }
@@ -622,10 +629,14 @@ namespace WhoNeedsHelp
                     return;
                 }
                 Question q = userFromDb.RequestHelp(question);
+                if (q == null) ;
+                db.Questions.Add(q);
+                q = db.Questions.Find(q);
                 db.SaveChanges();
                 if (q != null)
                 {
                     Channel channel = userFromDb.Channel;
+                    db.Questions.Add(q);
                     db.SaveChanges();
                     List<User> usersInChannel = channel.GetActiveUsers();
                     foreach (User user in usersInChannel)

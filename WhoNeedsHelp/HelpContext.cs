@@ -64,6 +64,11 @@ namespace WhoNeedsHelp
                     cu.MapRightKey("ChannelRefId");
                     cu.ToTable("AdministratorsInChannels");
                 });
+            modelBuilder.Entity<User>()
+                .HasMany<Question>(u => u.Questions)
+                .WithRequired(q => q.User)
+                .HasForeignKey(q => q.UserId)
+                .WillCascadeOnDelete(false);
             //modelBuilder.Entity<User>().HasOptional()
 
 
@@ -75,11 +80,14 @@ namespace WhoNeedsHelp
             modelBuilder.Entity<Channel>()
                 .HasMany<Question>(c => c.Questions)
                 .WithRequired(q => q.Channel)
-                .HasForeignKey(q => q.ChannelId);
+                .HasForeignKey(q => q.ChannelId)
+                .WillCascadeOnDelete(false);
 
             // Configure the ChatMessage model
             modelBuilder.Entity<ChatMessage>().HasKey(cm => cm.Id);
 
+            // Configure the Question model
+            
             base.OnModelCreating(modelBuilder);
         }
     }
