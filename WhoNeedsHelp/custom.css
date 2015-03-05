@@ -1,8 +1,4 @@
-﻿/*body {
-    padding-top: 50px;
-}*/
-
-.ChannelList {
+﻿.ChannelList {
     overflow-y: auto;
     max-height: 300px;
 }
@@ -10,8 +6,17 @@
 #HelpList {
     padding-top: 10px;
     overflow-y: auto;
-    max-height: 800px;
+    max-height: 600px;
 }
+
+a:active,
+a:hover,
+a:focus {
+    text-decoration: none;
+    outline: 0;
+}
+
+
 
 .list-group {
     margin-right: 6px;
@@ -21,7 +26,8 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    max-height: 800px;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
     .chat li {

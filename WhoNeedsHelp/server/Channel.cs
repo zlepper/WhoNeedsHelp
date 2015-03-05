@@ -27,7 +27,8 @@ namespace WhoNeedsHelp.server
         //[InverseProperty("AreAdministratorIn")]
         public virtual ICollection<User> Administrators { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<User> ActiveUsers { get; set; } 
+        public virtual ICollection<User> ActiveUsers { get; set; }
+        public virtual ICollection<ChatMessage> ChatMessages { get; set; }
 
         public string ChannelName { get; set; }
 
@@ -52,12 +53,18 @@ namespace WhoNeedsHelp.server
             //Administrators.Add(userId);
         }
 
+        public bool hasIp(string ip)
+        {
+            return Users.Count(u => u.Ip.Equals(ip)) > 0;
+        }
+
         public void RemoveUserRequestingHelp(User u)
         {
             /*var usrh = Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
             usrh.Remove(u);
             UsersRequestingHelp = Serialiser.SerialiseList(usrh);*/
             UsersRequestingHelp.Remove(u);
+            return;
         }
 
         public List<User> GetUsers()
@@ -91,14 +98,14 @@ namespace WhoNeedsHelp.server
             return UsersRequestingHelp.Count;
         }
 
-        public List<User> GetActiveUsers()
+        public IEnumerable<User> GetActiveUsers()
         {
             /*using (var db = new HelpContext())
             {
                 List<User> l = db.Users.Where(u => u.Channel.Equals(this)).ToList();
                 return l;
             }*/
-            return ActiveUsers.ToList();
+            return ActiveUsers;
         }
 
         public bool RequestHelp(User user)
@@ -144,37 +151,31 @@ namespace WhoNeedsHelp.server
         /// <param name="author">The Guid of the author user</param>
         /// <param name="text">The text in the message</param>
         /// <returns>The Guid of the new message</returns>
-        public int AddChatMessage(User author, string text)
+        public ChatMessage AddChatMessage(User author, string text)
         {
             if (!String.IsNullOrWhiteSpace(text))
             {
                 ChatMessage message = new ChatMessage(text, author, this);
-                using (var db = new HelpContext())
-                {
-                    db.ChatMessages.Add(message);
-                    db.SaveChanges();
-                }
-                return message.Id;
+                return message;
             }
-            return -1;
+            return null;
         }
 
         public bool AppendMessageToLast(ChatMessage chatMessage)
         {
             using (var db = new HelpContext())
             {
-                var bunch = db.ChatMessages.Where(cm => cm.Channel.Equals(this));
-                var bunchArray = bunch.ToArray();
-                if (bunchArray.Length > 1)
+                /*var bunch = db.ChatMessages.Where(cm => cm.Channel.Equals(this)).Select(cm => new ChatMessage{Channel = cm.Channel, ChannelId = cm.ChannelId, Id = cm.Id, Text = cm.Text, Time = cm.Time, User = cm.User, UserId = cm.UserId}).ToList();
+                if (bunch.Count > 1)
                 {
                     //var stuffs = bunch.ToList();
-                    ChatMessage lastChatMessage = bunchArray[bunchArray.Length - 2];
+                    ChatMessage lastChatMessage = bunch[bunch.Count - 2];
                     ChatMessage message = db.ChatMessages.Find(chatMessage);
                     if (lastChatMessage != null && message != null)
                     {
                         return lastChatMessage.User.Equals(message.User);
                     }
-                }
+                }*/
             }
             return false;
 

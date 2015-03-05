@@ -10,15 +10,12 @@ namespace WhoNeedsHelp
 {
     public class ChatMessage
     {
-        //[Key]
         public int Id { get; set; }
         public string Text { get; set; }
 
         public int UserId { get; set; }
-        //[ForeignKey("UserId")]
         public User User { get; set; }
         public int ChannelId { get; set; }
-        //[ForeignKey("ChannelId")]
         public Channel Channel { get; set; }
         public DateTime Time { get; set; }
 

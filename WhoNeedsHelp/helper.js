@@ -13,22 +13,35 @@ var chat = $.connection.centralHub;
 var fetchTables;
 
 //var setUserName;
-//var setUserName2;
+//var setUserName;
 //var validate;
-var setUserName2 = function () {
+var setUserName = function () {
     var input = $("#usernameModalInput");
     var name = input.val();
     name = name.replace(/[\s]+/g, " ");
     var n = name.match(patt);
-    console.log(n[0]);
-
-    //chat.server.send("1", n[0]);
     chat.server.setUsername(n[0]);
     $("#CurrentUserName").html(n[0]);
     $("#usernameModal").modal("hide");
-    $("#SearchChannelName").focus();
+    var id = getUrlParameter("id");
+    if (!isNullOrWhitespace(id)) {
+        chat.server.send("6", id);
+    }
+
+    //$("#SearchChannelName").focus();
     return false;
 };
+
+function getUrlParameter(sParam) {
+    var sPageUrl = window.location.search.substring(1);
+    var sUrlVariables = sPageUrl.split("&");
+    for (var i = 0; i < sUrlVariables.length; i++) {
+        var sParameterName = sUrlVariables[i].split("=");
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1];
+        }
+    }
+}
 
 var validate = function () {
     var t = $("#usernameModalInput").val();
@@ -52,16 +65,19 @@ chat.client.appendChannel = function (channelname, channelid) {
 };
 
 chat.client.setChannel = function (channel, areUserQuestioning) {
+    window.history.pushState({}, "Hvem behøver hjælp", "?id=" + channel);
     $("#CurrentChannelId").html(channel);
     $("div#ChannelList > a").stop().removeClass("active").attr("style", "");
     setTimeout(function () {
         $("#" + channel).addClass("active", 400);
+        var t = $("#" + channel).text();
+        console.log(t);
     }, 100);
     if (areUserQuestioning) {
-        console.log("User are questing");
+        //console.log("User are questing");
         setQuestionLayout(3);
     } else {
-        console.log("User are not questing");
+        //console.log("User are not questing");
         setQuestionLayout(1);
     }
 };
@@ -73,7 +89,7 @@ chat.client.updateChannelCount = function (activeUsers, connectedUsers, channelI
 
 chat.client.updateQuestion = function (question, questionId) {
     // TODO Prevent scripting injection attacks
-    console.log("updating question");
+    //console.log("updating question");
     var panel = $("#" + questionId + " .panel-body");
     if (question === "") {
         panel.hide("blind", function () {
@@ -95,12 +111,13 @@ chat.client.errorChannelAlreadyMade = function () {
 };
 
 chat.client.sendQuestion = function (question) {
-    console.log(question);
+    //console.log(question);
     $("#newQuestionText").val(question);
 };
 
 chat.client.exitChannel = function (e) {
     var tmpid = $("#ChannelList #" + e);
+    window.history.pushState({}, "Hvem behøver hjælp", "?");
     tmpid.hide("slide", {}, 400, function () {
         tmpid.remove();
         var id = $("#ChannelList a:first-child").attr("id");
@@ -142,6 +159,7 @@ chat.client.ipDiscover = function (ids, names) {
 };
 
 chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
+    console.log("Adding lots of questions");
     var helpList = $("#HelpList");
     helpList.empty();
     for (var i = 0; i < questionIds.length; i++) {
@@ -177,6 +195,7 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
 };
 
 chat.client.addQuestion = function (username, question, questionId, admin) {
+    console.log("Adding single question to que");
     var helpList = $("#HelpList");
     var span, button = $();
     if (admin) {
@@ -200,7 +219,8 @@ chat.client.userAreQuesting = function () {
 
 chat.client.removeQuestion = function (questionId) {
     var element = $("#HelpList #" + questionId);
-    console.log(questionId);
+
+    //console.log(questionId);
     element.hide("blind", function () {
         element.remove();
     });
@@ -224,7 +244,8 @@ chat.client.sendChatMessage = function (text, author, messageId, sender, appendT
     var p = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
     if (appendToLast) {
         var location = $(".chat li:last-child > div");
-        console.log(location);
+
+        //console.log(location);
         location.append(p);
     } else {
         var strong = $("<strong />").addClass("primary-font").text(author);
@@ -251,7 +272,7 @@ chat.client.removeChatMessage = function (messageId) {
 };
 
 chat.client.sendChatMessages = function (text, author, messageId, sender, appendToLast, canEdit) {
-    console.log("sendChatMessages");
+    //console.log("sendChatMessages");
     $(".chat").empty();
     for (var i = 0; i < text.length; i++) {
         chat.client.sendChatMessage(text[i], author[i], messageId[i], sender[i], appendToLast[i], canEdit[i]);
@@ -298,7 +319,7 @@ var isNullOrWhitespace = function (input) {
 };
 
 $.connection.hub.start().done(function () {
-    console.log("connected");
+    //console.log("connected");
     chat.server.getData(2);
 
     $(document).on("click", "span.channel-remove", function () {
@@ -318,19 +339,22 @@ $.connection.hub.start().done(function () {
 
     $(document).on("click", "div#ChannelList > a", function () {
         var tmpid = $(this).attr("id");
-        console.log(tmpid);
+
+        //console.log(tmpid);
         chat.server.send("7", tmpid);
     });
 
     $(document).on("click", "#closeBox", function () {
         var tmpid = $(this).parent().parent().attr("id");
-        console.log(tmpid);
+
+        //console.log(tmpid);
         chat.server.send("8", tmpid);
     });
 
     $(document).on("click", "#closeChatMessage", function () {
         var tmpid = $(this).parent().attr("id");
-        console.log(tmpid);
+
+        //console.log(tmpid);
         chat.server.send("11", tmpid);
     });
 });
@@ -346,7 +370,7 @@ $(document).ready(function () {
 
     //$("#modalForm").submit(function () {
     $("#usernameModalForm").submit(function () {
-        setUserName2();
+        setUserName();
     });
 
     $("#requestHelpForm").submit(function () {
@@ -378,16 +402,17 @@ $(document).ready(function () {
     });
 
     $("#editQuestion").click(function () {
-        console.log("edit");
+        //console.log("edit");
         $("#changeQuestionModal").modal("show");
         $("#newQuestionText").focus();
         chat.server.getData(1);
     });
 
     $("#newQuestionSubmit").click(function () {
-        console.log("submit");
+        //console.log("submit");
         var question = $("#newQuestionText").val();
-        console.log(question);
+
+        //console.log(question);
         chat.server.send("9", question);
         $("#changeQuestionModal").modal("hide");
     });

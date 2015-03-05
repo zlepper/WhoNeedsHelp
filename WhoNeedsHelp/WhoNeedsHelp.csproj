@@ -168,6 +168,14 @@
     <Compile Include="Migrations\201503051130379_initinal.Designer.cs">
       <DependentUpon>201503051130379_initinal.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503051358308_something.cs" />
+    <Compile Include="Migrations\201503051358308_something.Designer.cs">
+      <DependentUpon>201503051358308_something.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503051548334_addChatMessageRelationships.cs" />
+    <Compile Include="Migrations\201503051548334_addChatMessageRelationships.Designer.cs">
+      <DependentUpon>201503051548334_addChatMessageRelationships.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlConfiguration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
@@ -210,6 +218,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503051130379_initinal.resx">
       <DependentUpon>201503051130379_initinal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503051358308_something.resx">
+      <DependentUpon>201503051358308_something.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503051548334_addChatMessageRelationships.resx">
+      <DependentUpon>201503051548334_addChatMessageRelationships.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

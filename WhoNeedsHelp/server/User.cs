@@ -23,25 +23,20 @@ namespace WhoNeedsHelp.server
             }
         }
 
-        //[Key]
         public int Id { get; set; }
 
-        //[UniqueKey]
         public string UserName { get; set; }
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
         public int? ChannelId { get; set; }
         public string Pw { get; set; }
-        //[ForeignKey("ChannelId")]
         public Channel Channel { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
-        //[InverseProperty("Users")]
         public virtual ICollection<Channel> ChannelsIn { get; set; }
-        //[InverseProperty("UsersRequestingHelp")]
         public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
-        //[InverseProperty("Administrators")]
         public virtual ICollection<Channel> AreAdministratorIn { get; set; }
+        public virtual ICollection<ChatMessage> ChatMessages { get; set; } 
         public string Ip { get; set; }
         public string ConnectionId { get; set; }
 
@@ -52,20 +47,17 @@ namespace WhoNeedsHelp.server
 
         public Question RequestHelp(string question = null)
         {
-            using (var db = new HelpContext())
+            if (Channel != null)
             {
-                if (Channel != null)
-                {
-                    bool help = Channel.RequestHelp(this);
-                    if (!help) return null;
-                    if(AreUserQuestioning(Channel))
-                        return null;
-                    Question q = new Question(Channel, question, this);
-                    //db.Questions.Add(q);
-                    Questions.Add(q);
-                    //db.SaveChanges();
-                    return q;
-                }
+                bool help = Channel.RequestHelp(this);
+                if (!help) return null;
+                if(AreUserQuestioning(Channel))
+                    return null;
+                Question q = new Question(Channel, question, this);
+                //db.Questions.Add(q);
+                //Questions.Add(q);
+                //db.SaveChanges();
+                return q;
             }
             return null;
         }
@@ -95,21 +87,17 @@ namespace WhoNeedsHelp.server
         /// <returns>true if the question was changed. false if the question was added</returns>
         public bool UpdateQuestion(Channel c, string question)
         {
-            if (AreUserQuestioning(c))
+            /*if (AreUserQuestioning(c))
             {
                 return false;
-            }
-            using (var db = new HelpContext())
+            }*/
+            Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(Channel));
+            if (q != null)
             {
-                Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(Channel));
-                if (q != null)
-                {
-                    q.Text = question;
-                    db.SaveChanges();
-                    return true;
-                }
-                return false;
+                q.Text = question;
+                return true;
             }
+            return false;
         }
 
         public void RemoveQuestion(Question q)
