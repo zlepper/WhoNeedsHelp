@@ -1,4 +1,4 @@
-﻿var ChatMessage = (function () {
+var ChatMessage = (function () {
     function ChatMessage() {
     }
     return ChatMessage;

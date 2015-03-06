@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using WhoNeedsHelp.server;
@@ -76,21 +77,26 @@ namespace WhoNeedsHelp
             }
         }
 
+        public void LoadNearbyChannels()
+        {
+            using (var db = new HelpContext())
+            {
+                string ip = GetIpAddress();
+                var channels = db.Channels.Where(c => c.HasIp(ip)).ToList();
+                int count = channels.Count;
+                string[] channelIds = new string[count];
+                string[] channelNames = new string[count];
+                for (int i = 0; i < count; i++)
+                {
+                    channelIds[i] = channels[i].Id.ToString();
+                    channelNames[i] = channels[i].ChannelName;
+                }
+                Clients.Caller.IpDiscover(channelIds, channelNames);
+            }
+        }
+
         private void RemoveChatMessage(string messageId)
         {
-            /*Channel c = Users[Context.ConnectionId].CurrentChannel;
-            var messages = from message in c.ChatMessages.Values
-                where message.Id == messageId
-                select message;
-            var messagesList = messages.ToList();
-            foreach (User user in c.GetActiveUsers())
-            {
-                foreach (ChatMessage message in messagesList)
-                {
-                    Clients.Client(user.ConnectionId).RemoveChatMessage(message.Id);
-                    c.ChatMessages.Remove(message.Id);
-                }
-            }*/
             if (String.IsNullOrWhiteSpace(messageId)) return;
             using (var db = new HelpContext())
             {
@@ -141,13 +147,6 @@ namespace WhoNeedsHelp
 
         private void ChangeQuestion(string question)
         {
-            /*User u = Users[Context.ConnectionId];
-            u.UpdateQuestion(u.CurrentChannel, question);
-            string questionId = u.ConnectionId + "-" + u.CurrentChannel.ChannelId;
-            foreach (User user in u.CurrentChannel.GetActiveUsers())
-            {
-                Clients.Client(user.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(question) ? "" : question, questionId);
-            }*/
             using (var db = new HelpContext())
             {
                 var user = db.Users.Include(u => u.Channel).Include(u => u.Questions).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
@@ -213,27 +212,6 @@ namespace WhoNeedsHelp
                 }
             }
         }
-
-        /*private void RemoveQuestion(User u, Channel c)
-        {
-            if (u == null || c == null)
-            {
-                return;
-            }
-            using (var db = new HelpContext())
-            {
-                Question question = u.GetQuestion(c);
-                //Question question = db.Questions.Find(questionGuid);
-                u.RemoveQuestion(question);
-                Channel channel = db.Channels.Find(c);
-                channel.RemoveUserRequestingHelp(u);
-                foreach (User use in channel.GetActiveUsers())
-                {
-                    Clients.Client(use.ConnectionId).RemoveQuestion(question.Id.ToString());
-                }
-
-            }
-        }*/
 
         private void ChangeToChannel(string channelId)
         {

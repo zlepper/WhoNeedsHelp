@@ -35,4 +35,5 @@ interface ICentralServer {
     getData(action: number): JQueryPromise<void>;
     setUsername(name: string): JQueryPromise<void>;
     createNewChannel(channelName: string): JQueryPromise<void>;
+    loadNearbyChannels(): JQueryPromise<void>;
 }

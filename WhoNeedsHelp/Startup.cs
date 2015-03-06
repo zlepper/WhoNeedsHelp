@@ -18,20 +18,5 @@ namespace WhoNeedsHelp
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
             app.MapSignalR();
         }
-
-        public void ConfigureAuth(IAppBuilder app)
-        {
-            //app.UseCookieAuthentication(new CookieAuthenticationOptions());
-            //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
-
-            //app.UseOAuthBearerTokens(OAuthOptions);
-
-            app.UseOAuthAuthorizationServer(OAuthOptions);
-
-            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions
-            {
-                Provider = new ApplicationOAuthBearerAuthenticationProvider(),
-            });
-        }
     }
 }

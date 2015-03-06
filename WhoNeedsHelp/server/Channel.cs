@@ -53,7 +53,7 @@ namespace WhoNeedsHelp.server
             //Administrators.Add(userId);
         }
 
-        public bool hasIp(string ip)
+        public bool HasIp(string ip)
         {
             return Users.Count(u => u.Ip.Equals(ip)) > 0;
         }

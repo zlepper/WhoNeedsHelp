@@ -1,4 +1,4 @@
-﻿var User = (function () {
+var User = (function () {
     function User() {
     }
     return User;

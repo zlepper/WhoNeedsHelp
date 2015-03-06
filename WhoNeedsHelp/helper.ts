@@ -11,6 +11,7 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 // Make a connection to the correct hub
 // In this case the CentralHub which handles this application.
 var chat = $.connection.centralHub;
+console.log(chat);
 var fetchTables;
 //var setUserName;
 //var setUserName;
@@ -41,6 +42,7 @@ function getUrlParameter(sParam) {
             return sParameterName[1];
         }
     }
+    return "";
 }     
 
 var validate = () => {
@@ -422,5 +424,9 @@ $(document).ready(() => {
         $("#usernameModal").attr("ata-backdrop", "").attr("data-keyboard", "");
         $("#selectUsernameButton").text("Gem");
         $("#usernameModal").modal("show");
+    });
+
+    $("#reloadNearbyChannels").click(() => {
+        chat.server.loadNearbyChannels();
     });
 }); 
