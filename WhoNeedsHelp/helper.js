@@ -301,6 +301,12 @@ function isNullOrWhitespace(input) {
 $.connection.hub.start().done(function () {
     //console.log("connected");
     chat.server.getData(2);
+    setInterval(function () {
+        chat.server.getData(2);
+    }, 1000 * 60 * 10);
+    // Show the get username modal
+    $("#usernameModal").modal("show");
+    $("#usernameModalInput").focus();
     $(document).on("click", "span.channel-remove", function () {
         var tmpid = $(this).parent().attr("id");
         chat.server.exitChannel(tmpid);
@@ -331,12 +337,6 @@ $.connection.hub.start().done(function () {
     });
 });
 $(document).ready(function () {
-    setInterval(function () {
-        chat.server.getData(2);
-    }, 1000 * 60 * 10);
-    // Show the get username modal
-    $("#usernameModal").modal("show");
-    $("#usernameModalInput").focus();
     $("#usernameModalForm").submit(function () {
         setUserName();
     });
