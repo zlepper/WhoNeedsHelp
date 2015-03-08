@@ -1,6 +1,8 @@
 ﻿.ChannelList {
     overflow-y: auto;
     max-height: 300px;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }
 
 #HelpList {

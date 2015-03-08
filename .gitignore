@@ -199,3 +199,5 @@ FakesAssemblies/
 WhoNeedsHelp/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.cache
 WhoNeedsHelp.v12.suo
+*.user
+WhoNeedsHelp/bin/WhoNeedsHelp.dll
