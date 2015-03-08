@@ -7,13 +7,12 @@ using WhoNeedsHelp.server;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace WhoNeedsHelp
 {
     public class CentralHub : Hub<IClient>
     {
-        //private static readonly Dictionary<string, User> Users = new Dictionary<string, User>();
-        //private static readonly Dictionary<string, Channel> Channels = new Dictionary<string, Channel>();
 
         private string GetIpAddress()
         {
@@ -82,7 +81,9 @@ namespace WhoNeedsHelp
             using (var db = new HelpContext())
             {
                 string ip = GetIpAddress();
-                var channels = db.Channels.Where(c => c.HasIp(ip)).ToList();
+                //var users = (from user in db.Users where user.Ip.Equals(ip) select user).ToList();
+                //List<Channel> channels = users.SelectMany(user => user.ChannelsIn).ToList();
+                List<Channel> channels = db.Users.Where(u => u.Ip.Equals(ip)).SelectMany(u => u.ChannelsIn).Distinct().ToList();
                 int count = channels.Count;
                 string[] channelIds = new string[count];
                 string[] channelNames = new string[count];
@@ -95,7 +96,7 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void RemoveChatMessage(string messageId)
+        public void RemoveChatMessage(string messageId)
         {
             if (String.IsNullOrWhiteSpace(messageId)) return;
             using (var db = new HelpContext())
@@ -117,7 +118,7 @@ namespace WhoNeedsHelp
         }
 
 
-        private void Chat(string message)
+        public void Chat(string message)
         {
             if (String.IsNullOrWhiteSpace(message)) return;
             using (var db = new HelpContext())
@@ -145,7 +146,7 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void ChangeQuestion(string question)
+        public void ChangeQuestion(string question)
         {
             using (var db = new HelpContext())
             {
@@ -164,7 +165,22 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void RemoveQuestion(string questionId)
+        private void UpdateCount(int channelId)
+        {
+            using (var db = new HelpContext())
+            {
+                var channel = db.Channels.Find(channelId);
+                if (channel == null) return;
+                int totalUsers = channel.Users.Count;
+                int activeUsers = channel.UsersRequestingHelp.Count;
+                foreach (User user in channel.GetActiveUsers())
+                {
+                    Clients.Client(user.ConnectionId).UpdateChannelCount(activeUsers, totalUsers, channelId.ToString());
+                }
+            }
+        }
+
+        public void RemoveQuestion(string questionId)
         {
             if (String.IsNullOrWhiteSpace(questionId))
             {
@@ -183,8 +199,9 @@ namespace WhoNeedsHelp
                             Clients.Client(u.ConnectionId).RemoveQuestion(questionId);
                         }
                         db.Questions.Remove(question);
+                        db.SaveChanges();
+                        UpdateCount(channel.Id);
                     }
-                    db.SaveChanges();
                 }
             }
             else
@@ -200,7 +217,6 @@ namespace WhoNeedsHelp
                     User user = q.User;
                     Channel channel = q.Channel;
                     if (channel == null || user == null) return;
-                    //user.RemoveQuestion(q);
                     channel.RemoveUserRequestingHelp(user);
                     foreach (User use in channel.GetActiveUsers())
                     {
@@ -209,43 +225,30 @@ namespace WhoNeedsHelp
                     Clients.Client(user.ConnectionId).SetLayout(1);
                     db.Questions.Remove(q);
                     db.SaveChanges();
+                    UpdateCount(channel.Id);
                 }
             }
         }
 
-        private void ChangeToChannel(string channelId)
+        public void ChangeToChannel(string channelId)
         {
             using (var db = new HelpContext())
             {
                 var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 if (user != null)
                 {
-                    Channel channel = user.Channel;
-                    if (channel != null)
-                    {
-                        int activeUsers = channel.GetQuestingUserCount()-1;
-                        int userCount = channel.GetUsers().Count;
-                        foreach (User use in channel.GetUsers())
-                        {
-                            Clients.Client(use.ConnectionId).UpdateChannelCount(activeUsers, userCount, channel.Id.ToString());
-                        }
-                    }
-                    channel = null;
                     if (String.IsNullOrWhiteSpace(channelId)) return;
-                    int id = Int32.Parse(channelId);
-                    channel = db.Channels.Find(id);
+                    int id;
+                    bool parse = Int32.TryParse(channelId, out id);
+                    if (!parse) return;
+                    var channel = db.Channels.Find(id);
                     if (channel != null)
                     {
                         user.Channel = channel;
                         db.Users.AddOrUpdate(user);
                         db.SaveChanges();
                         Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
-                        int activeUsers = channel.GetQuestingUserCount();
-                        int userCount = channel.GetUsers().Count;
-                        foreach (User use in channel.GetUsers())
-                        {
-                            Clients.Client(use.ConnectionId).UpdateChannelCount(activeUsers, userCount, channelId);
-                        }
+                        UpdateCount(channel.Id);
                         List<User> questionUsers = channel.GetUsersRequestingHelp();
                         List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
                         foreach (User us in questionUsers)
@@ -282,7 +285,7 @@ namespace WhoNeedsHelp
 
         }
 
-        private void JoinChannel(string channelId)
+        public void JoinChannel(string channelId)
         {
             using (var db = new HelpContext())
             {
@@ -303,12 +306,11 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void SearchForChannel(string parameter)
+        public void SearchForChannel(string channelId)
         {
-           // parameter = parameter.ToLower();
-            if (String.IsNullOrWhiteSpace(parameter)) return;
+            if (String.IsNullOrWhiteSpace(channelId)) return;
             int id;
-            bool isInt = Int32.TryParse(parameter, out id);
+            bool isInt = Int32.TryParse(channelId, out id);
             if (!isInt) return;
             using (var db = new HelpContext())
             {
@@ -324,7 +326,7 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void ExitChannel(string channelId)
+        public void ExitChannel(string channelId)
         {
             if(string.IsNullOrWhiteSpace(channelId)) return;
             int id;
@@ -369,7 +371,7 @@ namespace WhoNeedsHelp
 
         }
 
-        private void CreateNewChannel(string channelName)
+        public void CreateNewChannel(string channelName)
         {
             using (var db = new HelpContext())
             {
@@ -413,7 +415,7 @@ namespace WhoNeedsHelp
             }
         }
 
-        private void RequestHelp(string question)
+        public void RequestHelp(string question)
         {
             if (String.IsNullOrWhiteSpace(question))
                 question = "";
@@ -432,8 +434,9 @@ namespace WhoNeedsHelp
                 IEnumerable<User> usersInChannel = channel.GetActiveUsers();
                 foreach (User user in usersInChannel)
                 {
-                    Clients.Client(user.ConnectionId).AddQuestion(user.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(user));
+                    Clients.Client(user.ConnectionId).AddQuestion(userFromDb.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(user));
                 }
+                UpdateCount(channel.Id);
             }
 
         }
@@ -472,41 +475,28 @@ namespace WhoNeedsHelp
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            /*if (Users.ContainsKey(Context.ConnectionId))
-            {
-                User u = Users[Context.ConnectionId];
-                Debug.WriteLine("Disconnecting: " + Context.ConnectionId);
-                var channelsToClear = from channel in Channels.Values
-                    where channel.Administrator == u
-                    select channel;
-                var ctc = channelsToClear.ToList();
-                for (int i = 0; i < ctc.Count(); i++)
-                {
-                    ExitChannel(ctc[i].ChannelId);
-                }
-                var channelsToLeave = from channel in Channels.Values
-                    where channel.Users.ContainsKey(u.ConnectionId)
-                    select channel;
-                ctc = channelsToLeave.ToList();
-                foreach (Channel channel in ctc)
-                {
-                    if (channel.UsersRequestingHelp.Contains(u))
-                    {
-                        RemoveQuestion(u, channel);
-                    }
-                    ExitChannel(channel.ChannelId);
-                }
-                if (Users.ContainsKey(Context.ConnectionId))
-                {
-                    Users.Remove(Context.ConnectionId);
-                }
-                Debug.WriteLine("Disconnected: " + Context.ConnectionId);
-            }*/
             using (var db = new HelpContext())
             {
-
+                var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (user == null) return base.OnDisconnected(stopCalled);
+                foreach (Channel c in user.ChannelsIn)
+                {
+                    ExitChannel(c.Id.ToString());
+                }
+                RemoveUser(user.Id);
             }
             return base.OnDisconnected(stopCalled);
+        }
+
+        private void RemoveUser(int id)
+        {
+            using (var db = new HelpContext())
+            {
+                var user = db.Users.Find(id);
+                if (user == null) return;
+                db.Users.Remove(user);
+                db.SaveChanges();
+            }
         }
 
         public override Task OnReconnected()

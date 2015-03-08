@@ -36,4 +36,13 @@ interface ICentralServer {
     setUsername(name: string): JQueryPromise<void>;
     createNewChannel(channelName: string): JQueryPromise<void>;
     loadNearbyChannels(): JQueryPromise<void>;
+    changeToChannel(channelId: string): JQueryPromise<void>;
+    exitChannel(channelId: string): JQueryPromise<void>;
+    joinChannel(channelId: string): JQueryPromise<void>;
+    removeQuestion(channelId: string): JQueryPromise<void>;
+    removeChatMessage(messageId: string): JQueryPromise<void>;
+    requestHelp(channelId: string): JQueryPromise<void>;
+    searchForChannel(channelId: string): JQueryPromise<void>;
+    changeQuestion(question: string): JQueryPromise<void>;
+    chat(message: string): JQueryPromise<void>;
 }

@@ -12,7 +12,7 @@ namespace WhoNeedsHelp.Migrations
         public Configuration()
         {
             CodeGenerator = new MySqlMigrationCodeGenerator();
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }

@@ -29,7 +29,11 @@ namespace WhoNeedsHelp
 
             // Configure the user model
             modelBuilder.Entity<User>().HasKey(u => u.Id);
-            modelBuilder.Entity<User>().HasOptional<Channel>(u => u.Channel).WithMany(c => c.ActiveUsers).HasForeignKey(u => u.ChannelId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<User>()
+                .HasOptional<Channel>(u => u.Channel)
+                .WithMany(c => c.ActiveUsers)
+                .HasForeignKey(u => u.ChannelId)
+                .WillCascadeOnDelete(false);
             modelBuilder.Entity<User>().Property(u => u.Pw).IsOptional();
             // Map relation between "User.ChannelsIn" and "Channel.Users"
             modelBuilder.Entity<User>()
@@ -66,13 +70,13 @@ namespace WhoNeedsHelp
                 .HasMany<Question>(u => u.Questions)
                 .WithRequired(q => q.User)
                 .HasForeignKey(q => q.UserId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
             // Map relation between "User.ChatMessages" and "ChatMessage.User"
             modelBuilder.Entity<User>()
                 .HasMany<ChatMessage>(u => u.ChatMessages)
                 .WithRequired(cm => cm.User)
                 .HasForeignKey(cm => cm.UserId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
 
             // Configure the channel model
@@ -84,13 +88,13 @@ namespace WhoNeedsHelp
                 .HasMany<Question>(c => c.Questions)
                 .WithRequired(q => q.Channel)
                 .HasForeignKey(q => q.ChannelId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
             // Map relation between "Channel.ChatMessages" and "ChatMessage.Channel"
             modelBuilder.Entity<Channel>()
                 .HasMany<ChatMessage>(c => c.ChatMessages)
                 .WithRequired(cm => cm.Channel)
                 .HasForeignKey(cm => cm.ChannelId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             // Configure the ChatMessage model
             modelBuilder.Entity<ChatMessage>().HasKey(cm => cm.Id);
