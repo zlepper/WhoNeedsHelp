@@ -21,5 +21,6 @@ namespace WhoNeedsHelp
         void CheckVersion(int version);
         void RemoveChatMessage(string messageId);
         void IpDiscover(string[] channelIds, string[] channelNames);
+        void ClearChat();
     }
 }

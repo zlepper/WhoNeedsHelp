@@ -136,7 +136,7 @@ namespace WhoNeedsHelp
                     foreach (User u in users)
                     {
                         Clients.Client(u.ConnectionId)
-                            .SendChatMessage(chatMessage.Text, u.Name,
+                            .SendChatMessage(chatMessage.Text, user.Name,
                                 chatMessage.Id.ToString(), chatMessage.User.Equals(u), channel.AppendMessageToLast(chatMessage),
                                 chatMessage.User.Equals(u) || channel.IsUserAdministrator(u));
                     }
@@ -162,6 +162,30 @@ namespace WhoNeedsHelp
                     Clients.Client(use.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id.ToString());
                 }
                 db.SaveChanges();
+            }
+        }
+
+        public void ClearChat()
+        {
+            using (var db = new HelpContext())
+            {
+                var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (user == null) return;
+                var channel = user.Channel;
+                if (channel == null) return;
+                if (channel.IsUserAdministrator(user))
+                {
+                    db.ChatMessages.RemoveRange(channel.ChatMessages);
+                    db.SaveChanges();
+                    foreach (User u in channel.GetActiveUsers())
+                    {
+                        Clients.Client(u.ConnectionId).ClearChat();
+                    }
+                }
+                else
+                {
+                    Clients.Client(user.ConnectionId).ClearChat();
+                }
             }
         }
 
@@ -259,7 +283,7 @@ namespace WhoNeedsHelp
                             questionIds.Add(question.Id.ToString());
                         }
                         Clients.Caller.AddQuestions(usernames.ToArray(), questions.ToArray(), questionIds.ToArray(), channel.IsUserAdministrator(user));
-                        var chatMessages = db.ChatMessages.Where(cm => cm.Channel.Id.Equals(channel.Id));
+                        var chatMessages = db.ChatMessages.Include(cm => cm.User).Where(cm => cm.Channel.Id.Equals(channel.Id));
                         List<string> textList = new List<string>();
                         List<string> authorList = new List<string>();
                         List<string> messageIdsList = new List<string>();

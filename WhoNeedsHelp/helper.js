@@ -77,7 +77,6 @@ chat.client.updateChannelCount = function (activeUsers, connectedUsers, channelI
     $("a#" + channelId + " .badge").html(badge);
 };
 chat.client.updateQuestion = function (question, questionId) {
-    // TODO Prevent scripting injection attacks
     //console.log("updating question");
     var panel = $("#" + questionId + " .panel-body");
     if (question === "") {
@@ -91,7 +90,6 @@ chat.client.updateQuestion = function (question, questionId) {
         }
         else {
             var html = $("<div />").attr("style", "display: none;").addClass("panel-body").text(question);
-            //var html = "<div style=\"display: none;\" class=\"panel-body\">" + question + "</div>";
             $("#HelpList #" + questionId).append(html);
             $("#HelpList #" + questionId + " .panel-body").show("blind");
         }
@@ -263,6 +261,9 @@ chat.client.checkVersion = function (version) {
         location.reload(true);
     }
 };
+chat.client.clearChat = function () {
+    $(".chat").empty();
+};
 function setQuestionLayout(layout) {
     switch (layout) {
         case 1:
@@ -392,6 +393,9 @@ $(document).ready(function () {
     });
     $("#reloadNearbyChannels").click(function () {
         chat.server.loadNearbyChannels();
+    });
+    $("#ClearChatButton").click(function () {
+        chat.server.clearChat();
     });
 });
 //# sourceMappingURL=helper.js.map

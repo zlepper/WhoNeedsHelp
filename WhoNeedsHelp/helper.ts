@@ -85,7 +85,6 @@ var fetchTables;
     }
 
     chat.client.updateQuestion = (question, questionId) => {
-        // TODO Prevent scripting injection attacks
         //console.log("updating question");
         var panel = $("#" + questionId + " .panel-body");
         if (question === "") {
@@ -97,7 +96,6 @@ var fetchTables;
                 panel.html(question);
             } else {
                 var html = $("<div />").attr("style", "display: none;").addClass("panel-body").text(question);
-                //var html = "<div style=\"display: none;\" class=\"panel-body\">" + question + "</div>";
                 $("#HelpList #" + questionId).append(html);
                 $("#HelpList #" + questionId + " .panel-body").show("blind");
             }
@@ -284,6 +282,10 @@ var fetchTables;
         }
     }
 
+    chat.client.clearChat = () => {
+        $(".chat").empty();
+    }
+
     function setQuestionLayout(layout: any) {
         switch (layout) {
             // Standard Layout
@@ -434,6 +436,10 @@ var fetchTables;
 
         $("#reloadNearbyChannels").click(() => {
             chat.server.loadNearbyChannels();
+        });
+
+        $("#ClearChatButton").click(() => {
+            chat.server.clearChat();
         });
     }); 
 
