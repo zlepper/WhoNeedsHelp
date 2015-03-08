@@ -327,6 +327,12 @@ var fetchTables;
     $.connection.hub.start().done(() => {
         //console.log("connected");
         chat.server.getData(2);
+        setInterval(() => {
+            chat.server.getData(2);
+        }, 1000 * 60 * 10);
+        // Show the get username modal
+        $("#usernameModal").modal("show");
+        $("#usernameModalInput").focus();
 
         $(document).on("click", "span.channel-remove", function () {
             var tmpid = $(this).parent().attr("id");
@@ -363,12 +369,6 @@ var fetchTables;
     });
 
     $(document).ready(() => {
-        setInterval(() => {
-            chat.server.getData(2);
-        }, 1000 * 60 * 10);
-        // Show the get username modal
-        $("#usernameModal").modal("show");
-        $("#usernameModalInput").focus();
 
         $("#usernameModalForm").submit(() => {
             setUserName();
