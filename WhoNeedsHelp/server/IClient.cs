@@ -22,5 +22,7 @@ namespace WhoNeedsHelp
         void RemoveChatMessage(string messageId);
         void IpDiscover(string[] channelIds, string[] channelNames);
         void ClearChat();
+        void LoginSuccess();
+        void LoginFailed();
     }
 }

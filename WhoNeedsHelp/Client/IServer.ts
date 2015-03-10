@@ -28,7 +28,9 @@ interface ICentralClient {
     checkVersion: (version: number) => void;
     removeChatMessage: (messageId: string) => void;
     ipDiscover: (channelIds: string[], channelNames: string[]) => void;
-    clearChat: () => void ;
+    clearChat: () => void;
+    loginSuccess: () => void;
+    loginFailed: () => void;
 }
 
 interface ICentralServer {
@@ -47,4 +49,5 @@ interface ICentralServer {
     changeQuestion(question: string): JQueryPromise<void>;
     chat(message: string): JQueryPromise<void>;
     clearChat(): JQueryPromise<void>;
+    login(un: string, pw: string): JQueryPromise<void>;
 }

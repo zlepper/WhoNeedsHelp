@@ -97,6 +97,7 @@ var fetchTables;
             } else {
                 var html = $("<div />").attr("style", "display: none;").addClass("panel-body").text(question);
                 $("#HelpList #" + questionId).append(html);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 $("#HelpList #" + questionId + " .panel-body").show("blind");
             }
         }
@@ -188,6 +189,7 @@ var fetchTables;
             var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionIds[i]).html(heading).append(body);
             helpList.append(html);
             var timeout = 200 * i;
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             setTimeout(showId(questionIds[i], timeout));
         }
     }
@@ -209,6 +211,7 @@ var fetchTables;
         var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionId).html(heading).append(body);
         helpList.append(html);
         console.log("Here");
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         $("#HelpList #" + questionId).show("blind");
     }
 
@@ -256,6 +259,7 @@ var fetchTables;
             }
             $(".chat").append(li);
         }
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     }
 
     chat.client.removeChatMessage = messageId => {
