@@ -525,9 +525,41 @@ namespace WhoNeedsHelp
 
         public override Task OnReconnected()
         {
+            
+            ReloadClientChannels();
+
+
             return base.OnReconnected();
         }
 
+        private void ReloadClientChannels()
+        {
+            // Resend channels to client
+            using (var db = new HelpContext())
+            {
+                var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (user == null) return;
+                List<string> channelNames = new List<string>();
+                List<string> channelIds = new List<string>();
+                foreach (Channel c in user.ChannelsIn)
+                {
+                    channelNames.Add(c.ChannelName);
+                    channelIds.Add(c.Id.ToString());
+                }
+                Clients.Caller.ShowChannels(channelIds.ToArray(), channelNames.ToArray());
+            }
+        }
+
+        public void RequestActiveChannel()
+        {
+            using (var db = new HelpContext())
+            {
+                var user =
+                    db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (user == null) return;
+                Clients.Caller.SetChannel(user.Channel.Id.ToString(), user.AreUserQuestioning(user.Channel));
+            }
+        }
 
     }
 }

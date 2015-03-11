@@ -103,6 +103,14 @@ var fetchTables;
         }
     }
 
+    chat.client.showChannels = (channelIds, channelNames) => {
+        $("#ChannelList").empty();
+        for (var i = 0; i < channelIds.length; i++) {
+            chat.client.appendChannel(channelNames[i], channelIds[i]);
+        }
+        chat.server.requestActiveChannel();
+    }
+
     chat.client.errorChannelAlreadyMade = () => {
         alert("This channel already exists");
     }

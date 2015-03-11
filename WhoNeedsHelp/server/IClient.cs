@@ -24,5 +24,6 @@ namespace WhoNeedsHelp
         void ClearChat();
         void LoginSuccess();
         void LoginFailed();
+        void ShowChannels(string[] channelId, string[] channelName);
     }
 }

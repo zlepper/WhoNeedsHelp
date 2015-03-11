@@ -31,6 +31,7 @@ interface ICentralClient {
     clearChat: () => void;
     loginSuccess: () => void;
     loginFailed: () => void;
+    showChannels: (channelIds: string[], channelNames: string[]) => void;
 }
 
 interface ICentralServer {
@@ -50,4 +51,5 @@ interface ICentralServer {
     chat(message: string): JQueryPromise<void>;
     clearChat(): JQueryPromise<void>;
     login(un: string, pw: string): JQueryPromise<void>;
+    requestActiveChannel(): JQueryPromise<void>;
 }
