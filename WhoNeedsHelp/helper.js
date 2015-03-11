@@ -408,5 +408,20 @@ $(document).ready(function () {
     $("#ClearChatButton").click(function () {
         chat.server.clearChat();
     });
+    $("#CreateUserButton").popover({
+        html: true,
+        content: function () { return $('#createUserContent').html(); },
+        title: function () { return $('#createUserTitle').html(); },
+        placement: "bottom",
+        container: "body"
+    });
+    $(document).on("submit", "#createUserForm", function (e) {
+        e.preventDefault();
+        console.log("submitted");
+    }).on("click", "#CreateUserButton", function (e) {
+        var name = $("#CurrentUserName").text();
+        var input = $(".popover-content #CreateUserName");
+        input.val(name);
+    });
 });
 //# sourceMappingURL=helper.js.map

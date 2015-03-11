@@ -453,5 +453,23 @@ var fetchTables;
         $("#ClearChatButton").click(() => {
             chat.server.clearChat();
         });
+
+        $("#CreateUserButton").popover({
+            html: true,
+            content: () => $('#createUserContent').html(),
+            title: () => $('#createUserTitle').html(),
+            placement: "bottom",
+            container: "body"
+        });
+
+        $(document).on("submit", "#createUserForm", e => {
+            e.preventDefault();
+            console.log("submitted");
+            
+        }).on("click", "#CreateUserButton", e => {
+            var name = $("#CurrentUserName").text();
+            var input = $(".popover-content #CreateUserName");
+            input.val(name);
+        });
     }); 
 

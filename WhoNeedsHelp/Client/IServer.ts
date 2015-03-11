@@ -50,6 +50,6 @@ interface ICentralServer {
     changeQuestion(question: string): JQueryPromise<void>;
     chat(message: string): JQueryPromise<void>;
     clearChat(): JQueryPromise<void>;
-    login(un: string, pw: string): JQueryPromise<void>;
+    createNewUser(un: string, email: string, pw: string): JQueryPromise<void>;
     requestActiveChannel(): JQueryPromise<void>;
 }

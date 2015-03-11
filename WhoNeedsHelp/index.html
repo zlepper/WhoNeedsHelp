@@ -94,21 +94,42 @@
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <li>
-                                <p class="navbar-text">Forbundet med navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
+                                <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
                             </li>
                             <!--Should only be shown when the user is not logged in-->
-                            <li style="display: none;" class="beta"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
-                            <li style="display: none;" class="beta"><a id="LoginButton" href="#">Log in</a></li>
+                            <li class="beta"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
+                            <li class="beta"><a id="LoginButton" href="#">Log in</a></li>
                             <!--Should only be shown when the user is logged in-->
                             <li style="display: none;" class="beta"><a id="logoutButton" href="#">Log ud</a></li>
                         </ul>
                     </div>
                 </div>
             </nav>
-            <!--Put all userinformation here.
-            Userid
-            -->
         </div>
+    <!--Create User hidden content-->
+    <div style="display: none;" id="createUserContent">
+        <form onsubmit=" return false; " id="createUserForm">
+            <div class="form-group">
+                <label for="CreateUserName">Navn</label>
+                <input required="required" type="text" class="form-control" id="CreateUserName"/>
+            </div>
+            <div class="form-group">
+                <label for="CreateUserEmail">Email</label>
+                <input required="required" type="email" class="form-control" id="CreateUserEmail"/>
+            </div>
+            <div class="form-group">
+                <label for="CreateUserPw">Kodeord</label>
+                <input required="required" type="password" class="form-control" id="CreateUserPw"/>
+            </div>
+            <button class="btn btn-primary" type="submit">Opret</button>
+        </form>
+    </div>
+        <!--Create User hidden title-->
+    <div style="display: none;" id="createUserTitle">
+        Opret Bruger
+    </div>
+        <!--login hidden content-->
+        <!--login hidden title-->
         <div class="row">
             <div class="col-md-3">
                 <div class="panel panel-primary">
@@ -156,7 +177,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a></h3>
-                        
+
                     </div>
                     <div class="panel-body">
                         <div class="list-group ChannelList joinChannel" id="ip-discovery">
@@ -237,7 +258,7 @@
                     <div class="panel-footer">
                         <form class="form" onsubmit=" return false; " id="chatForm">
                             <div class="form-group">
-                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control"/>
+                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control" />
                             </div>
                         </form>
                         <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>

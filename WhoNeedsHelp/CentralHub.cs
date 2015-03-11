@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using WhoNeedsHelp.server;
 using System.Data.Entity;
+using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Migrations;
 using System.Linq;
 // ReSharper disable MemberCanBePrivate.Global
@@ -556,8 +557,18 @@ namespace WhoNeedsHelp
             {
                 var user =
                     db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                if (user == null) return;
+                if (user == null || user.Channel == null) return;
                 Clients.Caller.SetChannel(user.Channel.Id.ToString(), user.AreUserQuestioning(user.Channel));
+            }
+        }
+
+        public void CreateNewUser(string username, string email, string pw)
+        {
+            using (var db = new HelpContext())
+            {
+                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                if (user == null) return;
+
             }
         }
 
