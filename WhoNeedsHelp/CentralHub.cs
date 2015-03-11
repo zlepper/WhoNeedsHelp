@@ -556,7 +556,7 @@ namespace WhoNeedsHelp
             {
                 var user =
                     db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                if (user == null) return;
+                if (user == null || user.Channel == null) return;
                 Clients.Caller.SetChannel(user.Channel.Id.ToString(), user.AreUserQuestioning(user.Channel));
             }
         }
