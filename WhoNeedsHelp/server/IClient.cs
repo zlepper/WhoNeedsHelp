@@ -3,6 +3,7 @@ namespace WhoNeedsHelp
     public interface IClient
     {
         void AppendChannel(string channelname, string channelid);
+        void AppendChannel2(string channelname, string channelid);
         void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
         void AddQuestion(string username, string question, string questionId, bool admin = false);
         void RemoveQuestion(string questionId);

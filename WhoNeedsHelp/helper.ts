@@ -3,6 +3,7 @@
 /// <reference path="Client/IServer.ts"/>
 /// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="Scripts/typings/jqueryui/jqueryui.d.ts"/>
+/// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 
 "use strict";
 // The pattern for the username
@@ -14,6 +15,7 @@ var chat = $.connection.centralHub;
 var fetchTables;
 var createUserPopover: JQuery;
 var loginUserPopover: JQuery;
+PNotify.prototype.options.styling = "bootstrap3";
 //var validate;
 
     function setUserName() {
@@ -65,6 +67,14 @@ var loginUserPopover: JQuery;
         chat.server.changeToChannel(channelid);
     }
 
+    chat.client.appendChannel2 = (channelname, channelid) => {
+        var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
+        var span2 = $("<span />").addClass("badge").text("0/0");
+        var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelid).addClass("list-group-item").text(channelname).prepend(span2).prepend(span1);
+        $("#ChannelList").append(html);
+        $("#ChannelList #" + channelid).show("slide", 400);
+    }
+
     chat.client.setChannel = (channel, areUserQuestioning) => {
         window.history.pushState({}, "Hvem behøver hjælp", "?id=" + channel);
         $("#CurrentChannelId").html(channel);
@@ -72,7 +82,6 @@ var loginUserPopover: JQuery;
         setTimeout(() => {
             $("#" + channel).addClass("active", 400);
             var t = $("#ChannelList #" + channel).text();
-            console.log(t);
         }, 100);
         if (areUserQuestioning) {
             setQuestionLayout(3);
@@ -87,7 +96,6 @@ var loginUserPopover: JQuery;
     }
 
     chat.client.updateQuestion = (question, questionId) => {
-        //console.log("updating question");
         var panel = $("#" + questionId + " .panel-body");
         if (question === "") {
             panel.hide("blind", function() {
@@ -108,7 +116,11 @@ var loginUserPopover: JQuery;
     chat.client.showChannels = (channelIds, channelNames) => {
         $("#ChannelList").empty();
         for (var i = 0; i < channelIds.length; i++) {
-            chat.client.appendChannel(channelNames[i], channelIds[i]);
+            var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
+            var span2 = $("<span />").addClass("badge").text("0/0");
+            var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelIds[i]).addClass("list-group-item").text(channelNames[i]).prepend(span2).prepend(span1);
+            $("#ChannelList").append(html);
+            $("#ChannelList #" + channelIds[i]).show("slide", 400);
         }
         chat.server.requestActiveChannel();
     }
@@ -118,7 +130,6 @@ var loginUserPopover: JQuery;
     }
 
     chat.client.sendQuestion = question => {
-        //console.log(question);
         $("#newQuestionText").val(question);
     }
 
@@ -147,11 +158,9 @@ var loginUserPopover: JQuery;
         var resultList = $("#SearchChannelResults");
 
         for (var i = 0; i < ids.length; i++) {
-            //var html = "<a href='#' style='display: none;' id='" + ids[i] + "' class='list-group-item'>" + names[i] + "</a>";
             var html = $("<a />");
             html = html.attr("id", ids[i]).attr("class", "list-group-item").attr("href", "#").attr("data-toggle", "tooltip").attr("data-placement","left").attr("title", "Kanel ID: " + ids[i]).text(names[i]);
             resultList.append(html);
-            //$("#" + ids[i]).show("blind");
             $("[data-toggle=\"tooltip\"]").tooltip();
         }
     }
@@ -168,23 +177,9 @@ var loginUserPopover: JQuery;
     }
 
     chat.client.addQuestions = (usernames, questions, questionIds, admin) => {
-        console.log("Adding lots of questions");
         var helpList = $("#HelpList");
         helpList.empty();
         for (var i = 0; i < questionIds.length; i++) {
-            /*var html = "";
-            if (admin) {
-                console.log("Admin");
-                html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\"  aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
-            } else {
-                console.log("not admin");
-                html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
-            }
-            if (questions[i] === "") {
-                html = html.replace("{0}", "");
-            } else {
-                html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
-            }*/
             var span: JQuery, button: JQuery = $();
             if (admin) {
                 span = $("<span />").attr("aria-hidden", "true").html("&times;");
@@ -205,7 +200,6 @@ var loginUserPopover: JQuery;
     }
 
     chat.client.addQuestion = (username, question, questionId, admin) => {
-        console.log("Adding single question to que");
         var helpList = $("#HelpList");
         var span, button = $();
         if (admin) {
@@ -220,7 +214,6 @@ var loginUserPopover: JQuery;
         }
         var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionId).html(heading).append(body);
         helpList.append(html);
-        console.log("Here");
         MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         $("#HelpList #" + questionId).show("blind");
     }
@@ -231,7 +224,6 @@ var loginUserPopover: JQuery;
 
     chat.client.removeQuestion = questionId => {
         var element = $("#HelpList #" + questionId);
-        //console.log(questionId);
         element.hide("blind", () => {
             element.remove();
         });
@@ -255,7 +247,6 @@ var loginUserPopover: JQuery;
         var p: JQuery = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
         if (appendToLast) {
             var location: JQuery = $(".chat li:last-child > div");
-            //console.log(location);
             location.append(p);
         } else {
             var strong: JQuery = $("<strong />").addClass("primary-font").text(author);
@@ -276,14 +267,12 @@ var loginUserPopover: JQuery;
         var message = $("#" + messageId);
         var parent = message.parent();
         message.remove();
-        console.log(parent.children().length);
         if (parent.children().length <= 1) {
             parent.parent().remove();
         }
     }
 
     chat.client.sendChatMessages = (text, author, messageId, sender, appendToLast, canEdit) => {
-        //console.log("sendChatMessages");
         $(".chat").empty();
         for (var i = 0; i < text.length; i++) {
             chat.client.sendChatMessage(text[i], author[i], messageId[i], sender[i], appendToLast[i], canEdit[i]);
@@ -307,36 +296,47 @@ var loginUserPopover: JQuery;
     }
 
     chat.client.userCreationSuccess = () => {
-        if (createUserPopover === undefined) return;
-        createUserPopover.find("#userCreationError").hide("blind");
-        createUserPopover.find("#createUserForm").hide("blind");
-        createUserPopover.find("#userCreationSuccess").show("blind");
-        setTimeout(() => {
+        if (createUserPopover !== undefined)
             createUserPopover.popover("hide");
-            createUserPopover = null;
-        }, 7000);
+        showNotification("success", "Din bruger er nu oprettet", "Tillykke!");
         setLoginState(1);
     }
 
     chat.client.loginFailed = () => {
         if (loginUserPopover === undefined) return;
         loginUserPopover.find("#invalidLoginMessage").show("blind");
-        loginUserPopover.find("#loginSuccessfulMessage").hide("blind");
     }
 
     chat.client.loginSuccess = () => {
         if (loginUserPopover === undefined) return;
-        loginUserPopover.find("#invalidLoginMessage").hide("blind");
-        loginUserPopover.find("#loginSuccessfulMessage").show("blind");
-        loginUserPopover.find("form").hide("blind");
-        setTimeout(() => {
-            loginUserPopover.popover("hide");
-            loginUserPopover = null;
-        }, 7000);
+        loginUserPopover.popover("hide");
+        showNotification("success", "Du er nu logget ind", "Login succesfuld!");
         setLoginState(1);
 
     }
 
+    chat.client.userLoggedOut = () => {
+        setLoginState(2);
+        $("#ChannelList").empty();
+        $("#HelpList").empty();
+        setQuestionLayout(2);
+        $(".chat").empty();
+        showNotification("info", "Du er nu logget ud", "Logud succesfuld");
+    }
+
+    function showNotification(typ: string, text: string, title: string) {
+        // ReSharper disable once WrongExpressionStatement
+        new PNotify({
+            title: title,
+            text: text,
+            type: typ,
+            animation: "show",
+            nonblock: {
+                nonblock: true,
+                nonblock_opacity: .2
+            }
+        });
+    }
     function setQuestionLayout(layout: any) {
         switch (layout) {
             // Standard Layout
@@ -396,7 +396,6 @@ var loginUserPopover: JQuery;
     }
 
     $.connection.hub.start().done(() => {
-        //console.log("connected");
         chat.server.getData(2);
         setInterval(() => {
             chat.server.getData(2);
@@ -422,19 +421,16 @@ var loginUserPopover: JQuery;
 
         $(document).on("click", "div#ChannelList > a", function () {
             var tmpid = $(this).attr("id");
-            //console.log(tmpid);
             chat.server.changeToChannel(tmpid);
         });
 
         $(document).on("click", "#closeBox", function () {
             var tmpid = $(this).parent().parent().attr("id");
-            //console.log(tmpid);
             chat.server.removeQuestion(tmpid);
         });
 
         $(document).on("click", "#closeChatMessage", function () {
             var tmpid = $(this).parent().attr("id");
-            //console.log(tmpid);
             chat.server.removeChatMessage(tmpid);
         });
     });
@@ -472,23 +468,19 @@ var loginUserPopover: JQuery;
         });
 
         $("#editQuestion").click(() => {
-            //console.log("edit");
             $("#changeQuestionModal").modal("show");
             $("#newQuestionText").focus();
             chat.server.getData(1);
         });
 
         $("#newQuestionSubmit").click(() => {
-            //console.log("submit");
             var question = $("#newQuestionText").val();
-            //console.log(question);
             chat.server.changeQuestion(question);
             $("#changeQuestionModal").modal("hide");
         });
 
         $("#chatForm").submit(() => {
             var message: string = $("#chatMessageInput").val();
-            console.log(message);
             if (!isNullOrWhitespace(message)) {
                 chat.server.chat(message);
                 $("#chatMessageInput").val("");
@@ -528,7 +520,6 @@ var loginUserPopover: JQuery;
 
         $(document).on("submit", "#createUserForm", e => {
             e.preventDefault();
-            console.log("submitted");
             var name = createUserPopover.find("#CreateUserName").val();
             var mail = createUserPopover.find("#CreateUserEmail").val();
             var pass = createUserPopover.find("#CreateUserPw").val();
@@ -536,11 +527,8 @@ var loginUserPopover: JQuery;
             chat.server.createNewUser(name, mail, pass);
         }).on("submit", "#loginUserForm", e => {
             e.preventDefault();
-            console.log("Login in");
             var mail = loginUserPopover.find("#LoginUserEmail").val();
-            console.log(mail);
             var pass = loginUserPopover.find("#LoginUserPassword").val();
-            console.log(pass);
             if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
             chat.server.loginUser(mail, pass);
         });

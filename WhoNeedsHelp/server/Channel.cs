@@ -46,11 +46,7 @@ namespace WhoNeedsHelp.server
             UsersRequestingHelp = new List<User>();
             Administrators = new List<User>();
             ActiveUsers = new List<User>();
-            //Users = "";
-            //UsersRequestingHelp = "";
-            //Administrators = "";
             AddAdministrator(user);
-            //Administrators.Add(userId);
         }
 
         public bool HasIp(string ip)
@@ -60,22 +56,17 @@ namespace WhoNeedsHelp.server
 
         public void RemoveUserRequestingHelp(User u)
         {
-            /*var usrh = Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
-            usrh.Remove(u);
-            UsersRequestingHelp = Serialiser.SerialiseList(usrh);*/
             UsersRequestingHelp.Remove(u);
             return;
         }
 
         public List<User> GetUsers()
         {
-            //return Serialiser.DesiraliseGuidStringList(Users);
             return Users.ToList();
         }
 
         public List<User> GetUsersRequestingHelp()
         {
-            //return Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
             return UsersRequestingHelp.ToList();
         } 
 
@@ -86,25 +77,16 @@ namespace WhoNeedsHelp.server
 
         public void AddAdministrator(User u)
         {
-            //List<int> a = Serialiser.DesiraliseGuidStringList(Administrators);
-            //a.Add(u);
-            //Administrators = Serialiser.SerialiseList(a);
             Administrators.Add(u);
         }
 
         public int GetQuestingUserCount()
         {
-            //return Serialiser.DesiraliseGuidStringList(UsersRequestingHelp).Count;
             return UsersRequestingHelp.Count;
         }
 
         public IEnumerable<User> GetActiveUsers()
         {
-            /*using (var db = new HelpContext())
-            {
-                List<User> l = db.Users.Where(u => u.Channel.Equals(this)).ToList();
-                return l;
-            }*/
             return ActiveUsers;
         }
 
@@ -114,9 +96,6 @@ namespace WhoNeedsHelp.server
             {
                 return false;
             }
-            //List<int> l = Serialiser.DesiraliseGuidStringList(UsersRequestingHelp);
-            //l.Add(user);
-            //UsersRequestingHelp = Serialiser.SerialiseList(l);
             UsersRequestingHelp.Add(user);
             return true;
         }
@@ -127,9 +106,6 @@ namespace WhoNeedsHelp.server
             {
                 return false;
             }
-            //List<int> l = Serialiser.DesiraliseGuidStringList(Users);
-            //l.Add(u);
-            //Users = Serialiser.SerialiseList(l);
             Users.Add(u);
             return true;
         }
@@ -138,9 +114,6 @@ namespace WhoNeedsHelp.server
         {
             if (Users.Contains(u))
             {
-                //List<int> l = Serialiser.DesiraliseGuidStringList(Users);
-                //l.Remove(u);
-                //Users = Serialiser.SerialiseList(l);
                 Users.Remove(u);
 
             }
@@ -172,22 +145,7 @@ namespace WhoNeedsHelp.server
 
         public bool AppendMessageToLast(ChatMessage chatMessage)
         {
-            using (var db = new HelpContext())
-            {
-                /*var bunch = db.ChatMessages.Where(cm => cm.Channel.Equals(this)).Select(cm => new ChatMessage{Channel = cm.Channel, ChannelId = cm.ChannelId, Id = cm.Id, Text = cm.Text, Time = cm.Time, User = cm.User, UserId = cm.UserId}).ToList();
-                if (bunch.Count > 1)
-                {
-                    //var stuffs = bunch.ToList();
-                    ChatMessage lastChatMessage = bunch[bunch.Count - 2];
-                    ChatMessage message = db.ChatMessages.Find(chatMessage);
-                    if (lastChatMessage != null && message != null)
-                    {
-                        return lastChatMessage.User.Equals(message.User);
-                    }
-                }*/
-            }
             return false;
-
         }
 
         public override bool Equals(object o)

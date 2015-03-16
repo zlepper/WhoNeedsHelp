@@ -35,6 +35,7 @@ interface ICentralClient {
     userCreationFailed: (errorMessage: string) => void;
     userCreationSuccess: () => void;
     userLoggedOut: () => void;
+    appendChannel2: (channelname: any, channelid: any) => void;
 }
 
 interface ICentralServer {
