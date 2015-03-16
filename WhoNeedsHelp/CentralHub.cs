@@ -493,7 +493,7 @@ namespace WhoNeedsHelp
             {
                 case 2:
                     // Request a version number from the server
-                    Clients.Caller.CheckVersion(1);
+                    Clients.Caller.CheckVersion(2);
                     break;
             }
         }

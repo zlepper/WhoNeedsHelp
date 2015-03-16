@@ -258,7 +258,7 @@ chat.client.sendChatMessages = function (text, author, messageId, sender, append
     }
 };
 chat.client.checkVersion = function (version) {
-    if (version !== 1) {
+    if (version !== 2) {
         location.reload(true);
     }
 };

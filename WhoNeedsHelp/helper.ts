@@ -280,7 +280,7 @@ PNotify.prototype.options.styling = "bootstrap3";
     }
 
     chat.client.checkVersion = version => {
-        if (version !== 1) {
+        if (version !== 2) {
             location.reload(true);
         }
     }
