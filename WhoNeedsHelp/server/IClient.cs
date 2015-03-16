@@ -29,5 +29,8 @@ namespace WhoNeedsHelp
         void UserCreationFailed(string errorMessage);
         void UserCreationSuccess();
         void UserLoggedOut();
+        void UpdateUsername(string name);
+        void UpdateQuestionAuthorName(string name, string questionId);
+        void UpdateChatMessageAuthorName(string name, string[] chatMessageIds);
     }
 }

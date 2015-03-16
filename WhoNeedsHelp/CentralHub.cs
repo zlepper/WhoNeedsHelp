@@ -445,6 +445,30 @@ namespace WhoNeedsHelp
                 else
                 {
                     user.Name = name;
+                    //Clients.Caller.UpdateUsername(name);
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).UpdateUsername(name);
+                    }
+
+                    foreach (var question in user.Questions)
+                    {
+                        foreach (Connection connection in question.Channel.ActiveUsers.SelectMany(u => u.Connections))
+                        {
+                            Clients.Client(connection.ConnectionId).UpdateQuestionAuthorName(user.Name, question.Id.ToString());
+                        }
+                    }
+
+                    var chatMessages = user.ChatMessages.ToList();
+                    foreach (Channel channel in chatMessages.Select(cm => cm.Channel).Distinct())
+                    {
+                        var updatingChatMessages = chatMessages.Where(cm => cm.Channel.Equals(channel));
+                        var ids = updatingChatMessages.Select(chatMessage => chatMessage.Id.ToString()).ToList();
+                        foreach (Connection connection in channel.ActiveUsers.SelectMany(u => u.Connections))
+                        {
+                            Clients.Client(connection.ConnectionId).UpdateChatMessageAuthorName(name, ids.ToArray());
+                        }
+                    }
                     db.SaveChanges();
                 }
             }
@@ -736,6 +760,7 @@ namespace WhoNeedsHelp
                         canEditList.Add(chatMessage.User.Equals(user) || user.Channel.IsUserAdministrator(user));
                     }
                     Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
+                    Clients.Caller.UpdateUsername(user.Name);
                 }
                 else
                 {
@@ -779,6 +804,7 @@ namespace WhoNeedsHelp
                 }
                 var newUser = new User()
                 {
+                    Name = user.Name,
                     Ip = user.Ip
                 };
                 newUser.Connections.Add(new Connection(){ConnectionId = Context.ConnectionId});

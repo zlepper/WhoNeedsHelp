@@ -13,6 +13,9 @@ var chat = $.connection.centralHub;
 var fetchTables;
 var createUserPopover;
 var loginUserPopover;
+var changeUsernamePopover;
+var firstName;
+firstName = false;
 PNotify.prototype.options.styling = "bootstrap3";
 //var validate;
 function setUserName() {
@@ -296,6 +299,28 @@ chat.client.userLoggedOut = function () {
     $(".chat").empty();
     showNotification("info", "Du er nu logget ud", "Logud succesfuld");
 };
+chat.client.updateUsername = function (name) {
+    $("#CurrentUserName").text(name);
+    if (firstName) {
+        showNotification("info", "Dit brugernavn er blevet ændret til: \"" + name + "\"", "Brugernavn ændret");
+    }
+    else {
+        firstName = !firstName;
+    }
+};
+chat.client.updateQuestionAuthorName = function (name, id) {
+    var question = $("#HelpList #" + id);
+    question.find("h3.panel-title").text(name);
+};
+chat.client.updateChatMessageAuthorName = function (name, ids) {
+    var chatten = $(".chat");
+    for (var i = 0; i < ids.length; i++) {
+        var element = chatten.find("#" + ids[i]);
+        var parent = element.parent();
+        var strong = parent.find("strong");
+        strong.text(name);
+    }
+};
 function showNotification(typ, text, title) {
     // ReSharper disable once WrongExpressionStatement
     new PNotify({
@@ -306,7 +331,8 @@ function showNotification(typ, text, title) {
         nonblock: {
             nonblock: true,
             nonblock_opacity: .2
-        }
+        },
+        styling: "bootstrap3"
     });
 }
 function setQuestionLayout(layout) {
@@ -438,9 +464,22 @@ $(document).ready(function () {
         }
     });
     $("#editUsername").click(function () {
-        $("#usernameModal").attr("ata-backdrop", "").attr("data-keyboard", "");
-        $("#selectUsernameButton").text("Gem");
-        $("#usernameModal").modal("show");
+        if (loginUserPopover !== undefined)
+            loginUserPopover.popover("hide");
+        if (createUserPopover !== undefined)
+            createUserPopover.popover("hide");
+        setTimeout(function () {
+            changeUsernamePopover = $("#" + $("#editUsername").attr("aria-describedby"));
+            var name = $("#CurrentUserName").text();
+            var input = changeUsernamePopover.find("#changeusernameInput");
+            input.val(name);
+        });
+    }).popover({
+        html: true,
+        content: function () { return $("#changeusernameContent").html(); },
+        title: function () { return $("#changeUsernameTitle").html(); },
+        placement: "bottom",
+        container: "body"
     });
     $("#reloadNearbyChannels").click(function () {
         chat.server.loadNearbyChannels();
@@ -457,6 +496,8 @@ $(document).ready(function () {
     }).click(function () {
         if (loginUserPopover !== undefined)
             loginUserPopover.popover("hide");
+        if (changeUsernamePopover !== undefined)
+            changeUsernamePopover.popover("hide");
         setTimeout(function () {
             createUserPopover = $("#" + $("#CreateUserButton").attr("aria-describedby"));
             var name = $("#CurrentUserName").text();
@@ -479,6 +520,15 @@ $(document).ready(function () {
         if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
             return;
         chat.server.loginUser(mail, pass);
+    }).on("submit", "#changeusernameForm", function (e) {
+        e.preventDefault();
+        console.log("submitted");
+        var input = changeUsernamePopover.find("#changeusernameInput");
+        var name = input.val();
+        name = name.replace(/[\s]+/g, " ");
+        var n = name.match(patt);
+        chat.server.setUsername(n[0]);
+        changeUsernamePopover.popover("hide");
     });
     $("#LoginButton").popover({
         html: true,
@@ -489,6 +539,8 @@ $(document).ready(function () {
     }).click(function () {
         if (createUserPopover !== undefined)
             createUserPopover.popover("hide");
+        if (changeUsernamePopover !== undefined)
+            changeUsernamePopover.popover("hide");
         setTimeout(function () {
             loginUserPopover = $("#" + $("#LoginButton").attr("aria-describedby"));
         }, 500);

@@ -36,6 +36,10 @@ interface ICentralClient {
     userCreationSuccess: () => void;
     userLoggedOut: () => void;
     appendChannel2: (channelname: any, channelid: any) => void;
+    updateUsername: (name: string) => void;
+    updateQuestionAuthorName: (name: string, id: string) => void;
+    updateChatMessageAuthorName: (name: string, ids: string[]) => void ;
+
 }
 
 interface ICentralServer {

@@ -153,6 +153,19 @@
     <div style="display: none;" id="loginUserTitle">
         Login
     </div>
+    <!--Change username title-->
+    <div style="display: none;" id="changeUsernameTitle">
+        Skift brugernavn
+    </div>
+    <div id="changeusernameContent" style="display: none;">
+        <form onsubmit="return false;" id="changeusernameForm">
+            <div class="form-group">
+                <label for="changeusernameInput">Brugernavn</label>
+                <input required="required" type="text" class="form-control" id="changeusernameInput" />
+            </div>
+            <button class="btn btn-primary" type="submit">Skift</button>
+        </form>
+    </div>
         <div class="row">
             <div class="col-md-3">
                 <div class="panel panel-primary">

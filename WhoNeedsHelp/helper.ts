@@ -15,6 +15,9 @@ var chat = $.connection.centralHub;
 var fetchTables;
 var createUserPopover: JQuery;
 var loginUserPopover: JQuery;
+var changeUsernamePopover: JQuery;
+var firstName: Boolean;
+firstName = false;
 PNotify.prototype.options.styling = "bootstrap3";
 //var validate;
 
@@ -324,6 +327,30 @@ PNotify.prototype.options.styling = "bootstrap3";
         showNotification("info", "Du er nu logget ud", "Logud succesfuld");
     }
 
+    chat.client.updateUsername = (name) => {
+        $("#CurrentUserName").text(name);
+        if (firstName) {
+            showNotification("info", "Dit brugernavn er blevet ændret til: \"" + name + "\"", "Brugernavn ændret");
+        } else {
+            firstName = !firstName;
+        }
+    }
+
+    chat.client.updateQuestionAuthorName = (name, id) => {
+        var question = $("#HelpList #" + id);
+        question.find("h3.panel-title").text(name);
+    }
+
+    chat.client.updateChatMessageAuthorName = (name, ids) => {
+        var chatten = $(".chat");
+        for (var i = 0; i < ids.length; i++) {
+            var element = chatten.find("#" + ids[i]);
+            var parent = element.parent();
+            var strong = parent.find("strong");
+            strong.text(name);
+        }
+    }
+
     function showNotification(typ: string, text: string, title: string) {
         // ReSharper disable once WrongExpressionStatement
         new PNotify({
@@ -334,7 +361,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             nonblock: {
                 nonblock: true,
                 nonblock_opacity: .2
-            }
+            },
+            styling: "bootstrap3"
         });
     }
     function setQuestionLayout(layout: any) {
@@ -488,9 +516,20 @@ PNotify.prototype.options.styling = "bootstrap3";
         });
 
         $("#editUsername").click(() => {
-            $("#usernameModal").attr("ata-backdrop", "").attr("data-keyboard", "");
-            $("#selectUsernameButton").text("Gem");
-            $("#usernameModal").modal("show");
+            if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
+            if (createUserPopover !== undefined) createUserPopover.popover("hide");
+            setTimeout(() => {
+                changeUsernamePopover = $("#" + $("#editUsername").attr("aria-describedby"));
+                var name = $("#CurrentUserName").text();
+                var input = changeUsernamePopover.find("#changeusernameInput");
+                input.val(name);
+            });
+        }).popover({
+            html: true,
+            content: () => $("#changeusernameContent").html(),
+            title: () => $("#changeUsernameTitle").html(),
+            placement: "bottom",
+            container: "body"
         });
 
         $("#reloadNearbyChannels").click(() => {
@@ -509,6 +548,7 @@ PNotify.prototype.options.styling = "bootstrap3";
             container: "body"
         }).click(() => {
             if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
+            if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
             setTimeout(() => {
                 createUserPopover = $("#" + $("#CreateUserButton").attr("aria-describedby"));
                 var name = $("#CurrentUserName").text();
@@ -531,6 +571,15 @@ PNotify.prototype.options.styling = "bootstrap3";
             var pass = loginUserPopover.find("#LoginUserPassword").val();
             if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
             chat.server.loginUser(mail, pass);
+        }).on("submit", "#changeusernameForm", e => {
+            e.preventDefault();
+            console.log("submitted");
+            var input = changeUsernamePopover.find("#changeusernameInput");
+            var name = input.val();
+            name = name.replace(/[\s]+/g, " ");
+            var n = name.match(patt);
+            chat.server.setUsername(n[0]);
+            changeUsernamePopover.popover("hide");
         });
 
         $("#LoginButton").popover({
@@ -541,6 +590,7 @@ PNotify.prototype.options.styling = "bootstrap3";
             container: "body"
         }).click(() => {
             if (createUserPopover !== undefined) createUserPopover.popover("hide");
+            if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
             setTimeout(() => {
                 loginUserPopover = $("#" + $("#LoginButton").attr("aria-describedby"));
             }, 500);
