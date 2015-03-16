@@ -32,6 +32,9 @@ interface ICentralClient {
     loginSuccess: () => void;
     loginFailed: () => void;
     showChannels: (channelIds: string[], channelNames: string[]) => void;
+    userCreationFailed: (errorMessage: string) => void;
+    userCreationSuccess: () => void;
+    userLoggedOut: () => void;
 }
 
 interface ICentralServer {
@@ -50,6 +53,8 @@ interface ICentralServer {
     changeQuestion(question: string): JQueryPromise<void>;
     chat(message: string): JQueryPromise<void>;
     clearChat(): JQueryPromise<void>;
-    createNewUser(un: string, email: string, pw: string): JQueryPromise<void>;
+    createNewUser(username: string, email: string, password: string): JQueryPromise<void>;
     requestActiveChannel(): JQueryPromise<void>;
+    loginUser(mail: string, pass: string): JQueryPromise<void>;
+    logoutUser(): JQueryPromise<void>;
 }

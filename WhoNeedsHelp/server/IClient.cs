@@ -25,5 +25,8 @@ namespace WhoNeedsHelp
         void LoginSuccess();
         void LoginFailed();
         void ShowChannels(string[] channelId, string[] channelName);
+        void UserCreationFailed(string errorMessage);
+        void UserCreationSuccess();
+        void UserLoggedOut();
     }
 }

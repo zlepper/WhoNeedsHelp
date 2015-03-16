@@ -97,10 +97,10 @@
                                 <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
                             </li>
                             <!--Should only be shown when the user is not logged in-->
-                            <li class="beta"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
-                            <li class="beta"><a id="LoginButton" href="#">Log in</a></li>
+                            <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
+                            <li class="beta not-logged-in"><a id="LoginButton" href="#">Log in</a></li>
                             <!--Should only be shown when the user is logged in-->
-                            <li style="display: none;" class="beta"><a id="logoutButton" href="#">Log ud</a></li>
+                            <li style="display: none;" class="beta logged-in"><a id="logoutButton" href="#">Log ud</a></li>
                         </ul>
                     </div>
                 </div>
@@ -108,6 +108,9 @@
         </div>
     <!--Create User hidden content-->
     <div style="display: none;" id="createUserContent">
+        <div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
+        <div class="alert alert-success" role="alert" style="display: none;" id="userCreationSuccess"><strong>Tillykke!</strong> Din bruger er nu oprettet!
+        </div>
         <form onsubmit=" return false; " id="createUserForm">
             <div class="form-group">
                 <label for="CreateUserName">Navn</label>
@@ -128,8 +131,26 @@
     <div style="display: none;" id="createUserTitle">
         Opret Bruger
     </div>
-        <!--login hidden content-->
-        <!--login hidden title-->
+    <!--login hidden content-->
+    <div style="display: none;" id="loginUserContent">
+        <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessage">Ugyldigt email eller kodeord</div>
+        <div class="alert alert-success" role="alert" style="display: none;" id="loginSuccessfulMessage"><strong>Login succesfuld!</strong> Du er nu logget ind.</div>
+        <form onsubmit="return false;" id="loginUserForm">
+            <div class="form-group">
+                <label for="LoginUserEmail">Email</label>
+                <input required="required" type="email" class="form-control" id="LoginUserEmail"/>
+            </div>
+            <div class="form-group">
+                <label for="LoginUserPassword">Kodeord</label>
+                <input type="password" required="required" class="form-control" id="LoginUserPassword"/>
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+    </div>
+    <!--login hidden title-->
+    <div style="display: none;" id="loginUserTitle">
+        Login
+    </div>
         <div class="row">
             <div class="col-md-3">
                 <div class="panel panel-primary">

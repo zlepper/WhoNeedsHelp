@@ -142,7 +142,16 @@ namespace WhoNeedsHelp.server
                 //l.Remove(u);
                 //Users = Serialiser.SerialiseList(l);
                 Users.Remove(u);
+
             }
+            if (UsersRequestingHelp.Contains(u))
+            {
+                UsersRequestingHelp.Remove(u);
+            }
+            if (ActiveUsers.Contains(u))
+            {
+                ActiveUsers.Remove(u);
+            } 
         }
 
         /// <summary>

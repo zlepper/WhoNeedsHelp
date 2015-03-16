@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using WhoNeedsHelp.server;
-using System.Data.Entity;
-using System.Data.Entity.Core.Common.CommandTrees;
-using System.Data.Entity.Migrations;
-using System.Linq;
+
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace WhoNeedsHelp
 {
@@ -102,17 +103,19 @@ namespace WhoNeedsHelp
             if (String.IsNullOrWhiteSpace(messageId)) return;
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null) return;
                 Channel c = user.Channel;
                 if (c == null) return;
                 var message = db.ChatMessages.Find(Int32.Parse(messageId));
                 if (message == null || (!c.IsUserAdministrator(user) && !message.User.Equals(user)))
                     return;
-                IEnumerable<User> users = c.GetActiveUsers();
-                foreach (User u in users)
+                foreach (Connection connection in c.ActiveUsers.SelectMany(u => u.Connections))
                 {
-                    Clients.Client(u.ConnectionId).RemoveChatMessage(message.Id.ToString());
+                    Clients.Client(connection.ConnectionId).RemoveChatMessage(message.Id.ToString());
                 }
             }
 
@@ -124,7 +127,10 @@ namespace WhoNeedsHelp
             if (String.IsNullOrWhiteSpace(message)) return;
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null) return;
                 var channel = user.Channel;
                 if (channel == null) return;
@@ -133,13 +139,12 @@ namespace WhoNeedsHelp
                 {
                     db.ChatMessages.Add(chatMessage);
                     db.SaveChanges();
-                    var users = channel.GetActiveUsers();
-                    foreach (User u in users)
+                    foreach (User u in channel.ActiveUsers)
                     {
-                        Clients.Client(u.ConnectionId)
-                            .SendChatMessage(chatMessage.Text, user.Name,
-                                chatMessage.Id.ToString(), chatMessage.User.Equals(u), channel.AppendMessageToLast(chatMessage),
-                                chatMessage.User.Equals(u) || channel.IsUserAdministrator(u));
+                        foreach (Connection connection in u.Connections)
+                        {
+                            Clients.Client(connection.ConnectionId).SendChatMessage(chatMessage.Text, user.Name,chatMessage.Id.ToString(), chatMessage.User.Equals(u), channel.AppendMessageToLast(chatMessage),chatMessage.User.Equals(u) || channel.IsUserAdministrator(u));
+                        }
                     }
                 }
 
@@ -151,16 +156,19 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.Channel).Include(u => u.Questions).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.Channel).Include(u => u.Questions).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null) return;
                 Channel channel = user.Channel;
                 if (channel == null) return;
                 user.UpdateQuestion(channel, question);
                 Question q = user.GetQuestion(channel);
                 if (q == null) return;
-                foreach (User use in channel.GetActiveUsers())
+                foreach (Connection connection in channel.ActiveUsers.SelectMany(use => use.Connections))
                 {
-                    Clients.Client(use.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id.ToString());
+                    Clients.Client(connection.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id.ToString());
                 }
                 db.SaveChanges();
             }
@@ -170,7 +178,10 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null) return;
                 var channel = user.Channel;
                 if (channel == null) return;
@@ -178,14 +189,18 @@ namespace WhoNeedsHelp
                 {
                     db.ChatMessages.RemoveRange(channel.ChatMessages);
                     db.SaveChanges();
-                    foreach (User u in channel.GetActiveUsers())
+                    foreach (Connection connection in channel.ActiveUsers.SelectMany(u => u.Connections))
                     {
-                        Clients.Client(u.ConnectionId).ClearChat();
+                        Clients.Client(connection.ConnectionId).ClearChat();
                     }
                 }
                 else
                 {
-                    Clients.Client(user.ConnectionId).ClearChat();
+                    //Clients.Client(user.ConnectionId).ClearChat();
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).ClearChat();
+                    }
                 }
             }
         }
@@ -198,9 +213,9 @@ namespace WhoNeedsHelp
                 if (channel == null) return;
                 int totalUsers = channel.Users.Count;
                 int activeUsers = channel.UsersRequestingHelp.Count;
-                foreach (User user in channel.GetActiveUsers())
+                foreach (Connection connection in channel.ActiveUsers.SelectMany(user => user.Connections))
                 {
-                    Clients.Client(user.ConnectionId).UpdateChannelCount(activeUsers, totalUsers, channelId.ToString());
+                    Clients.Client(connection.ConnectionId).UpdateChannelCount(activeUsers, totalUsers, channelId.ToString());
                 }
             }
         }
@@ -211,22 +226,23 @@ namespace WhoNeedsHelp
             {
                 using (var db = new HelpContext())
                 {
-                    var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                    if (user != null)
+                    //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                    var con = db.Connections.Find(Context.ConnectionId);
+                    if (con == null) return;
+                    var user = con.User;
+                    if (user == null) return;
+                    Channel channel = user.Channel;
+                    Question question = user.GetQuestion(channel);
+                    user.RemoveQuestion(question);
+                    channel.RemoveUserRequestingHelp(user);
+                    questionId = question.Id.ToString();
+                    foreach (Connection connection in channel.ActiveUsers.SelectMany(u => u.Connections))
                     {
-                        Channel channel = user.Channel;
-                        Question question = user.GetQuestion(channel);
-                        user.RemoveQuestion(question);
-                        channel.RemoveUserRequestingHelp(user);
-                        questionId = question.Id.ToString();
-                        foreach (User u in channel.GetActiveUsers())
-                        {
-                            Clients.Client(u.ConnectionId).RemoveQuestion(questionId);
-                        }
-                        db.Questions.Remove(question);
-                        db.SaveChanges();
-                        UpdateCount(channel.Id);
+                        Clients.Client(connection.ConnectionId).RemoveQuestion(questionId);
                     }
+                    db.Questions.Remove(question);
+                    db.SaveChanges();
+                    UpdateCount(channel.Id);
                 }
             }
             else
@@ -243,11 +259,15 @@ namespace WhoNeedsHelp
                     Channel channel = q.Channel;
                     if (channel == null || user == null) return;
                     channel.RemoveUserRequestingHelp(user);
-                    foreach (User use in channel.GetActiveUsers())
+                    foreach (Connection connection in channel.ActiveUsers.SelectMany(use => use.Connections))
                     {
-                        Clients.Client(use.ConnectionId).RemoveQuestion(questionId);
+                        Clients.Client(connection.ConnectionId).RemoveQuestion(questionId);
                     }
-                    Clients.Client(user.ConnectionId).SetLayout(1);
+                    //Clients.Client(user.ConnectionId).SetLayout(1);
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).SetLayout(1);
+                    }
                     db.Questions.Remove(q);
                     db.SaveChanges();
                     UpdateCount(channel.Id);
@@ -259,7 +279,10 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user != null)
                 {
                     if (String.IsNullOrWhiteSpace(channelId)) return;
@@ -272,7 +295,11 @@ namespace WhoNeedsHelp
                         user.Channel = channel;
                         db.Users.AddOrUpdate(user);
                         db.SaveChanges();
-                        Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
+                        //Clients.Caller.SetChannel(channelId, user.AreUserQuestioning(channel));
+                        foreach (Connection connection in user.Connections)
+                        {
+                            Clients.Client(connection.ConnectionId).SetChannel(channelId, user.AreUserQuestioning(channel));
+                        }
                         UpdateCount(channel.Id);
                         List<User> questionUsers = channel.GetUsersRequestingHelp();
                         List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
@@ -317,16 +344,15 @@ namespace WhoNeedsHelp
                 var channel = db.Channels.Find(Int32.Parse(channelId));
                 if (channel != null)
                 {
-                    var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                    if (user != null)
-                    {
-                        if (!channel.GetUsers().Contains(user))
-                        {
-                            channel.AddUser(user);
-                            Clients.Caller.AppendChannel(channel.ChannelName, channelId);
-                            db.SaveChanges();
-                        }
-                    }
+                    //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                    var con = db.Connections.Find(Context.ConnectionId);
+                    if (con == null) return;
+                    var user = con.User;
+                    if (user == null) return;
+                    if (channel.GetUsers().Contains(user)) return;
+                    channel.AddUser(user);
+                    Clients.Caller.AppendChannel(channel.ChannelName, channelId);
+                    db.SaveChanges();
                 }
             }
         }
@@ -359,7 +385,10 @@ namespace WhoNeedsHelp
             if (!isInt) return;
             using (var db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user != null)
                 {
 
@@ -369,9 +398,9 @@ namespace WhoNeedsHelp
                         if (channel.IsUserAdministrator(user))
                         {
                             // Make everybody quit the channel
-                            foreach (User u in channel.GetUsers())
+                            foreach (Connection connection in channel.Users.SelectMany(u => u.Connections))
                             {
-                                Clients.Client(u.ConnectionId).ExitChannel(id.ToString());
+                                Clients.Client(connection.ConnectionId).ExitChannel(id.ToString());
                             }
                             db.Channels.Remove(channel);
                         }
@@ -383,9 +412,10 @@ namespace WhoNeedsHelp
                             Clients.Caller.ExitChannel(id.ToString());
                             int activeUsers = channel.GetQuestingUserCount();
                             int userCount = channel.GetUsers().Count;
-                            foreach (User us in channel.GetUsers())
+                            string idString = id.ToString();
+                            foreach (Connection connection in channel.Users.SelectMany(us => us.Connections))
                             {
-                                Clients.Client(us.ConnectionId).UpdateChannelCount(activeUsers, userCount, id.ToString());
+                                Clients.Client(connection.ConnectionId).UpdateChannelCount(activeUsers, userCount, idString);
                             }
                         }
                     }
@@ -400,16 +430,22 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                if (user != null)
+                //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
+                if (user == null) return;
+                var channel = new Channel(user, channelName);
+                channel.AddUser(user);
+                user.Channel = channel;
+                db.Users.AddOrUpdate(user);
+                db.Channels.Add(channel);
+                db.SaveChanges();
+                string channelid = channel.Id.ToString();
+                //Clients.Caller.AppendChannel(channelName, channel.Id.ToString());
+                foreach (Connection connection in user.Connections)
                 {
-                    var channel = new Channel(user, channelName);
-                    channel.AddUser(user);
-                    user.Channel = channel;
-                    db.Users.AddOrUpdate(user);
-                    db.Channels.Add(channel);
-                    db.SaveChanges();
-                    Clients.Caller.AppendChannel(channelName, channel.Id.ToString());
+                    Clients.Client(connection.ConnectionId).AppendChannel(channelName, channelid);
                 }
             }
         }
@@ -419,16 +455,20 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user =
-                    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
+                //var user =
+                //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null)
                 {
                     user = new User
                     {
                         Name = name,
                         //Connections = new List<Connection>(),
-                        ConnectionId = Context.ConnectionId
+                        //ConnectionId = Context.ConnectionId
                     };
+                    user.Connections.Add(new Connection(){ConnectionId = Context.ConnectionId});
                     db.Users.Add(user);
                     db.SaveChanges();
                 }
@@ -446,7 +486,10 @@ namespace WhoNeedsHelp
                 question = "";
             using (var db = new HelpContext())
             {
-                var userFromDb = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var userFromDb = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var userFromDb = con.User;
                 if (userFromDb == null)
                 {
                     return;
@@ -456,10 +499,17 @@ namespace WhoNeedsHelp
                 db.Questions.Add(q);
                 db.SaveChanges();
                 Channel channel = userFromDb.Channel;
-                IEnumerable<User> usersInChannel = channel.GetActiveUsers();
-                foreach (User user in usersInChannel)
+                string qtext = q.Text;
+                string qid = q.Id.ToString();
+                string helpRequestName = userFromDb.Name;
+                foreach (User user in channel.ActiveUsers)
                 {
-                    Clients.Client(user.ConnectionId).AddQuestion(userFromDb.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(user));
+                    //Clients.Client(user.ConnectionId).AddQuestion(userFromDb.Name, q.Text, q.Id.ToString(), channel.IsUserAdministrator(user));
+                    bool isUserAdmin = channel.IsUserAdministrator(user);
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).AddQuestion(helpRequestName, qtext, qid, isUserAdmin);
+                    }
                 }
                 UpdateCount(channel.Id);
             }
@@ -481,18 +531,18 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user =
-                    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
-                if (user == null)
-                {
-                    user = new User
+                //var user =
+                //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
+
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con != null) return base.OnConnected();
+                    var user = new User
                     {
-                        ConnectionId = Context.ConnectionId,
                         Ip = GetIpAddress()
                     };
+                    user.Connections.Add(new Connection(user){ConnectionId = Context.ConnectionId});
                     db.Users.Add(user);
                     db.SaveChanges();
-                }
             }
 
             return base.OnConnected();
@@ -502,13 +552,23 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return base.OnDisconnected(stopCalled);
+                var user = con.User;
                 if (user == null) return base.OnDisconnected(stopCalled);
-                foreach (Channel c in user.ChannelsIn)
+                if (String.IsNullOrWhiteSpace(user.EmailAddress))
                 {
-                    ExitChannel(c.Id.ToString());
+                    foreach (Channel c in user.ChannelsIn)
+                    {
+                        ExitChannel(c.Id.ToString());
+                    }
+                    RemoveUser(user.Id);
                 }
-                RemoveUser(user.Id);
+                else
+                {
+                    user.Connections.Remove(con);
+                }
             }
             return base.OnDisconnected(stopCalled);
         }
@@ -538,7 +598,10 @@ namespace WhoNeedsHelp
             // Resend channels to client
             using (var db = new HelpContext())
             {
-                var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null) return;
                 List<string> channelNames = new List<string>();
                 List<string> channelIds = new List<string>();
@@ -555,22 +618,191 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                var user =
-                    db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                //var user =
+                //    db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
                 if (user == null || user.Channel == null) return;
+                bool question = user.AreUserQuestioning(user.Channel);
+                string id = user.Channel.Id.ToString();
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).SetChannel(id, question);
+                }
                 Clients.Caller.SetChannel(user.Channel.Id.ToString(), user.AreUserQuestioning(user.Channel));
             }
         }
 
         public void CreateNewUser(string username, string email, string pw)
         {
+            if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(pw))
+            {
+                Clients.Caller.UserCreationFailed("En af værdier er ikke blevet sat.");
+                return;
+            }
             using (var db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+                if (user != null)
+                {
+                    Clients.Caller.UserCreationFailed("Emailadressen er allerede i brug.");
+                    return;
+                }
+                //user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                user = con.User;
                 if (user == null) return;
-
+                if (!String.IsNullOrWhiteSpace(user.Pw) || !String.IsNullOrWhiteSpace(user.EmailAddress))
+                {
+                    Clients.Caller.UserCreationFailed("Du er allerede logget ind.");
+                    return;
+                }
+                var pass = PasswordHash.CreateHash(pw);
+                user.Pw = pass;
+                user.EmailAddress = email;
+                db.SaveChanges();
+                Clients.Caller.UserCreationSuccess();
             }
         }
 
+        public void LoginUser(string email, string password)
+        {
+            if (String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(password))
+            {
+                Clients.Caller.LoginFailed();
+                return;
+            }
+            using (var db = new HelpContext())
+            {
+                //var currentUser = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var currentUser = con.User;
+                if (currentUser == null || !String.IsNullOrWhiteSpace(currentUser.EmailAddress) || !String.IsNullOrWhiteSpace(currentUser.Pw))
+                {
+                    Clients.Caller.LoginFailed();
+                    return;
+                }
+                var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+                if (user == null)
+                {
+                    Clients.Caller.LoginFailed();
+                    return;
+                }
+                bool success = PasswordHash.ValidatePassword(password, user.Pw);
+                if (success)
+                {
+                    //user.ConnectionId = Context.ConnectionId;
+                    Connection connection =
+                        db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+                    currentUser.Connections.Remove(connection);
+                    user.Connections.Add(connection);
+                    foreach (Channel channel in currentUser.ChannelsIn.Where(channel => !user.ChannelsIn.Contains(channel)))
+                    {
+                        user.ChannelsIn.Add(channel);
+                    }
+                    foreach (Question question in currentUser.Questions)
+                    {
+                        if (user.AreUserQuestioning(question.Channel))
+                        {
+                            RemoveQuestion(question.Id.ToString());
+                        }
+                        else
+                        {
+                            question.User = user;
+                        }
+                    }
+                    
+
+                    foreach (Channel channel in currentUser.ChannelsRequestingHelpIn.Where(channel => !user.ChannelsRequestingHelpIn.Contains(channel)))
+                    {
+                        user.ChannelsRequestingHelpIn.Add(channel);
+                    }
+                    foreach (Channel c in currentUser.ChannelsIn.Where(channel => !user.ChannelsIn.Contains(channel)))
+                    {
+                        ExitChannel(c, currentUser);
+                    }
+
+                    List<string> channelNames = new List<string>();
+                    List<string> channelIds = new List<string>();
+                    foreach (Channel c in user.ChannelsIn)
+                    {
+                        channelNames.Add(c.ChannelName);
+                        channelIds.Add(c.Id.ToString());
+                    }
+                    foreach (Connection connec in user.Connections)
+                    {
+                        Clients.Client(connec.ConnectionId).ShowChannels(channelIds.ToArray(), channelNames.ToArray());
+                    }
+                    db.Users.Remove(currentUser);
+                    db.SaveChanges();
+                    Clients.Caller.LoginSuccess();
+
+                }
+                else
+                {
+                    Clients.Caller.LoginFailed();
+                }
+            }
+        }
+
+        private void RequestHelp(Channel channel, User user)
+        {
+            
+        }
+
+        private void ExitChannel(Channel channel, User user)
+        {
+            using (var db = new HelpContext())
+            {
+                user = db.Users.Find(user);
+                if (user == null) return;
+                channel = db.Channels.Find(channel);
+                if (channel == null) return;
+                channel.RemoveUser(user);
+                db.SaveChanges();
+            }
+        }
+
+        private void ChangeToChannel(Channel channel, User user)
+        {
+            
+        }
+
+        public void LogoutUser()
+        {
+            using (var db = new HelpContext())
+            {
+                //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
+                if (user == null)
+                {
+                    Clients.Caller.UserLoggedOut();
+                    return;
+                }
+                //user.ConnectionId = null;
+                var connectionToRemove = user.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+                if (connectionToRemove != null)
+                {
+                    user.Connections.Remove(connectionToRemove);
+                }
+                var newUser = new User()
+                {
+                    AreAdministratorIn = user.AreAdministratorIn,
+                    Channel = user.Channel,
+                    ChannelsIn = user.ChannelsIn,
+                    ChannelsRequestingHelpIn = user.ChannelsRequestingHelpIn,
+                    ChatMessages = user.ChatMessages,
+                    Ip = user.Ip
+                };
+                newUser.Connections.Add(new Connection(){ConnectionId = Context.ConnectionId});
+                db.Users.Add(newUser);
+                db.SaveChanges();
+            }
+        }
     }
 }

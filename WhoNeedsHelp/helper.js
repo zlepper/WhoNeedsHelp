@@ -10,6 +10,8 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 // In this case the CentralHub which handles this application.
 var chat = $.connection.centralHub;
 var fetchTables;
+var createUserPopover;
+var loginUserPopover;
 //var validate;
 function setUserName() {
     var input = $("#usernameModalInput");
@@ -275,6 +277,41 @@ chat.client.checkVersion = function (version) {
 chat.client.clearChat = function () {
     $(".chat").empty();
 };
+chat.client.userCreationFailed = function (errorMessage) {
+    var input = createUserPopover.find("#userCreationError");
+    input.text(errorMessage);
+    input.show("blind");
+};
+chat.client.userCreationSuccess = function () {
+    if (createUserPopover === undefined)
+        return;
+    createUserPopover.find("#userCreationError").hide("blind");
+    createUserPopover.find("#createUserForm").hide("blind");
+    createUserPopover.find("#userCreationSuccess").show("blind");
+    setTimeout(function () {
+        createUserPopover.popover("hide");
+        createUserPopover = null;
+    }, 7000);
+    setLoginState(1);
+};
+chat.client.loginFailed = function () {
+    if (loginUserPopover === undefined)
+        return;
+    loginUserPopover.find("#invalidLoginMessage").show("blind");
+    loginUserPopover.find("#loginSuccessfulMessage").hide("blind");
+};
+chat.client.loginSuccess = function () {
+    if (loginUserPopover === undefined)
+        return;
+    loginUserPopover.find("#invalidLoginMessage").hide("blind");
+    loginUserPopover.find("#loginSuccessfulMessage").show("blind");
+    loginUserPopover.find("form").hide("blind");
+    setTimeout(function () {
+        loginUserPopover.popover("hide");
+        loginUserPopover = null;
+    }, 7000);
+    setLoginState(1);
+};
 function setQuestionLayout(layout) {
     switch (layout) {
         case 1:
@@ -291,6 +328,20 @@ function setQuestionLayout(layout) {
             $("#requestingHelp").show();
             $("#noChannelsSelected").hide();
             $("#requestHelpForm").hide();
+            break;
+        default:
+    }
+}
+function setLoginState(layout) {
+    switch (layout) {
+        case 1:
+            $(".not-logged-in").hide();
+            $(".logged-in").show();
+            break;
+        case 2:
+            // Not logged in
+            $(".not-logged-in").show();
+            $(".logged-in").hide();
             break;
         default:
     }
@@ -410,18 +461,58 @@ $(document).ready(function () {
     });
     $("#CreateUserButton").popover({
         html: true,
-        content: function () { return $('#createUserContent').html(); },
-        title: function () { return $('#createUserTitle').html(); },
+        content: function () { return $("#createUserContent").html(); },
+        title: function () { return $("#createUserTitle").html(); },
         placement: "bottom",
         container: "body"
+    }).click(function () {
+        if (loginUserPopover !== undefined)
+            loginUserPopover.popover("hide");
+        setTimeout(function () {
+            createUserPopover = $("#" + $("#CreateUserButton").attr("aria-describedby"));
+            var name = $("#CurrentUserName").text();
+            var input = createUserPopover.find("#CreateUserName");
+            input.val(name);
+        }, 500);
     });
     $(document).on("submit", "#createUserForm", function (e) {
         e.preventDefault();
         console.log("submitted");
-    }).on("click", "#CreateUserButton", function (e) {
-        var name = $("#CurrentUserName").text();
-        var input = $(".popover-content #CreateUserName");
-        input.val(name);
+        var name = createUserPopover.find("#CreateUserName").val();
+        var mail = createUserPopover.find("#CreateUserEmail").val();
+        var pass = createUserPopover.find("#CreateUserPw").val();
+        if (isNullOrWhitespace(name) || isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
+            return;
+        chat.server.createNewUser(name, mail, pass);
+    }).on("submit", "#loginUserForm", function (e) {
+        e.preventDefault();
+        console.log("Login in");
+        var mail = loginUserPopover.find("#LoginUserEmail").val();
+        console.log(mail);
+        var pass = loginUserPopover.find("#LoginUserPassword").val();
+        console.log(pass);
+        if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
+            return;
+        chat.server.loginUser(mail, pass);
+    });
+    $("#LoginButton").popover({
+        html: true,
+        content: function () { return $("#loginUserContent").html(); },
+        title: function () { return $("#loginUserTitle").html(); },
+        placement: "bottom",
+        container: "body"
+    }).click(function () {
+        if (createUserPopover !== undefined)
+            createUserPopover.popover("hide");
+        setTimeout(function () {
+            loginUserPopover = $("#" + $("#LoginButton").attr("aria-describedby"));
+        }, 500);
+    });
+    $("#logoutButton").click(function () {
+        chat.server.logoutUser();
     });
 });
+function getPopoverId() {
+    return $(this).attr("aria-describedby");
+}
 //# sourceMappingURL=helper.js.map

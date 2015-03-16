@@ -29,19 +29,23 @@ namespace WhoNeedsHelp.server
         public string Name { get; set; }
         public int? ChannelId { get; set; }
         public string Pw { get; set; }
-        public Channel Channel { get; set; }
+        public virtual Channel Channel { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Channel> ChannelsIn { get; set; }
         public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
         public virtual ICollection<Channel> AreAdministratorIn { get; set; }
         public virtual ICollection<ChatMessage> ChatMessages { get; set; } 
         public string Ip { get; set; }
-        public string ConnectionId { get; set; }
+        //public string ConnectionId { get; set; }
+        public virtual ICollection<Connection> Connections { get; set; } 
         public string EmailAddress { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTime LastFailedAttempt { get; set; }
 
         public User()
         {
             Questions = new List<Question>();
+            Connections = new List<Connection>();
         }
 
         public Question RequestHelp(string question = null)
