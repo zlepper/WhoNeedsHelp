@@ -3,6 +3,7 @@
 /// <reference path="Client/IServer.ts"/>
 /// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="Scripts/typings/jqueryui/jqueryui.d.ts"/>
+/// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 "use strict";
 // The pattern for the username
 var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
@@ -10,6 +11,9 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 // In this case the CentralHub which handles this application.
 var chat = $.connection.centralHub;
 var fetchTables;
+var createUserPopover;
+var loginUserPopover;
+PNotify.prototype.options.styling = "bootstrap3";
 //var validate;
 function setUserName() {
     var input = $("#usernameModalInput");
@@ -56,6 +60,13 @@ chat.client.appendChannel = function (channelname, channelid) {
     $("#ChannelList #" + channelid).show("slide", 400);
     chat.server.changeToChannel(channelid);
 };
+chat.client.appendChannel2 = function (channelname, channelid) {
+    var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
+    var span2 = $("<span />").addClass("badge").text("0/0");
+    var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelid).addClass("list-group-item").text(channelname).prepend(span2).prepend(span1);
+    $("#ChannelList").append(html);
+    $("#ChannelList #" + channelid).show("slide", 400);
+};
 chat.client.setChannel = function (channel, areUserQuestioning) {
     window.history.pushState({}, "Hvem behøver hjælp", "?id=" + channel);
     $("#CurrentChannelId").html(channel);
@@ -63,7 +74,6 @@ chat.client.setChannel = function (channel, areUserQuestioning) {
     setTimeout(function () {
         $("#" + channel).addClass("active", 400);
         var t = $("#ChannelList #" + channel).text();
-        console.log(t);
     }, 100);
     if (areUserQuestioning) {
         setQuestionLayout(3);
@@ -77,7 +87,6 @@ chat.client.updateChannelCount = function (activeUsers, connectedUsers, channelI
     $("a#" + channelId + " .badge").html(badge);
 };
 chat.client.updateQuestion = function (question, questionId) {
-    //console.log("updating question");
     var panel = $("#" + questionId + " .panel-body");
     if (question === "") {
         panel.hide("blind", function () {
@@ -99,7 +108,11 @@ chat.client.updateQuestion = function (question, questionId) {
 chat.client.showChannels = function (channelIds, channelNames) {
     $("#ChannelList").empty();
     for (var i = 0; i < channelIds.length; i++) {
-        chat.client.appendChannel(channelNames[i], channelIds[i]);
+        var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
+        var span2 = $("<span />").addClass("badge").text("0/0");
+        var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelIds[i]).addClass("list-group-item").text(channelNames[i]).prepend(span2).prepend(span1);
+        $("#ChannelList").append(html);
+        $("#ChannelList #" + channelIds[i]).show("slide", 400);
     }
     chat.server.requestActiveChannel();
 };
@@ -107,7 +120,6 @@ chat.client.errorChannelAlreadyMade = function () {
     alert("This channel already exists");
 };
 chat.client.sendQuestion = function (question) {
-    //console.log(question);
     $("#newQuestionText").val(question);
 };
 chat.client.exitChannel = function (e) {
@@ -134,11 +146,9 @@ chat.client.exitChannel = function (e) {
 chat.client.channelsFound = function (ids, names) {
     var resultList = $("#SearchChannelResults");
     for (var i = 0; i < ids.length; i++) {
-        //var html = "<a href='#' style='display: none;' id='" + ids[i] + "' class='list-group-item'>" + names[i] + "</a>";
         var html = $("<a />");
         html = html.attr("id", ids[i]).attr("class", "list-group-item").attr("href", "#").attr("data-toggle", "tooltip").attr("data-placement", "left").attr("title", "Kanel ID: " + ids[i]).text(names[i]);
         resultList.append(html);
-        //$("#" + ids[i]).show("blind");
         $("[data-toggle=\"tooltip\"]").tooltip();
     }
 };
@@ -152,23 +162,9 @@ chat.client.ipDiscover = function (ids, names) {
     }
 };
 chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
-    console.log("Adding lots of questions");
     var helpList = $("#HelpList");
     helpList.empty();
     for (var i = 0; i < questionIds.length; i++) {
-        /*var html = "";
-        if (admin) {
-            console.log("Admin");
-            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"><button type=\"button\" class=\"close\" id=\"closeBox\"  aria-label=\"luk\"><span aria-hidden=\"true\">&times;</span></button> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
-        } else {
-            console.log("not admin");
-            html = "<div style=\"display: none;\" class=\"panel panel-primary\" id=\"" + questionIds[i] + "\"><div class=\"panel-heading\"> <h3 class=\"panel-title\">" + usernames[i] + "</h3></div>{0}</div>";
-        }
-        if (questions[i] === "") {
-            html = html.replace("{0}", "");
-        } else {
-            html = html.replace("{0}", "<div class=\"panel-body\">" + questions[i] + "</div>");
-        }*/
         var span, button = $();
         if (admin) {
             span = $("<span />").attr("aria-hidden", "true").html("&times;");
@@ -188,7 +184,6 @@ chat.client.addQuestions = function (usernames, questions, questionIds, admin) {
     }
 };
 chat.client.addQuestion = function (username, question, questionId, admin) {
-    console.log("Adding single question to que");
     var helpList = $("#HelpList");
     var span, button = $();
     if (admin) {
@@ -203,7 +198,6 @@ chat.client.addQuestion = function (username, question, questionId, admin) {
     }
     var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionId).html(heading).append(body);
     helpList.append(html);
-    console.log("Here");
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     $("#HelpList #" + questionId).show("blind");
 };
@@ -212,7 +206,6 @@ chat.client.userAreQuesting = function () {
 };
 chat.client.removeQuestion = function (questionId) {
     var element = $("#HelpList #" + questionId);
-    //console.log(questionId);
     element.hide("blind", function () {
         element.remove();
     });
@@ -233,7 +226,6 @@ chat.client.sendChatMessage = function (text, author, messageId, sender, appendT
     var p = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
     if (appendToLast) {
         var location = $(".chat li:last-child > div");
-        //console.log(location);
         location.append(p);
     }
     else {
@@ -255,13 +247,11 @@ chat.client.removeChatMessage = function (messageId) {
     var message = $("#" + messageId);
     var parent = message.parent();
     message.remove();
-    console.log(parent.children().length);
     if (parent.children().length <= 1) {
         parent.parent().remove();
     }
 };
 chat.client.sendChatMessages = function (text, author, messageId, sender, appendToLast, canEdit) {
-    //console.log("sendChatMessages");
     $(".chat").empty();
     for (var i = 0; i < text.length; i++) {
         chat.client.sendChatMessage(text[i], author[i], messageId[i], sender[i], appendToLast[i], canEdit[i]);
@@ -275,6 +265,50 @@ chat.client.checkVersion = function (version) {
 chat.client.clearChat = function () {
     $(".chat").empty();
 };
+chat.client.userCreationFailed = function (errorMessage) {
+    var input = createUserPopover.find("#userCreationError");
+    input.text(errorMessage);
+    input.show("blind");
+};
+chat.client.userCreationSuccess = function () {
+    if (createUserPopover !== undefined)
+        createUserPopover.popover("hide");
+    showNotification("success", "Din bruger er nu oprettet", "Tillykke!");
+    setLoginState(1);
+};
+chat.client.loginFailed = function () {
+    if (loginUserPopover === undefined)
+        return;
+    loginUserPopover.find("#invalidLoginMessage").show("blind");
+};
+chat.client.loginSuccess = function () {
+    if (loginUserPopover === undefined)
+        return;
+    loginUserPopover.popover("hide");
+    showNotification("success", "Du er nu logget ind", "Login succesfuld!");
+    setLoginState(1);
+};
+chat.client.userLoggedOut = function () {
+    setLoginState(2);
+    $("#ChannelList").empty();
+    $("#HelpList").empty();
+    setQuestionLayout(2);
+    $(".chat").empty();
+    showNotification("info", "Du er nu logget ud", "Logud succesfuld");
+};
+function showNotification(typ, text, title) {
+    // ReSharper disable once WrongExpressionStatement
+    new PNotify({
+        title: title,
+        text: text,
+        type: typ,
+        animation: "show",
+        nonblock: {
+            nonblock: true,
+            nonblock_opacity: .2
+        }
+    });
+}
 function setQuestionLayout(layout) {
     switch (layout) {
         case 1:
@@ -291,6 +325,20 @@ function setQuestionLayout(layout) {
             $("#requestingHelp").show();
             $("#noChannelsSelected").hide();
             $("#requestHelpForm").hide();
+            break;
+        default:
+    }
+}
+function setLoginState(layout) {
+    switch (layout) {
+        case 1:
+            $(".not-logged-in").hide();
+            $(".logged-in").show();
+            break;
+        case 2:
+            // Not logged in
+            $(".not-logged-in").show();
+            $(".logged-in").hide();
             break;
         default:
     }
@@ -313,7 +361,6 @@ function isNullOrWhitespace(input) {
     return input.replace(/\s/g, "").length < 1;
 }
 $.connection.hub.start().done(function () {
-    //console.log("connected");
     chat.server.getData(2);
     setInterval(function () {
         chat.server.getData(2);
@@ -336,17 +383,14 @@ $.connection.hub.start().done(function () {
     });
     $(document).on("click", "div#ChannelList > a", function () {
         var tmpid = $(this).attr("id");
-        //console.log(tmpid);
         chat.server.changeToChannel(tmpid);
     });
     $(document).on("click", "#closeBox", function () {
         var tmpid = $(this).parent().parent().attr("id");
-        //console.log(tmpid);
         chat.server.removeQuestion(tmpid);
     });
     $(document).on("click", "#closeChatMessage", function () {
         var tmpid = $(this).parent().attr("id");
-        //console.log(tmpid);
         chat.server.removeChatMessage(tmpid);
     });
 });
@@ -377,21 +421,17 @@ $(document).ready(function () {
         setQuestionLayout(1);
     });
     $("#editQuestion").click(function () {
-        //console.log("edit");
         $("#changeQuestionModal").modal("show");
         $("#newQuestionText").focus();
         chat.server.getData(1);
     });
     $("#newQuestionSubmit").click(function () {
-        //console.log("submit");
         var question = $("#newQuestionText").val();
-        //console.log(question);
         chat.server.changeQuestion(question);
         $("#changeQuestionModal").modal("hide");
     });
     $("#chatForm").submit(function () {
         var message = $("#chatMessageInput").val();
-        console.log(message);
         if (!isNullOrWhitespace(message)) {
             chat.server.chat(message);
             $("#chatMessageInput").val("");
@@ -408,5 +448,56 @@ $(document).ready(function () {
     $("#ClearChatButton").click(function () {
         chat.server.clearChat();
     });
+    $("#CreateUserButton").popover({
+        html: true,
+        content: function () { return $("#createUserContent").html(); },
+        title: function () { return $("#createUserTitle").html(); },
+        placement: "bottom",
+        container: "body"
+    }).click(function () {
+        if (loginUserPopover !== undefined)
+            loginUserPopover.popover("hide");
+        setTimeout(function () {
+            createUserPopover = $("#" + $("#CreateUserButton").attr("aria-describedby"));
+            var name = $("#CurrentUserName").text();
+            var input = createUserPopover.find("#CreateUserName");
+            input.val(name);
+        }, 500);
+    });
+    $(document).on("submit", "#createUserForm", function (e) {
+        e.preventDefault();
+        var name = createUserPopover.find("#CreateUserName").val();
+        var mail = createUserPopover.find("#CreateUserEmail").val();
+        var pass = createUserPopover.find("#CreateUserPw").val();
+        if (isNullOrWhitespace(name) || isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
+            return;
+        chat.server.createNewUser(name, mail, pass);
+    }).on("submit", "#loginUserForm", function (e) {
+        e.preventDefault();
+        var mail = loginUserPopover.find("#LoginUserEmail").val();
+        var pass = loginUserPopover.find("#LoginUserPassword").val();
+        if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
+            return;
+        chat.server.loginUser(mail, pass);
+    });
+    $("#LoginButton").popover({
+        html: true,
+        content: function () { return $("#loginUserContent").html(); },
+        title: function () { return $("#loginUserTitle").html(); },
+        placement: "bottom",
+        container: "body"
+    }).click(function () {
+        if (createUserPopover !== undefined)
+            createUserPopover.popover("hide");
+        setTimeout(function () {
+            loginUserPopover = $("#" + $("#LoginButton").attr("aria-describedby"));
+        }, 500);
+    });
+    $("#logoutButton").click(function () {
+        chat.server.logoutUser();
+    });
 });
+function getPopoverId() {
+    return $(this).attr("aria-describedby");
+}
 //# sourceMappingURL=helper.js.map

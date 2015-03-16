@@ -111,6 +111,8 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\pnotify.custom.min.css" />
+    <Content Include="Scripts\pnotify.custom.min.js" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -170,7 +172,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CentralHub.cs" />
-    <Compile Include="Connection.cs" />
+    <Compile Include="Migrations\201503141119032_multipleConnections.cs" />
+    <Compile Include="Migrations\201503141119032_multipleConnections.Designer.cs">
+      <DependentUpon>201503141119032_multipleConnections.cs</DependentUpon>
+    </Compile>
+    <Compile Include="server\Connection.cs" />
     <Compile Include="Migrations\201503051130379_initinal.cs" />
     <Compile Include="Migrations\201503051130379_initinal.Designer.cs">
       <DependentUpon>201503051130379_initinal.cs</DependentUpon>
@@ -191,12 +197,21 @@
     <Compile Include="Migrations\201503081037323_userRemovalCascation.Designer.cs">
       <DependentUpon>201503081037323_userRemovalCascation.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503112050071_addEmailAddressToUser.cs" />
+    <Compile Include="Migrations\201503112050071_addEmailAddressToUser.Designer.cs">
+      <DependentUpon>201503112050071_addEmailAddressToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503121633047_security.cs" />
+    <Compile Include="Migrations\201503121633047_security.Designer.cs">
+      <DependentUpon>201503121633047_security.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="MySqlConfiguration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="MySqlInitializer.cs" />
     <Compile Include="server\Channel.cs" />
     <Compile Include="server\ChatMessage.cs" />
+    <Compile Include="server\hasher.cs" />
     <Compile Include="server\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="server\Question.cs" />
@@ -223,6 +238,7 @@
     <TypeScriptCompile Include="helper.ts" />
     <TypeScriptCompile Include="Client\IServer.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.pnotify\jquery.pnotify.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
@@ -244,6 +260,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503081037323_userRemovalCascation.resx">
       <DependentUpon>201503081037323_userRemovalCascation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503112050071_addEmailAddressToUser.resx">
+      <DependentUpon>201503112050071_addEmailAddressToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503121633047_security.resx">
+      <DependentUpon>201503121633047_security.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503141119032_multipleConnections.resx">
+      <DependentUpon>201503141119032_multipleConnections.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

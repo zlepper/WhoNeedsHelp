@@ -12,7 +12,7 @@ namespace WhoNeedsHelp
     public class HelpContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        //public DbSet<Connection> Connections { get; set; }
+        public DbSet<Connection> Connections { get; set; }
         public DbSet<Channel> Channels { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Question> Questions { get; set; }
@@ -77,6 +77,11 @@ namespace WhoNeedsHelp
                 .WithRequired(cm => cm.User)
                 .HasForeignKey(cm => cm.UserId)
                 .WillCascadeOnDelete(true);
+            // Map relation between "User.Connections" and "Connection.User"
+            modelBuilder.Entity<User>()
+                .HasMany<Connection>(u => u.Connections)
+                .WithRequired(c => c.User)
+                .HasForeignKey(c => c.UserId);
 
 
             // Configure the channel model
@@ -99,6 +104,8 @@ namespace WhoNeedsHelp
             // Configure the ChatMessage model
             modelBuilder.Entity<ChatMessage>().HasKey(cm => cm.Id);
             //modelBuilder.Entity<ChatMessage>().
+
+            modelBuilder.Entity<Connection>().HasKey(c => c.ConnectionId);
 
             // Configure the Question model
             

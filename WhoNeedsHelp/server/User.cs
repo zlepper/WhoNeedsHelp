@@ -12,37 +12,40 @@ namespace WhoNeedsHelp.server
     {
         protected bool Equals(User other)
         {
-            return Id == other.Id && string.Equals(UserName, other.UserName);
+            return Id == other.Id && string.Equals(EmailAddress, other.EmailAddress);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Id*397) ^ (UserName != null ? UserName.GetHashCode() : 0);
+                return (Id * 397) ^ (EmailAddress != null ? EmailAddress.GetHashCode() : 0);
             }
         }
 
         public int Id { get; set; }
 
-        public string UserName { get; set; }
-
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
         public int? ChannelId { get; set; }
         public string Pw { get; set; }
-        public Channel Channel { get; set; }
+        public virtual Channel Channel { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Channel> ChannelsIn { get; set; }
         public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
         public virtual ICollection<Channel> AreAdministratorIn { get; set; }
         public virtual ICollection<ChatMessage> ChatMessages { get; set; } 
         public string Ip { get; set; }
-        public string ConnectionId { get; set; }
+        //public string ConnectionId { get; set; }
+        public virtual ICollection<Connection> Connections { get; set; } 
+        public string EmailAddress { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTime LastFailedAttempt { get; set; }
 
         public User()
         {
             Questions = new List<Question>();
+            Connections = new List<Connection>();
         }
 
         public Question RequestHelp(string question = null)
@@ -136,6 +139,7 @@ namespace WhoNeedsHelp.server
 
         public bool AreUserQuestioning(Channel c)
         {
+            if (c == null) return false;
             using (var db = new HelpContext())
             {
                 //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(c) && q.User.Equals(this));
