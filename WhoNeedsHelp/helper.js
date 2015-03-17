@@ -261,7 +261,7 @@ chat.client.sendChatMessages = function (text, author, messageId, sender, append
     }
 };
 chat.client.checkVersion = function (version) {
-    if (version !== 2) {
+    if (version !== 3) {
         location.reload(true);
     }
 };
@@ -392,6 +392,8 @@ $.connection.hub.start().done(function () {
         chat.server.getData(2);
     }, 1000 * 60 * 10);
     // Show the get username modal
+    $("#loadingAnimation").hide("blind");
+    $("#interface").show("blind");
     $("#usernameModal").modal("show");
     $("#usernameModalInput").focus();
     $(document).on("click", "span.channel-remove", function () {

@@ -23,6 +23,8 @@
     <!--Add script to update the page and send messages.-->
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="helper.js"></script>
+    <script type="text/javascript" src="loading.js"></script>
+    <link href="loading.css" type="text/css" rel="stylesheet"/>
 
 
 
@@ -76,39 +78,7 @@
             </div> <!--</modal-dialog>-->
         </div> <!--</modal>-->
 
-        <div class="row">
-            <nav class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
-                    </div>
-
-                    <div class="collapse navbar-collapse" id="navbar">
-                        <ul class="nav navbar-nav">
-                            <li>
-                                <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
-                            </li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li>
-                                <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
-                            </li>
-                            <!--Should only be shown when the user is not logged in-->
-                            <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
-                            <li class="beta not-logged-in"><a id="LoginButton" href="#">Log in</a></li>
-                            <!--Should only be shown when the user is logged in-->
-                            <li style="display: none;" class="beta logged-in"><a id="logoutButton" href="#">Log ud</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </div>
+        
     <!--Create User hidden content-->
     <div style="display: none;" id="createUserContent">
         <div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
@@ -161,11 +131,45 @@
         <form onsubmit="return false;" id="changeusernameForm">
             <div class="form-group">
                 <label for="changeusernameInput">Brugernavn</label>
-                <input required="required" type="text" class="form-control" id="changeusernameInput" />
+                <input required="required" type="text" class="form-control" id="changeusernameInput"/>
             </div>
             <button class="btn btn-primary" type="submit">Skift</button>
         </form>
     </div>
+    <div id="interface" style="display: none;">
+        <div class="row">
+            <nav class="navbar navbar-default">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="navbar">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
+                            </li>
+                            <!--Should only be shown when the user is not logged in-->
+                            <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
+                            <li class="beta not-logged-in"><a id="LoginButton" href="#">Log in</a></li>
+                            <!--Should only be shown when the user is logged in-->
+                            <li style="display: none;" class="beta logged-in"><a id="logoutButton" href="#">Log ud</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
         <div class="row">
             <div class="col-md-3">
                 <div class="panel panel-primary">
@@ -183,7 +187,7 @@
                         <form onsubmit=" return false; " class="form" id="CreateChannelForm">
                             <div class="form-group">
                                 <label class="sr-only" for="newChannelName">Ny kanal</label>
-                                <input pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control" />
+                                <input pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName" placeholder="Ny kanal navn" class="form-control"/>
                             </div>
                             <div class="form-group hidden">
                                 <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
@@ -205,14 +209,15 @@
                         <form onsubmit=" return false; " class="form" id="SearchChannelForm">
                             <div class="form-group">
                                 <label class="sr-only" for="SearchChannelName">Søg efter kanal</label>
-                                <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control" />
+                                <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control"/>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a></h3>
+                        <h3 class="panel-title">Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a>
+                        </h3>
 
                     </div>
                     <div class="panel-body">
@@ -234,7 +239,7 @@
                         <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
                             <div class="form-group">
                                 <label for="question"></label>
-                                <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
+                                <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
@@ -255,7 +260,8 @@
             <div class="col-md-3">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><span class="pull-left glyphicon glyphicon-comment"></span> Chat</h3>
+                        <h3 class="panel-title"><span class="pull-left glyphicon glyphicon-comment"></span> Chat
+                        </h3>
                     </div>
                     <!--Put some chat function thingy here-->
                     <!--Chat channel should follow help channel-->
@@ -294,7 +300,7 @@
                     <div class="panel-footer">
                         <form class="form" onsubmit=" return false; " id="chatForm">
                             <div class="form-group">
-                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control" />
+                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control"/>
                             </div>
                         </form>
                         <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
@@ -304,8 +310,39 @@
         </div>
         <footer>
             <p>&copy; Rasmus Hansen 2015</p>
-            <p>Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.</p>
+            <p>
+                Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
+            </p>
         </footer>
+    </div>
+    <div id="loadingAnimation">
+        <div class="loading">
+            <div class="finger finger-1">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-2">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-3">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="finger finger-4">
+                <div class="finger-item">
+                    <span></span><i></i>
+                </div>
+            </div>
+            <div class="last-finger">
+                <div class="last-finger-item"><i></i>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 </html>

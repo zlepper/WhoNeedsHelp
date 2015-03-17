@@ -517,7 +517,7 @@ namespace WhoNeedsHelp
             {
                 case 2:
                     // Request a version number from the server
-                    Clients.Caller.CheckVersion(2);
+                    Clients.Caller.CheckVersion(3);
                     break;
             }
         }
@@ -760,7 +760,10 @@ namespace WhoNeedsHelp
                         canEditList.Add(chatMessage.User.Equals(user) || user.Channel.IsUserAdministrator(user));
                     }
                     Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
-                    Clients.Caller.UpdateUsername(user.Name);
+                    if (!currentUser.Name.Equals(user.Name))
+                    {
+                        Clients.Caller.UpdateUsername(user.Name);
+                    }
                 }
                 else
                 {

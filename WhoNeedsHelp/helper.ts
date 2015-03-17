@@ -283,7 +283,7 @@ PNotify.prototype.options.styling = "bootstrap3";
     }
 
     chat.client.checkVersion = version => {
-        if (version !== 2) {
+        if (version !== 3) {
             location.reload(true);
         }
     }
@@ -429,6 +429,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             chat.server.getData(2);
         }, 1000 * 60 * 10);
         // Show the get username modal
+        $("#loadingAnimation").hide("blind");
+        $("#interface").show("blind");
         $("#usernameModal").modal("show");
         $("#usernameModalInput").focus();
 
