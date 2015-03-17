@@ -80,7 +80,11 @@ namespace WhoNeedsHelp
                 var user = con.User;
                 if (user == null) return;
                 var channel = user.Channel;
-                if (channel == null) return;
+                if (channel == null)
+                {
+                    Clients.Caller.ErrorChat("Du er ikke i nogen kanal");
+                    return;
+                }
                 ChatMessage chatMessage = channel.AddChatMessage(user, message);
                 if (chatMessage != null)
                 {
@@ -180,6 +184,11 @@ namespace WhoNeedsHelp
                     if (user == null) return;
                     Channel channel = user.Channel;
                     Question question = user.GetQuestion(channel);
+                    if (question == null)
+                    {
+                        Clients.Caller.SetLayout(1);
+                        return;
+                    }
                     user.RemoveQuestion(question);
                     foreach (Connection connection in user.Connections)
                     {
@@ -291,9 +300,17 @@ namespace WhoNeedsHelp
                             Clients.Client(connection.ConnectionId)
                                 .SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(),
                                     senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
-                            
-                        }
 
+                        }
+                        var users = channel.Users;
+                        var userNames = users.Select(u => u.Name);
+                        var ids = users.Select(u => u.Id);
+                        bool a = channel.IsUserAdministrator(user);
+                        foreach (Connection connection in user.Connections)
+                        {
+                            Clients.Client(connection.ConnectionId).AppendUsers(userNames.ToArray(), ids.ToArray(), a);
+                        }
+                        
                     }
                 }
                 db.SaveChanges();
@@ -319,7 +336,23 @@ namespace WhoNeedsHelp
                     {
                         Clients.Client(connection.ConnectionId).AppendChannel(channel.ChannelName, channelId);
                     }
+                    foreach (User us in channel.ActiveUsers)
+                    {
+                        bool admin = channel.IsUserAdministrator(us);
+                        foreach (Connection connection in us.Connections)
+                        {
+                            Clients.Client(connection.ConnectionId).AppendUser(user.Name, user.Id, admin);
+                        }
+                    }
                     db.SaveChanges();
+                    var users = channel.Users;
+                    var userNames = users.Select(u => u.Name);
+                    var ids = users.Select(u => u.Id);
+                    bool ad = channel.IsUserAdministrator(user);
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).AppendUsers(userNames.ToArray(), ids.ToArray(), ad);
+                    }
                 }
             }
         }
@@ -381,12 +414,16 @@ namespace WhoNeedsHelp
                             {
                                 Clients.Client(connection.ConnectionId).ExitChannel(id.ToString());
                             }
-                            int activeUsers = channel.GetQuestingUserCount();
-                            int userCount = channel.GetUsers().Count;
+                            int activeUsers = channel.ActiveUsers.Count;
+                            int userCount = channel.Users.Count;
                             string idString = id.ToString();
                             foreach (Connection connection in channel.Users.SelectMany(us => us.Connections))
                             {
                                 Clients.Client(connection.ConnectionId).UpdateChannelCount(activeUsers, userCount, idString);
+                            }
+                            foreach (var connection in channel.ActiveUsers.SelectMany(us => us.Connections))
+                            {
+                                Clients.Client(connection.ConnectionId).RemoveUser(user.Id);
                             }
                         }
                     }
@@ -406,6 +443,11 @@ namespace WhoNeedsHelp
                 if (con == null) return;
                 var user = con.User;
                 if (user == null) return;
+                if (user.AreAdministratorIn.Count > 4)
+                {
+                    Clients.Caller.Alert("Du kan ikke oprette mere end 5 kanaler af gangen", "Maks oprettede kanaler nået", "error");
+                    return;
+                }
                 var channel = new Channel(user, channelName);
                 channel.AddUser(user);
                 user.Channel = channel;
@@ -503,12 +545,45 @@ namespace WhoNeedsHelp
                     foreach (Connection connection in user.Connections)
                     {
                         Clients.Client(connection.ConnectionId).AddQuestion(helpRequestName, qtext, qid, isUserAdmin);
-                        Clients.Client(connection.ConnectionId).SetLayout(3);
                     }
+                }
+                foreach (Connection connection in userFromDb.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).SetLayout(3);
                 }
                 UpdateCount(channel.Id);
             }
 
+        }
+
+        public void RemoveUserFromChannel(string id)
+        {
+            if (String.IsNullOrEmpty(id)) return;
+            int Id;
+            bool parse = Int32.TryParse(id, out Id);
+            if (!parse) return;
+            using (var db = new HelpContext())
+            {
+                var user = db.Users.Find(Id);
+                if (user == null)
+                {
+                    Clients.Caller.RemoveUser(Id);
+                    return;
+                }
+                var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+                if (con == null) return;
+                var callingUser = con.User;
+                if (callingUser == null) return;
+                if (callingUser.Id == user.Id)
+                {
+                    Clients.Caller.Alert("Du har lige forsøgt at smide dig selv ud af kanalen...", "Really?!", "warning");
+                    return;
+                }
+                if (callingUser.Channel.IsUserAdministrator(callingUser))
+                {
+                    ExitChannel(callingUser.Channel, user);
+                }
+            }
         }
 
         public void GetData(int action)
@@ -776,12 +851,21 @@ namespace WhoNeedsHelp
         {
             using (var db = new HelpContext())
             {
-                user = db.Users.Find(user);
+                user = db.Users.Find(user.Id);
                 if (user == null) return;
-                channel = db.Channels.Find(channel);
+                channel = db.Channels.Find(channel.Id);
                 if (channel == null) return;
+                foreach (Connection con in channel.ActiveUsers.SelectMany(u => u.Connections))
+                {
+                    Clients.Client(con.ConnectionId).RemoveUser(user.Id);
+                }
+                foreach (Connection con in user.Connections)
+                {
+                    Clients.Client(con.ConnectionId).ExitChannel(channel.Id.ToString());
+                }
                 channel.RemoveUser(user);
                 db.SaveChanges();
+                UpdateCount(channel.Id);
             }
         }
 

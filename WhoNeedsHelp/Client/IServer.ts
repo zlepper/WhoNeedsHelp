@@ -38,8 +38,12 @@ interface ICentralClient {
     appendChannel2: (channelname: any, channelid: any) => void;
     updateUsername: (name: string) => void;
     updateQuestionAuthorName: (name: string, id: string) => void;
-    updateChatMessageAuthorName: (name: string, ids: string[]) => void ;
-
+    updateChatMessageAuthorName: (name: string, ids: string[]) => void;
+    errorChat: (errorMessage: string) => void;
+    appendUsers(usernames: string[], userids: number[], admin: boolean);
+    appendUser(username: string, id: number, admin: boolean);
+    removeUser(id: number);
+    alert: (message: string, title: string, t: string) => void;
 }
 
 interface ICentralServer {
@@ -62,4 +66,5 @@ interface ICentralServer {
     requestActiveChannel(): JQueryPromise<void>;
     loginUser(mail: string, pass: string): JQueryPromise<void>;
     logoutUser(): JQueryPromise<void>;
+    removeUserFromChannel(tmpid: string): JQueryPromise<void>;
 }

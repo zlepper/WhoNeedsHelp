@@ -18,7 +18,7 @@ var loginUserPopover: JQuery;
 var changeUsernamePopover: JQuery;
 var firstName: Boolean;
 firstName = false;
-PNotify.prototype.options.styling = "bootstrap3";
+PNotify.prototype.options.styling = "fontawesome";
 //var validate;
 
     function setUserName() {
@@ -84,13 +84,19 @@ PNotify.prototype.options.styling = "bootstrap3";
         $("div#ChannelList > a").stop().removeClass("active").attr("style", "");
         setTimeout(() => {
             $("#" + channel).addClass("active", 400);
-            var t = $("#ChannelList #" + channel).text();
+            //var t = $("#ChannelList #" + channel).text();
         }, 100);
         if (areUserQuestioning) {
             setQuestionLayout(3);
         } else {
             setQuestionLayout(1);
         }
+    }
+
+    chat.client.removeUser = (id) => {
+        $("#userlistlist #" + id).hide("blind", function() {
+            $(this).remove();
+        });
     }
 
     chat.client.updateChannelCount = (activeUsers, connectedUsers, channelId) => {
@@ -147,6 +153,11 @@ PNotify.prototype.options.styling = "bootstrap3";
                 $(".chat").empty();
                 $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
                 $("#HelpList > div").each(function(index) {
+                    $(this).delay(index * 300).hide("blind", {}, 400, function() {
+                        $(this).remove();
+                    });
+                });
+                $("#userlistlist > div").each(function(index) {
                     $(this).delay(index * 300).hide("blind", {}, 400, function() {
                         $(this).remove();
                     });
@@ -238,6 +249,12 @@ PNotify.prototype.options.styling = "bootstrap3";
 
     chat.client.setLayout = layout => {
         setQuestionLayout(layout);
+    }
+
+    chat.client.errorChat = (errorMessage) => {
+        var error: JQuery = $("<div />").addClass("alert alert-danger").attr("style", "display: none;").attr("role", "alert").attr("id", "chatFejl").text(errorMessage);
+        $(".chat").append(error);
+        $("#chatFejl").show("blind");
     }
 
     chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, canEdit) => {
@@ -351,18 +368,50 @@ PNotify.prototype.options.styling = "bootstrap3";
         }
     }
 
+    chat.client.appendUser = (username, id, admin) => {
+        var ele = $("<div />").attr("style", "display: none;").addClass("list-group-item").text(username).attr("id", id);
+        if (admin) {
+            var span = $("<span />").attr("aria-hidden", "true").html("&times;");
+            var button = $("<button />").attr("type", "button").addClass("close").attr("id", "removeUserFromChannel").attr("aria-label", "Fjern").append(span);
+            ele.append(button);
+        }
+        $("#userlistlist").append(ele);
+        $("#userlistlist #" + id).show("blind");
+    }
+
+    chat.client.appendUsers = (usernames, ids, admin) => {
+        $("#userlistlist").empty();
+        var span = $("<span />").attr("aria-hidden", "true").html("&times;");
+        var button = $("<button />").attr("type", "button").addClass("close").attr("id", "removeUserFromChannel").attr("aria-label", "luk").append(span);
+        for (var i = 0; i < ids.length; i++) {
+            var ele = $("<div />").attr("style", "display: none;").addClass("list-group-item").text(usernames[i]).attr("id", ids[i]);
+            if (admin) {
+                ele.append(button);
+            }
+            $("#userlistlist").append(ele);
+            $("#userlistlist #" + ids[i]).show("blind");
+        }
+    }
+
+    chat.client.alert = (message, title, t) => {
+        showNotification(t, message, title);
+    }
+
     function showNotification(typ: string, text: string, title: string) {
-        // ReSharper disable once WrongExpressionStatement
-        new PNotify({
+        var notice = new PNotify({
             title: title,
             text: text,
             type: typ,
             animation: "show",
-            nonblock: {
+            /*nonblock: {
                 nonblock: true,
                 nonblock_opacity: .2
-            },
-            styling: "bootstrap3"
+            },*/
+            styling: "fontawesome",
+            mouse_reset: false
+        });
+        notice.elem.click(() => {
+            notice.remove();
         });
     }
     function setQuestionLayout(layout: any) {
@@ -467,6 +516,11 @@ PNotify.prototype.options.styling = "bootstrap3";
             e.preventDefault();
             var tmpid = $(this).parent().attr("id");
             chat.server.removeChatMessage(tmpid);
+        });
+
+        $(document).on("click", "#removeUserFromChannel", function(e) {
+            var tmpid = $(this).parent().attr("id");
+            chat.server.removeUserFromChannel(tmpid);
         });
     });
 

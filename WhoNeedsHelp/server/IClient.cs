@@ -32,5 +32,10 @@ namespace WhoNeedsHelp
         void UpdateUsername(string name);
         void UpdateQuestionAuthorName(string name, string questionId);
         void UpdateChatMessageAuthorName(string name, string[] chatMessageIds);
+        void ErrorChat(string errorMessage);
+        void AppendUsers(string[] toArray, int[] ids, bool admin);
+        void AppendUser(string name, int id, bool admin);
+        void RemoveUser(int id);
+        void Alert(string message, string title, string type);
     }
 }
