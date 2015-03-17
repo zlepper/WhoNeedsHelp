@@ -565,8 +565,13 @@ PNotify.prototype.options.styling = "bootstrap3";
             var name = createUserPopover.find("#CreateUserName").val();
             var mail = createUserPopover.find("#CreateUserEmail").val();
             var pass = createUserPopover.find("#CreateUserPw").val();
-            if (isNullOrWhitespace(name) || isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
-            chat.server.createNewUser(name, mail, pass);
+            var pass2 = createUserPopover.find("#CreateUserPwConfirm").val();
+            if (isNullOrWhitespace(name) || isNullOrWhitespace(mail) || isNullOrWhitespace(pass) || isNullOrWhitespace(pass2)) return;
+            if (pass === pass2) {
+                chat.server.createNewUser(name, mail, pass);
+            } else {
+                chat.client.userCreationFailed("Kodeorderne er ikke ens");
+            }
         }).on("submit", "#loginUserForm", e => {
             e.preventDefault();
             var mail = loginUserPopover.find("#LoginUserEmail").val();
