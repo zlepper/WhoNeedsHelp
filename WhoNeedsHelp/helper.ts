@@ -434,12 +434,14 @@ PNotify.prototype.options.styling = "bootstrap3";
         $("#usernameModal").modal("show");
         $("#usernameModalInput").focus();
 
-        $(document).on("click", "span.channel-remove", function () {
+        $(document).on("click", "span.channel-remove", function (e) {
+            e.preventDefault();
             var tmpid = $(this).parent().attr("id");
             chat.server.exitChannel(tmpid);
         });
 
-        $(document).on("click", "div.joinChannel > a", function () {
+        $(document).on("click", "div.joinChannel > a", function (e) {
+            e.preventDefault();
             var tmpid = $(this).attr("id");
             chat.server.joinChannel(tmpid);
             if ($(this).parent().attr("id") === "SearchChannelResults") {
@@ -449,17 +451,20 @@ PNotify.prototype.options.styling = "bootstrap3";
             }
         });
 
-        $(document).on("click", "div#ChannelList > a", function () {
+        $(document).on("click", "div#ChannelList > a", function (e) {
+            e.preventDefault();
             var tmpid = $(this).attr("id");
             chat.server.changeToChannel(tmpid);
         });
 
-        $(document).on("click", "#closeBox", function () {
+        $(document).on("click", "#closeBox", function (e) {
+            e.preventDefault();
             var tmpid = $(this).parent().parent().attr("id");
             chat.server.removeQuestion(tmpid);
         });
 
-        $(document).on("click", "#closeChatMessage", function () {
+        $(document).on("click", "#closeChatMessage", function (e) {
+            e.preventDefault();
             var tmpid = $(this).parent().attr("id");
             chat.server.removeChatMessage(tmpid);
         });
@@ -492,18 +497,21 @@ PNotify.prototype.options.styling = "bootstrap3";
             }
         });
 
-        $("#removeQuestion").click(() => {
+        $("#removeQuestion").click((e) => {
+            e.preventDefault();
             chat.server.removeQuestion(null);
             setQuestionLayout(1);
         });
 
-        $("#editQuestion").click(() => {
+        $("#editQuestion").click((e) => {
+            e.preventDefault();
             $("#changeQuestionModal").modal("show");
             $("#newQuestionText").focus();
             chat.server.getData(1);
         });
 
-        $("#newQuestionSubmit").click(() => {
+        $("#newQuestionSubmit").click((e) => {
+            e.preventDefault();
             var question = $("#newQuestionText").val();
             chat.server.changeQuestion(question);
             $("#changeQuestionModal").modal("hide");
@@ -517,7 +525,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             }
         });
 
-        $("#editUsername").click(() => {
+        $("#editUsername").click((e) => {
+            e.preventDefault();
             if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
             if (createUserPopover !== undefined) createUserPopover.popover("hide");
             setTimeout(() => {
@@ -534,11 +543,13 @@ PNotify.prototype.options.styling = "bootstrap3";
             container: "body"
         });
 
-        $("#reloadNearbyChannels").click(() => {
+        $("#reloadNearbyChannels").click((e) => {
+            e.preventDefault();
             chat.server.loadNearbyChannels();
         });
 
-        $("#ClearChatButton").click(() => {
+        $("#ClearChatButton").click((e) => {
+            e.preventDefault();
             chat.server.clearChat();
         });
 
@@ -548,7 +559,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             title: () => $("#createUserTitle").html(),
             placement: "bottom",
             container: "body"
-        }).click(() => {
+        }).click((e) => {
+            e.preventDefault();
             if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
             if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
             setTimeout(() => {
@@ -595,7 +607,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             title: () => $("#loginUserTitle").html(),
             placement: "bottom",
             container: "body"
-        }).click(() => {
+        }).click((e) => {
+            e.preventDefault();
             if (createUserPopover !== undefined) createUserPopover.popover("hide");
             if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
             setTimeout(() => {
@@ -603,7 +616,8 @@ PNotify.prototype.options.styling = "bootstrap3";
             }, 500);
             });
 
-        $("#logoutButton").click(() => {
+        $("#logoutButton").click((e) => {
+            e.preventDefault();
             chat.server.logoutUser();
         });
     });
