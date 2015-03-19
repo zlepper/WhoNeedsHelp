@@ -261,7 +261,7 @@ namespace WhoNeedsHelp
                             Clients.Client(connection.ConnectionId).SetChannel(channelId, areUserQuestioning);
                         }
                         UpdateCount(channel.Id);
-                        List<User> questionUsers = channel.GetUsersRequestingHelp();
+                        /*List<User> questionUsers = channel.GetUsersRequestingHelp();
                         List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
                         foreach (User us in questionUsers)
                         {
@@ -269,9 +269,17 @@ namespace WhoNeedsHelp
                             Question question = us.GetQuestion(channel);
                             questions.Add(question.Text);
                             questionIds.Add(question.Id.ToString());
+                        }*/
+                        List<Question> questions = db.Questions.Where(q => q.Channel.Id == channel.Id).OrderBy(q => q.AskedTime).ToList();
+                        List<string> usernames = new List<string>(), questiontexts = new List<string>(), questionIds = new List<string>();
+                        foreach (Question ques in questions)
+                        {
+                            usernames.Add(ques.User.Name);
+                            questiontexts.Add(ques.Text);
+                            questionIds.Add(ques.Id.ToString());
                         }
                         var usernamesArray = usernames.ToArray();
-                        var questionsArray = questions.ToArray();
+                        var questionsArray = questiontexts.ToArray();
                         var questionidsArray = questionIds.ToArray();
                         bool admin = channel.IsUserAdministrator(user);
                         foreach (Connection connection in user.Connections)
