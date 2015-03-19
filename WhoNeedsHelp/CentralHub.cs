@@ -320,60 +320,44 @@ namespace WhoNeedsHelp
 
         public void JoinChannel(string channelId)
         {
-            using (var db = new HelpContext())
-            {
-                var channel = db.Channels.Find(Int32.Parse(channelId));
-                if (channel != null)
-                {
-                    //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                    var con = db.Connections.Find(Context.ConnectionId);
-                    if (con == null) return;
-                    var user = con.User;
-                    if (user == null) return;
-                    if (channel.GetUsers().Contains(user)) return;
-                    channel.AddUser(user);
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).AppendChannel(channel.ChannelName, channelId);
-                    }
-                    foreach (User us in channel.ActiveUsers)
-                    {
-                        bool admin = channel.IsUserAdministrator(us);
-                        foreach (Connection connection in us.Connections)
-                        {
-                            Clients.Client(connection.ConnectionId).AppendUser(user.Name, user.Id, admin);
-                        }
-                    }
-                    db.SaveChanges();
-                    var users = channel.Users;
-                    var userNames = users.Select(u => u.Name);
-                    var ids = users.Select(u => u.Id);
-                    bool ad = channel.IsUserAdministrator(user);
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).AppendUsers(userNames.ToArray(), ids.ToArray(), ad);
-                    }
-                }
-            }
-        }
-
-        public void SearchForChannel(string channelId)
-        {
-            if (String.IsNullOrWhiteSpace(channelId)) return;
             int id;
-            bool isInt = Int32.TryParse(channelId, out id);
-            if (!isInt) return;
+            bool parsed = Int32.TryParse(channelId, out id);
+            if (!parsed) return;
             using (var db = new HelpContext())
             {
-                var matches = db.Channels.Where(c => c.Id == id).ToList();
-                string[] channelIds = new string[matches.Count];
-                string[] channelNames = new string[matches.Count];
-                for (int i = 0; i < matches.Count; i++)
+                var channel = db.Channels.Find(id);
+                if (channel == null)
                 {
-                    channelIds[i] = matches[i].Id.ToString();
-                    channelNames[i] = matches[i].ChannelName;
+                    Clients.Caller.Alert("Kanalen med id \"" + id + "\" blev ikke fundet.", "Kanal ikke fundet", "info");
+                    return;
                 }
-                Clients.Caller.ChannelsFound(channelIds, channelNames);
+                var con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                var user = con.User;
+                if (user == null) return;
+                if (channel.GetUsers().Contains(user)) return;
+                channel.AddUser(user);
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).AppendChannel(channel.ChannelName, channelId);
+                }
+                foreach (User us in channel.ActiveUsers)
+                {
+                    bool admin = channel.IsUserAdministrator(us);
+                    foreach (Connection connection in us.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).AppendUser(user.Name, user.Id, admin);
+                    }
+                }
+                db.SaveChanges();
+                var users = channel.Users;
+                var userNames = users.Select(u => u.Name);
+                var ids = users.Select(u => u.Id);
+                bool ad = channel.IsUserAdministrator(user);
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).AppendUsers(userNames.ToArray(), ids.ToArray(), ad);
+                }
             }
         }
 
@@ -385,7 +369,6 @@ namespace WhoNeedsHelp
             if (!isInt) return;
             using (var db = new HelpContext())
             {
-                //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
                 var con = db.Connections.Find(Context.ConnectionId);
                 if (con == null) return;
                 var user = con.User;

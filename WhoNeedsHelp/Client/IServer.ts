@@ -16,7 +16,7 @@ interface ICentralClient {
     errorChannelAlreadyMade: () => void;
     log: (text: string) => void;
     exitChannel: (channelId: string) => void;
-    channelsFound: (channelIds: string[], channelNames: string[]) => void;
+    //channelsFound: (channelIds: string[], channelNames: string[]) => void;
     setChannel: (channel: string, areUserQuestioning: boolean) => void;
     updateChannelCount: (activeUsers: number, connectedUsers: number, channelId: string) => void;
     sendQuestion: (question: string) => void;

@@ -140,10 +140,8 @@ chat.client.exitChannel = function (e) {
             setQuestionLayout(2);
             $(".chat").empty();
             $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
-            $("#HelpList > div").each(function (index) {
-                $(this).delay(index * 300).hide("blind", {}, 400, function () {
-                    $(this).remove();
-                });
+            $("#HelpList > div").hide("blind", {}, 400, function () {
+                $(this).remove();
             });
             $("#userlistlist > div").each(function (index) {
                 $(this).delay(index * 300).hide("blind", {}, 400, function () {
@@ -155,15 +153,6 @@ chat.client.exitChannel = function (e) {
             chat.server.changeToChannel(id);
         }
     });
-};
-chat.client.channelsFound = function (ids, names) {
-    var resultList = $("#SearchChannelResults");
-    for (var i = 0; i < ids.length; i++) {
-        var html = $("<a />");
-        html = html.attr("id", ids[i]).attr("class", "list-group-item").attr("href", "#").attr("data-toggle", "tooltip").attr("data-placement", "left").attr("title", "Kanel ID: " + ids[i]).text(names[i]);
-        resultList.append(html);
-        $("[data-toggle=\"tooltip\"]").tooltip();
-    }
 };
 chat.client.ipDiscover = function (ids, names) {
     var discoverElement = $("#ip-discovery");
@@ -368,10 +357,6 @@ function showNotification(typ, text, title) {
         text: text,
         type: typ,
         animation: "show",
-        /*nonblock: {
-            nonblock: true,
-            nonblock_opacity: .2
-        },*/
         styling: "fontawesome",
         mouse_reset: false
     });
@@ -471,6 +456,7 @@ $.connection.hub.start().done(function () {
         chat.server.removeChatMessage(tmpid);
     });
     $(document).on("click", "#removeUserFromChannel", function (e) {
+        e.preventDefault();
         var tmpid = $(this).parent().attr("id");
         chat.server.removeUserFromChannel(tmpid);
     });
@@ -487,16 +473,21 @@ $(document).ready(function () {
     });
     $("#CreateChannelForm").submit(function () {
         var channelName = $("#newChannelName").val();
-        chat.server.createNewChannel(channelName);
+        if (isNaN(Number(channelName))) {
+            chat.server.createNewChannel(channelName);
+        }
+        else {
+            chat.server.joinChannel(channelName);
+        }
         $("#newChannelName").val("");
     });
-    $("#SearchChannelName").keyup(function () {
+    /*$("#SearchChannelName").keyup(function () {
         $("#SearchChannelResults").empty();
         var value = $(this).val();
         if (value.length > 0) {
             chat.server.searchForChannel(value);
         }
-    });
+    });*/
     $("#removeQuestion").click(function (e) {
         e.preventDefault();
         chat.server.removeQuestion(null);
