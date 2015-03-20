@@ -674,6 +674,10 @@ PNotify.prototype.options.styling = "fontawesome";
             e.preventDefault();
             chat.server.logoutUser();
         });
+
+        $(() => {
+            $("[data-toggle=\"popover\"]").popover()
+        });
     });
 
 function getPopoverId() {

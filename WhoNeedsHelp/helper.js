@@ -618,6 +618,9 @@ $(document).ready(function () {
         e.preventDefault();
         chat.server.logoutUser();
     });
+    $(function () {
+        $("[data-toggle=\"popover\"]").popover();
+    });
 });
 function getPopoverId() {
     return $(this).attr("aria-describedby");
