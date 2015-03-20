@@ -529,6 +529,9 @@ PNotify.prototype.options.styling = "fontawesome";
                 chat.server.joinChannel(channelName);
             }
             $("#newChannelName").val("");
+            var pop = $("#newChannelName").attr("aria-describedby");
+            console.log(pop);
+            $("#" + pop).popover("hide");
         });
 
         /*$("#SearchChannelName").keyup(function () {
@@ -664,7 +667,7 @@ PNotify.prototype.options.styling = "fontawesome";
         });
 
         $(() => {
-            $("[data-toggle=\"popover\"]").popover()
+            $("[data-toggle=\"popover\"]").popover();
         });
     });
 

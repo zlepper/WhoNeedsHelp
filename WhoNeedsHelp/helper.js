@@ -480,6 +480,9 @@ $(document).ready(function () {
             chat.server.joinChannel(channelName);
         }
         $("#newChannelName").val("");
+        var pop = $("#newChannelName").attr("aria-describedby");
+        console.log(pop);
+        $("#" + pop).popover("hide");
     });
     /*$("#SearchChannelName").keyup(function () {
         $("#SearchChannelResults").empty();

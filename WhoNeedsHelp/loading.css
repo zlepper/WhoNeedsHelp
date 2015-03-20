@@ -145,7 +145,7 @@
   width: 22px;
   height: 8px;
   background: #4492f4;
-  overflow: #fff;
+  overflow: hidden;
 }
 .loading .last-finger-item i:after {
   content: '';
