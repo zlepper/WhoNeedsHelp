@@ -10,7 +10,7 @@ namespace WhoNeedsHelp
         void ErrorChannelAlreadyMade();
         void Log(string text);
         void ExitChannel(string channelId);
-        void ChannelsFound(string[] channelId, string[] channelName);
+        //void ChannelsFound(string[] channelId, string[] channelName);
         void SetChannel(string channel, bool areUserQuestioning);
         void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
         void SendQuestion(string question);
