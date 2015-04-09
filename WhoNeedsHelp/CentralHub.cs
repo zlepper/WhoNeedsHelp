@@ -583,7 +583,7 @@ namespace WhoNeedsHelp
             {
                 case 2:
                     // Request a version number from the server
-                    Clients.Caller.CheckVersion(3);
+                    Clients.Caller.CheckVersion(4);
                     break;
             }
         }

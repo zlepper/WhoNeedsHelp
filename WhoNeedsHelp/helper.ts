@@ -289,7 +289,7 @@ PNotify.prototype.options.styling = "fontawesome";
     }
 
     chat.client.checkVersion = version => {
-        if (version !== 3) {
+        if (version !== 4) {
             location.reload(true);
         }
     }
