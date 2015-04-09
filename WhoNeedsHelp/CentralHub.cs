@@ -796,37 +796,40 @@ namespace WhoNeedsHelp
                     {
                         UpdateCount(channel.Id);
                     }
-                    List<Question> questions = user.Channel.Questions.ToList();
-                    String[] usernames = new string[questions.Count];
-                    String[] questionText = new string[questions.Count];
-                    String[] questionIds = new string[questions.Count];
-                    for (int i = 0; i < questions.Count; i++)
+                    if (user.Channel != null)
                     {
-                        usernames[i] = questions[i].User.Name;
-                        questionText[i] = questions[i].Text;
-                        questionIds[i] = questions[i].Id.ToString();
+                        List<Question> questions = user.Channel.Questions.ToList();
+                        String[] usernames = new string[questions.Count];
+                        String[] questionText = new string[questions.Count];
+                        String[] questionIds = new string[questions.Count];
+                        for (int i = 0; i < questions.Count; i++)
+                        {
+                            usernames[i] = questions[i].User.Name;
+                            questionText[i] = questions[i].Text;
+                            questionIds[i] = questions[i].Id.ToString();
+                        }
+                        bool admin = user.Channel.IsUserAdministrator(user);
+                        Clients.Caller.AddQuestions(usernames, questionText, questionIds, admin);
+                        List<ChatMessage> chatMessages = user.Channel.ChatMessages.ToList();
+                        List<string> textList = new List<string>();
+                        List<string> authorList = new List<string>();
+                        List<string> messageIdsList = new List<string>();
+                        List<bool> senderList = new List<bool>();
+                        List<bool> appendToLastList = new List<bool>();
+                        List<bool> canEditList = new List<bool>();
+                        foreach (ChatMessage chatMessage in chatMessages)
+                        {
+                            var chatMessageAuthor = chatMessage.User;
+                            textList.Add(chatMessage.Text);
+                            authorList.Add(chatMessageAuthor.Name);
+                            messageIdsList.Add(chatMessage.Id.ToString());
+                            senderList.Add(chatMessage.User.Equals(user));
+                            appendToLastList.Add(false);
+                            canEditList.Add(chatMessage.User.Equals(user) || user.Channel.IsUserAdministrator(user));
+                        }
+                        Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
                     }
-                    bool admin = user.Channel.IsUserAdministrator(user);
-                    Clients.Caller.AddQuestions(usernames, questionText, questionIds, admin);
-                    List<ChatMessage> chatMessages = user.Channel.ChatMessages.ToList();
-                    List<string> textList = new List<string>();
-                    List<string> authorList = new List<string>();
-                    List<string> messageIdsList = new List<string>();
-                    List<bool> senderList = new List<bool>();
-                    List<bool> appendToLastList = new List<bool>();
-                    List<bool> canEditList = new List<bool>();
-                    foreach (ChatMessage chatMessage in chatMessages)
-                    {
-                        var chatMessageAuthor = chatMessage.User;
-                        textList.Add(chatMessage.Text);
-                        authorList.Add(chatMessageAuthor.Name);
-                        messageIdsList.Add(chatMessage.Id.ToString());
-                        senderList.Add(chatMessage.User.Equals(user));
-                        appendToLastList.Add(false);
-                        canEditList.Add(chatMessage.User.Equals(user) || user.Channel.IsUserAdministrator(user));
-                    }
-                    Clients.Caller.SendChatMessages(textList.ToArray(), authorList.ToArray(), messageIdsList.ToArray(), senderList.ToArray(), appendToLastList.ToArray(), canEditList.ToArray());
-                    if (!currentUser.Name.Equals(user.Name))
+                    if (String.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
                     {
                         Clients.Caller.UpdateUsername(user.Name);
                     }

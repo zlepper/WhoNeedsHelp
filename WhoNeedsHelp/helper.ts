@@ -17,6 +17,7 @@ var createUserPopover: JQuery;
 var loginUserPopover: JQuery;
 var changeUsernamePopover: JQuery;
 var firstName: Boolean;
+var ready = false;
 firstName = false;
 PNotify.prototype.options.styling = "fontawesome";
 //var validate;
@@ -33,6 +34,7 @@ PNotify.prototype.options.styling = "fontawesome";
         if (!isNullOrWhitespace(id)) {
             chat.server.joinChannel(id);
         }
+        ready = true;
         return false;
     }
 
@@ -310,13 +312,22 @@ PNotify.prototype.options.styling = "fontawesome";
     }
 
     chat.client.loginFailed = () => {
-        if (loginUserPopover === undefined) return;
-        loginUserPopover.find("#invalidLoginMessage").show("blind");
+        if (ready) {
+            if (loginUserPopover === undefined) return;
+            loginUserPopover.find("#invalidLoginMessage").show("blind");
+        } else {
+            $("#invalidLoginMessageModal").show("blind");
+        }
     }
 
     chat.client.loginSuccess = () => {
-        if (loginUserPopover === undefined) return;
-        loginUserPopover.popover("hide");
+        if (ready) {
+            if (loginUserPopover === undefined) return;
+            loginUserPopover.popover("hide");
+        } else {
+            $("#usernameModal").modal("hide");
+            ready = true;
+        }
         showNotification("success", "Du er nu logget ind", "Login succesfuld!");
         setLoginState(1);
 
@@ -514,6 +525,14 @@ PNotify.prototype.options.styling = "fontawesome";
             setUserName();
         });
 
+        $("#loginUserFormModal").submit((e) => {
+            e.preventDefault();
+            var mail = $("#LoginUserEmailModal").val();
+            var pass = $("#LoginUserPasswordModal").val();
+            if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
+            chat.server.loginUser(mail, pass);
+        });
+
         $("#requestHelpForm").submit(() => {
             var question: string = $("#question").val();
             chat.server.requestHelp(question);
@@ -533,14 +552,6 @@ PNotify.prototype.options.styling = "fontawesome";
             console.log(pop);
             $("#" + pop).popover("hide");
         });
-
-        /*$("#SearchChannelName").keyup(function () {
-            $("#SearchChannelResults").empty();
-            var value = $(this).val();
-            if (value.length > 0) {
-                chat.server.searchForChannel(value);
-            }
-        });*/
 
         $("#removeQuestion").click((e) => {
             e.preventDefault();

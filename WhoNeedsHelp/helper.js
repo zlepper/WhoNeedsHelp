@@ -15,6 +15,7 @@ var createUserPopover;
 var loginUserPopover;
 var changeUsernamePopover;
 var firstName;
+var ready = false;
 firstName = false;
 PNotify.prototype.options.styling = "fontawesome";
 //var validate;
@@ -30,6 +31,7 @@ function setUserName() {
     if (!isNullOrWhitespace(id)) {
         chat.server.joinChannel(id);
     }
+    ready = true;
     return false;
 }
 function getUrlParameter(sParam) {
@@ -284,14 +286,25 @@ chat.client.userCreationSuccess = function () {
     setLoginState(1);
 };
 chat.client.loginFailed = function () {
-    if (loginUserPopover === undefined)
-        return;
-    loginUserPopover.find("#invalidLoginMessage").show("blind");
+    if (ready) {
+        if (loginUserPopover === undefined)
+            return;
+        loginUserPopover.find("#invalidLoginMessage").show("blind");
+    }
+    else {
+        $("#invalidLoginMessageModal").show("blind");
+    }
 };
 chat.client.loginSuccess = function () {
-    if (loginUserPopover === undefined)
-        return;
-    loginUserPopover.popover("hide");
+    if (ready) {
+        if (loginUserPopover === undefined)
+            return;
+        loginUserPopover.popover("hide");
+    }
+    else {
+        $("#usernameModal").modal("hide");
+        ready = true;
+    }
     showNotification("success", "Du er nu logget ind", "Login succesfuld!");
     setLoginState(1);
 };
@@ -465,6 +478,14 @@ $(document).ready(function () {
     $("#usernameModalForm").submit(function () {
         setUserName();
     });
+    $("#loginUserFormModal").submit(function (e) {
+        e.preventDefault();
+        var mail = $("#LoginUserEmailModal").val();
+        var pass = $("#LoginUserPasswordModal").val();
+        if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass))
+            return;
+        chat.server.loginUser(mail, pass);
+    });
     $("#requestHelpForm").submit(function () {
         var question = $("#question").val();
         chat.server.requestHelp(question);
@@ -484,13 +505,6 @@ $(document).ready(function () {
         console.log(pop);
         $("#" + pop).popover("hide");
     });
-    /*$("#SearchChannelName").keyup(function () {
-        $("#SearchChannelResults").empty();
-        var value = $(this).val();
-        if (value.length > 0) {
-            chat.server.searchForChannel(value);
-        }
-    });*/
     $("#removeQuestion").click(function (e) {
         e.preventDefault();
         chat.server.removeQuestion(null);

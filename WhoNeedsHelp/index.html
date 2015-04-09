@@ -36,9 +36,10 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Navn</h4>
+                        <h4 class="modal-title">Velkommen</h4>
                     </div>
                     <div class="modal-body">
+                        <h2>Brug uden login</h2>
                         <form onsubmit=" return false; " id="usernameModalForm">
                             <div class="form-group" id="usernameGroup">
                                 <label for="usernameModal">Navn</label>
@@ -47,6 +48,20 @@
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary" id="selectUsernameButton">Start</button>
                             </div>
+                        </form>
+                        <hr />
+                        <h2>Login</h2>
+                        <form onsubmit="return false;" id="loginUserFormModal">
+                            <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
+                            <div class="form-group">
+                                <label for="LoginUserEmailModal">Email</label>
+                                <input required="required" type="email" class="form-control" id="LoginUserEmailModal" />
+                            </div>
+                            <div class="form-group">
+                                <label for="LoginUserPasswordModal">Kodeord</label>
+                                <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" />
+                            </div>
+                            <button class="btn btn-primary" type="submit">Login</button>
                         </form>
                     </div>
                     <div class="modal-footer beta" style="display: none;">
@@ -199,25 +214,6 @@
                             </form>
                         </div>
                     </div>
-                    <!--<div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Søg efter kanal</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="list-group ChannelList joinChannel" id="SearchChannelResults">
-                                Searched for channels will appear here
-                            </div>
-                        </div>
-                        <div class="panel-footer">
-                            Join channel form
-                            <form onsubmit=" return false; " class="form" id="SearchChannelForm">
-                                <div class="form-group">
-                                    <label class="sr-only" for="SearchChannelName">Søg efter kanal</label>
-                                    <input type="text" name="SearchChannelName" placeholder="Søg efter kanal" id="SearchChannelName" class="form-control"/>
-                                </div>
-                            </form>
-                        </div>
-                    </div>-->
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <h3 class="panel-title">
