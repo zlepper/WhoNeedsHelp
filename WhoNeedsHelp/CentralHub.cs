@@ -261,15 +261,6 @@ namespace WhoNeedsHelp
                             Clients.Client(connection.ConnectionId).SetChannel(channelId, areUserQuestioning);
                         }
                         UpdateCount(channel.Id);
-                        /*List<User> questionUsers = channel.GetUsersRequestingHelp();
-                        List<string> usernames = new List<string>(), questions = new List<string>(), questionIds = new List<string>();
-                        foreach (User us in questionUsers)
-                        {
-                            usernames.Add(us.Name);
-                            Question question = us.GetQuestion(channel);
-                            questions.Add(question.Text);
-                            questionIds.Add(question.Id.ToString());
-                        }*/
                         List<Question> questions = db.Questions.Where(q => q.Channel.Id == channel.Id).OrderBy(q => q.AskedTime).ToList();
                         List<string> usernames = new List<string>(), questiontexts = new List<string>(), questionIds = new List<string>();
                         foreach (Question ques in questions)
@@ -318,7 +309,6 @@ namespace WhoNeedsHelp
                         {
                             Clients.Client(connection.ConnectionId).AppendUsers(userNames.ToArray(), ids.ToArray(), a);
                         }
-                        
                     }
                 }
                 db.SaveChanges();
@@ -417,6 +407,7 @@ namespace WhoNeedsHelp
                                 Clients.Client(connection.ConnectionId).RemoveUser(user.Id);
                             }
                         }
+                        UpdateCount(channel.Id);
                     }
                 }
                 db.SaveChanges();
@@ -453,13 +444,10 @@ namespace WhoNeedsHelp
             }
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void SetUsername(string name)
         {
             using (var db = new HelpContext())
             {
-                //var user =
-                //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
                 var con = db.Connections.Find(Context.ConnectionId);
                 if (con == null) return;
                 var user = con.User;
@@ -640,6 +628,10 @@ namespace WhoNeedsHelp
             {
                 var user = db.Users.Find(id);
                 if (user == null) return;
+                foreach (Channel c in user.ChannelsIn)
+                {
+                    ExitChannel(c, user);
+                }
                 db.Users.Remove(user);
                 db.SaveChanges();
             }
@@ -669,6 +661,7 @@ namespace WhoNeedsHelp
                 {
                     channelNames.Add(c.ChannelName);
                     channelIds.Add(c.Id.ToString());
+                    UpdateCount(c.Id);
                 }
                 Clients.Caller.ShowChannels(channelIds.ToArray(), channelNames.ToArray());
             }
