@@ -80,6 +80,14 @@ namespace WhoNeedsHelp.server
             Administrators.Add(u);
         }
 
+        public void RemoveAdministrator(User u)
+        {
+            if (Administrators.Contains(u))
+            {
+                Administrators.Remove(u);
+            }
+        }
+
         public int GetQuestingUserCount()
         {
             return UsersRequestingHelp.Count;
