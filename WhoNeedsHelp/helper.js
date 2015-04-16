@@ -475,6 +475,11 @@ $.connection.hub.start().done(function () {
     });
 });
 $(document).ready(function () {
+    var removeFirstQuestion = function () {
+        var ele = $("#HelpList").children().first();
+        var id = ele.attr("id");
+        chat.server.removeQuestion(id);
+    };
     $("#usernameModalForm").submit(function () {
         setUserName();
     });
@@ -574,6 +579,18 @@ $(document).ready(function () {
             var input = createUserPopover.find("#CreateUserName");
             input.val(name);
         }, 500);
+    });
+    $(document).keydown(function (event) {
+        var key = event.which;
+        console.log(key);
+        switch (key) {
+            case 39:
+                removeFirstQuestion();
+                break;
+            case 37:
+                chat.server.requestActiveChannel();
+                break;
+        }
     });
     $(document).on("submit", "#createUserForm", function (e) {
         e.preventDefault();
