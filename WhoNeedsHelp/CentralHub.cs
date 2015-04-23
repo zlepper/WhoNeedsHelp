@@ -562,7 +562,6 @@ namespace WhoNeedsHelp
                     };
                     user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
                     db.Users.Add(user);
-                    db.SaveChanges();
                 }
                 else
                 {
@@ -591,8 +590,8 @@ namespace WhoNeedsHelp
                             Clients.Client(connection.ConnectionId).UpdateChatMessageAuthorName(name, ids.ToArray());
                         }
                     }
-                    db.SaveChanges();
                 }
+                db.SaveChanges();
             }
         }
 
