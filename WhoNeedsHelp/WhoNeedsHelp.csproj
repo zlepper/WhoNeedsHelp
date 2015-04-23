@@ -248,12 +248,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Client\Channel.ts" />
-    <TypeScriptCompile Include="Client\ChatMessage.ts" />
-    <TypeScriptCompile Include="Client\Question.ts" />
-    <TypeScriptCompile Include="Client\User.ts" />
     <None Include="helper.ts.old" />
-    <TypeScriptCompile Include="Client\IServer.ts" />
     <TypeScriptCompile Include="helper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
@@ -270,7 +265,9 @@
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Client\" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503051130379_initinal.resx">
       <DependentUpon>201503051130379_initinal.cs</DependentUpon>

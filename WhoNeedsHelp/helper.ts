@@ -79,7 +79,7 @@ interface ICentralServer {
 
 module Help {
 
-    var app = angular.module("HelpCtrl", ["ui.bootstrap"]);
+    var app = angular.module("Help", ["ui.bootstrap"]);
 
     export interface IHelpScope extends ng.IScope {
         me: User;
@@ -96,9 +96,12 @@ module Help {
             this.helper = $.connection.centralHub;
             var that = this;
 
+
             
         }
     }
+
+    app.controller("HelpCtrl", HelpCtrl);
 
     export enum QuestionState {
         HaveQuestion,
@@ -106,27 +109,27 @@ module Help {
     }
 
     export class Question {
-        id: number;
-        user: User;
-        askedTime: Date;
+        public id: number;
+        public user: User;
+        public askedTime: Date;
     }
 
     export class User {
-        name: string;
-        id: number;
+        public name: string;
+        public id: number;
     }
 
     export class Channel {
-        id: number;
-        chatMessages: ChatMessage[];
-        questions: Question[];
-        channelName: string;
-        users: User[];
-        questionState: QuestionState;
+        public id: number;
+        public chatMessages: ChatMessage[];
+        public questions: Question[];
+        public channelName: string;
+        public users: User[];
+        public questionState: QuestionState;
     }
 
     export class ChatMessage {
-        text: string;
-        author: User;
+        public text: string;
+        public author: User;
     }
 }

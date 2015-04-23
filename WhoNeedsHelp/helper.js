@@ -5,9 +5,10 @@
 /// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 /// <reference path="scripts/typings/angularjs/angular.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
+/// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 var Help;
 (function (Help) {
-    var app = angular.module("HelpCtrl", ["ui.bootstrap"]);
+    var app = angular.module("Help", ["ui.bootstrap"]);
     var HelpCtrl = (function () {
         function HelpCtrl($scope) {
             this.$scope = $scope;
@@ -18,6 +19,7 @@ var Help;
         return HelpCtrl;
     })();
     Help.HelpCtrl = HelpCtrl;
+    app.controller("HelpCtrl", HelpCtrl);
     (function (QuestionState) {
         QuestionState[QuestionState["HaveQuestion"] = 0] = "HaveQuestion";
         QuestionState[QuestionState["NoQuestion"] = 1] = "NoQuestion";
