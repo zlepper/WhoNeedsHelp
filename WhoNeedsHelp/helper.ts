@@ -5,12 +5,13 @@
 /// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 /// <reference path="scripts/typings/angularjs/angular.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
+/// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
  
 interface SignalR {
     centralHub: ICentralHubProxy;
 }
 
-interface ICentralHubProxy {
+interface ICentralHubProxy extends HubProxy {
     client: ICentralClient;
     server: ICentralServer;
 }
@@ -76,12 +77,32 @@ interface ICentralServer {
     removeUserFromChannel(tmpid: string): JQueryPromise<void>;
 }
 
-module Hjalp {
+module Help {
 
-    var app = angular.module("hjalpCtrl", ["ui.bootstrap"]);
+    var app = angular.module("HelpCtrl", ["ui.bootstrap"]);
 
-    export interface IHjalp extends ng.IScope {
-        
+    export interface IHelpScope extends ng.IScope {
+        me: User;
+        channels: Channel[];
+
+    }
+
+    export class HelpCtrl {
+        private helper: HubProxy;
+
+        static $inject = ["$scope"];
+
+        constructor(private $scope: IHelpScope) {
+            this.helper = $.connection.centralHub;
+            var that = this;
+
+            
+        }
+    }
+
+    export enum QuestionState {
+        HaveQuestion,
+        NoQuestion
     }
 
     export class Question {
@@ -101,6 +122,7 @@ module Hjalp {
         questions: Question[];
         channelName: string;
         users: User[];
+        questionState: QuestionState;
     }
 
     export class ChatMessage {
