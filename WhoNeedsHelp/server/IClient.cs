@@ -2,16 +2,15 @@ namespace WhoNeedsHelp
 {
     public interface IClient
     {
-        void AppendChannel(string channelname, string channelid);
-        void AppendChannel2(string channelname, string channelid);
+        void AppendChannel(string channelname, int channelid);
+        void AppendChannel2(string channelname, int channelid);
         void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
         void AddQuestion(string username, string question, string questionId, bool admin = false);
         void RemoveQuestion(string questionId);
         void ErrorChannelAlreadyMade();
         void Log(string text);
-        void ExitChannel(string channelId);
-        //void ChannelsFound(string[] channelId, string[] channelName);
-        void SetChannel(string channel, bool areUserQuestioning);
+        void ExitChannel(int channelId);
+        void SetChannel(int channelId, bool areUserQuestioning);
         void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
         void SendQuestion(string question);
         void UpdateQuestion(string question, string questionId);

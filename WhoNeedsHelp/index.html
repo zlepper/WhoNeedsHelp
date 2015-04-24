@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Hvem behøver hjælp</title>
     <link rel="stylesheet" href="Content/bootstrap.min.css" />
-    <link rel="stylesheet" href="custom.css"/>
+    <link rel="stylesheet" href="custom.css" />
     <script src="Scripts/analytics.js"></script>
     <!--Script references. -->
     <!--Reference the jQuery library. -->
@@ -36,67 +36,6 @@
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
     <div class="container">
-        <div data-backdrop="static" data-keyboard="false" class="modal fade" id="usernameModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Velkommen</h4>
-                    </div>
-                    <div class="modal-body">
-                        <h2>Brug uden login</h2>
-                        <form onsubmit=" return false; " id="usernameModalForm">
-                            <div class="form-group" id="usernameGroup">
-                                <label for="usernameModal">Navn</label>
-                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary" id="selectUsernameButton">Start</button>
-                            </div>
-                        </form>
-                        <hr />
-                        <h2>Login</h2>
-                        <form onsubmit="return false;" id="loginUserFormModal">
-                            <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
-                            <div class="form-group">
-                                <label for="LoginUserEmailModal">Email</label>
-                                <input required="required" type="email" class="form-control" id="LoginUserEmailModal" />
-                            </div>
-                            <div class="form-group">
-                                <label for="LoginUserPasswordModal">Kodeord</label>
-                                <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" />
-                            </div>
-                            <button class="btn btn-primary" type="submit">Login</button>
-                        </form>
-                    </div>
-                    <div class="modal-footer beta" style="display: none;">
-                        <button type="button" class="btn btn-default" id="LoginFromModalButton">Log in</button>
-                    </div>
-                </div> <!--</modal-content>-->
-            </div> <!--</modal-dialog>-->
-        </div> <!--</modal>-->
-
-        <div class="modal fade" id="changeQuestionModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Rediger Spørgsmål</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form onsubmit=" return false; " id="newQuestionForm">
-                            <div class="form-group">
-                                <label class="sr-only" for="newQuestionText">Nyt spørgsmål tekst</label>
-                                <input type="text" class="form-control" id="newQuestionText" />
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Luk</button>
-                        <button id="newQuestionSubmit" type="button" class="btn btn-primary" value="Rediger">Rediger</button>
-                    </div>
-                </div> <!--</modal-content>-->
-            </div> <!--</modal-dialog>-->
-        </div> <!--</modal>-->
         <!--Create User hidden content-->
         <div style="display: none;" id="createUserContent">
             <div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
@@ -159,7 +98,7 @@
                 <button class="btn btn-primary" type="submit">Skift</button>
             </form>
         </div>
-        <div id="interface" style="display: none;">
+        <div id="interface" style="display: none;" ng-show="!loading">
             <div class="row">
                 <nav class="navbar navbar-default">
                     <div class="container">
@@ -202,6 +141,11 @@
                         <div class="panel-body">
                             <div class="list-group ChannelList" id="ChannelList">
                                 <!--Current channels will appear here-->
+                                <a ng-repeat="channel in channels" id="{{channel.id}}" class="list-group-item" href="#" ng-class="{'active': channel.currentlyActive}">
+                                    <span class="glyphicon glyphicon-remove close"></span>
+                                    <span class="badge">{{channel.questions.length + "/" + channel.users.length}}</span>
+                                    {{channel.channelName}}
+                                </a>
                             </div>
                         </div>
 
@@ -241,16 +185,18 @@
                             <!--Help panels will appear here-->
                         </div>
                         <div class="panel-footer">
-                            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
+
+                            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="!activeChannel.haveQuestion">
                                 <div class="form-group">
                                     <label for="question"></label>
-                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
+                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
                                 </div>
                             </form>
-                            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; ">
+
+                            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; " ng-show="activeChannel.haveQuestion">
                                 <div class="form-group">
                                     <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
                                 </div>
@@ -258,7 +204,8 @@
                                     <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
                                 </div>
                             </form>
-                            <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+
+                            <p id="noChannelsSelected" ng-show="activeChannel === null || activeChannel === undefined">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
                         </div>
                     </div>
                 </div>
@@ -272,70 +219,70 @@
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active fade in" id="chat">
                                 <!--<div class="panel panel-primary">-->
-                                    <!--<div class="panel-heading">
-                                        <h3 class="panel-title">
-                                            <span class="pull-left glyphicon glyphicon-comment"></span> Chat
-                                        </h3>
-                                    </div>-->
-                                    <!--<div class="panel-body">-->
-                                        <ul class="chat"></ul>
-                                    <!--</div>-->
-                                    <!--Chat input-->
-                                    <!--<div class="panel-footer">-->
-                                        <form class="form" onsubmit=" return false; " id="chatForm">
-                                            <div class="form-group">
-                                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control"/>
-                                            </div>
-                                        </form>
-                                        <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
-                                    <!--</div>
+                                <!--<div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span class="pull-left glyphicon glyphicon-comment"></span> Chat
+                                    </h3>
+                                </div>-->
+                                <!--<div class="panel-body">-->
+                                <ul class="chat"></ul>
+                                <!--</div>-->
+                                <!--Chat input-->
+                                <!--<div class="panel-footer">-->
+                                <form class="form" onsubmit=" return false; " id="chatForm">
+                                    <div class="form-group">
+                                        <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control" />
+                                    </div>
+                                </form>
+                                <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
+                                <!--</div>
                                 </div>-->
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
-                                    
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-                <footer>
-                    <p>&copy; Rasmus Hansen 2015</p>
-                    <p>
-                        Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
-                    </p>
-                </footer>
-            </div>
-            <div id="loadingAnimation">
-                <div class="loading">
-                    <div class="finger finger-1">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+            <footer>
+                <p>&copy; Rasmus Hansen 2015</p>
+                <p>
+                    Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
+                </p>
+            </footer>
+        </div>
+        <div id="loadingAnimation" ng-show="loading">
+            <div class="loading">
+                <div class="finger finger-1">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-2">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-2">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-3">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-3">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-4">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-4">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="last-finger">
-                        <div class="last-finger-item">
-                            <i></i>
-                        </div>
+                </div>
+                <div class="last-finger">
+                    <div class="last-finger-item">
+                        <i></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </body>
 </html>

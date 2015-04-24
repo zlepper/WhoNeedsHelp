@@ -1,0 +1,29 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Velkommen</h4>
+</div>
+<div class="modal-body">
+    <h2>Brug uden login</h2>
+    <form onsubmit=" return false; " id="usernameModalForm">
+        <div class="form-group" id="usernameGroup">
+            <label for="usernameModalInput">Navn</label>
+            <input type="text" class="form-control" id="usernameModalInput" ng-model="startingModal.name" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" id="selectUsernameButton" ng-click="start()">Start</button>
+        </div>
+    </form>
+    <hr />
+    <h2>Login</h2>
+    <form onsubmit="return false;" id="loginUserFormModal">
+        <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
+        <div class="form-group">
+            <label for="LoginUserEmailModal">Email</label>
+            <input required="required" type="email" class="form-control" id="LoginUserEmailModal" ng-model="startingModal.email" />
+        </div>
+        <div class="form-group">
+            <label for="LoginUserPasswordModal">Kodeord</label>
+            <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" ng-model="loginOptions.password" />
+        </div>
+        <button class="btn btn-primary" type="submit" ng-click="loginFromModal">Login</button>
+    </form>
+</div>
