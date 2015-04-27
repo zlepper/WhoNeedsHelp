@@ -492,23 +492,30 @@ namespace WhoNeedsHelp
                         {
                             channel.RemoveUser(user);
                             var question = user.GetQuestion(channel);
-                            if (channel.GetUsersRequestingHelp().Contains(user)) channel.RemoveUserRequestingHelp(user);
-                            if (user.Channel != null) user.Channel = null;
-                            foreach (Connection connec in channel.ActiveUsers.SelectMany(us => us.Connections))
+                            if (channel.GetUsersRequestingHelp().Contains(user))
                             {
-                                Clients.Client(connec.ConnectionId).RemoveQuestion(question.Id.ToString());
+                                channel.RemoveUserRequestingHelp(user);
                             }
+                            if (user.Channel != null) user.Channel = null;
+                            if (question != null)
+                                foreach (Connection connec in channel.ActiveUsers.SelectMany(us => us.Connections))
+                                {
+                                    Clients.Client(connec.ConnectionId).RemoveQuestion(question.Id.ToString());
+                                }
                             foreach (Connection connection in user.Connections)
                             {
                                 Clients.Client(connection.ConnectionId).ExitChannel(id.ToString());
                             }
-                            UpdateCount(channel.Id);
                             foreach (var connection in channel.ActiveUsers.SelectMany(us => us.Connections))
                             {
                                 Clients.Client(connection.ConnectionId).RemoveUser(user.Id);
                             }
                         }
                         UpdateCount(channel.Id);
+                    }
+                    else
+                    {
+                        Clients.Caller.Alert("Channel not found", "Missing", "error");
                     }
                 }
                 db.SaveChanges();
