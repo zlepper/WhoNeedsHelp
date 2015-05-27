@@ -8,7 +8,7 @@
     <script src="Scripts/analytics.js"></script>
     <!--Script references. -->
     <!--Reference the jQuery library. -->
-    <script src="Scripts/jquery-2.1.3.min.js"></script>
+    <script src="Scripts/jquery-2.1.4.min.js"></script>
     <!--Reference the jQuery UI library-->
     <script src="Scripts/jquery-ui-1.11.4.min.js"></script>
     <!--Reference the Bootstrap jquery library-->
@@ -98,7 +98,7 @@
                 <button class="btn btn-primary" type="submit">Skift</button>
             </form>
         </div>
-        <div id="interface" style="display: none;" ng-show="!loading">
+        <div id="interface" ng-show="!loading">
             <div class="row">
                 <nav class="navbar navbar-default">
                     <div class="container">
@@ -115,12 +115,12 @@
                         <div class="collapse navbar-collapse" id="navbar">
                             <ul class="nav navbar-nav">
                                 <li>
-                                    <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
+                                    <p class="navbar-text">Nuværende kanal ID: <span ng-if="!ActiveChannel">Ikke forbundet til nogen kanal</span><span ng-if="ActiveChannel">{{ActiveChannel}}</span></p>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
+                                    <p class="navbar-text">Navn: <span ng-if="!Me.Name">Navn endnu ikke valgt</span><span ng-if="Me.Name">{{Me.Name}}</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
                                 </li>
                                 <!--Should only be shown when the user is not logged in-->
                                 <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
@@ -141,20 +141,24 @@
                         <div class="panel-body">
                             <div class="list-group ChannelList" id="ChannelList">
                                 <!--Current channels will appear here-->
-                                <a ng-repeat="channel in channels" id="{{channel.id}}" class="list-group-item" href="#" ng-class="{'active': channel.currentlyActive}">
-                                    <span class="glyphicon glyphicon-remove close"></span>
-                                    <span class="badge">{{channel.questions.length + "/" + channel.users.length}}</span>
-                                    {{channel.channelName}}
+                                <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#" 
+                                   ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
+                                    <span class="glyphicon glyphicon-remove close" ng-click="exitChannel(channel.Id)"></span>
+                                    <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
+                                    {{channel.ChannelName}}
                                 </a>
                             </div>
                         </div>
 
                         <div class="panel-footer">
                             <!--Create new channel form-->
-                            <form onsubmit=" return false; " class="form" id="CreateChannelForm">
+                            <form onsubmit=" return false; " class="form" id="CreateChannelForm" ng-submit="CreateNewChannel(newChannelName)">
                                 <div class="form-group">
                                     <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
-                                    <input pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName" placeholder="Tilslut eller opret kanal" class="form-control" data-toggle="popover" data-container="body" data-trigger="focus" title="Info" data-content="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
+                                    <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
+                                           placeholder="Tilslut eller opret kanal" class="form-control" data-toggle="popover"
+                                           data-container="body" data-trigger="focus" title="Info" 
+                                           data-content="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 </div>
                                 <div class="form-group hidden">
                                     <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
@@ -240,7 +244,7 @@
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
-
+                                    <div class="list-group-item" ng-repeat></div>
                                 </div>
                             </div>
                         </div>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using WhoNeedsHelp.Simples;
 
 namespace WhoNeedsHelp.server
 {
@@ -29,6 +30,10 @@ namespace WhoNeedsHelp.server
             Comments = "";
         }
 
+        public SimpleQuestion ToSimpleQuestion()
+        {
+            return new SimpleQuestion(Id, Text, User.ToSimpleUser());
+        }
 
 
         /*public void AddComment(Guid u, string text)

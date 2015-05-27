@@ -17,8 +17,8 @@ interface ICentralHubProxy {
 }
 
 interface ICentralClient {
-    appendChannel: (channelname: string, channelid: number) => void;
-    addQuestions: (usernames: string[], questions: string[], questionsIds: number[]) => void;
+    appendChannel: (channel: Help.Channel) => void;
+    addQuestions: (questions: Help.Question[]) => void;
     addQuestion: (username: string, question: string, questionId: string) => void;
     userAreQuesting: () => void;
     removeQuestion: (questionId: number) => void;
@@ -59,15 +59,13 @@ interface ICentralServer {
     setUsername(name: string): JQueryPromise<void>;
     createNewChannel(channelName: string): JQueryPromise<void>;
     loadNearbyChannels(): JQueryPromise<void>;
-    changeToChannel(channelId: string): JQueryPromise<void>;
-    exitChannel(channelId: string): JQueryPromise<void>;
-    joinChannel(channelId: string): JQueryPromise<void>;
-    removeQuestion(channelId: string): JQueryPromise<void>;
-    removeChatMessage(messageId: string): JQueryPromise<void>;
-    requestHelp(channelId: string): JQueryPromise<void>;
-    searchForChannel(channelId: string): JQueryPromise<void>;
-    changeQuestion(question: string): JQueryPromise<void>;
-    chat(message: string): JQueryPromise<void>;
+    exitChannel(channelId: number): JQueryPromise<void>;
+    joinChannel(channelId: number): JQueryPromise<void>;
+    removeQuestion(channelId: number): JQueryPromise<void>;
+    removeChatMessage(messageId: number): JQueryPromise<void>;
+    requestHelp(question: string, channelid: number): JQueryPromise<void>;
+    changeQuestion(question: string, channelid: number): JQueryPromise<void>;
+    chat(message: string, channelid: number): JQueryPromise<void>;
     clearChat(): JQueryPromise<void>;
     createNewUser(username: string, email: string, password: string): JQueryPromise<void>;
     requestActiveChannel(): JQueryPromise<void>;
@@ -94,273 +92,211 @@ module Help {
         /**
          * The local user.
          */
-        me: User;
+        Me: Me;
         /**
          * The channels the local user are in.
          */
-        channels: Channel[];
+        Channels: {[id: number]: Channel};
         /**
          * Indicates if the signalr connection is ready.
          */
-        loading: boolean;
+        Loading: boolean;
         /**
          * Indicates if the user has choosen a username yet.
          */
-        ready: boolean;
+        Ready: boolean;
 
         /**
          * The info from the first modal
          */
-        startingModal: LoginOptions;
+        StartingModal: LoginOptions;
         /**
          * Call to have the user login from the modal
          * @returns {} 
          */
-        loginFromModal: () => void;
+        LoginFromModal: () => void;
         /**
          * The instance of the first modal
          */
-        loginModal: ModalServiceInstance;
+        LoginModal: ModalServiceInstance;
         /**
          * The configuration options for the first modal
          */
-        loginModalOptions: ModalSettings;
+        LoginModalOptions: ModalSettings;
         /**
          * Starts the application with the selected username
          * @returns {} 
          */
-        start: () => void;
+        Start: () => void;
 
         /**
-         * The currently active channel
+         * The currently active channel id
          */
-        activeChannel: Channel;
+        ActiveChannel: number;
 
         /**
          * The result of IP-discover
          */
-        discoveredIps: Channel[];
+        DiscoveredIps: Channel[];
         /**
          * Finds a user with a specific ID
          * @param id The id of the user to find
          * @returns {} 
          */
-        getUser: (id: number) => User;
+        GetUser: (id: number) => User;
+        CreateNewChannel: (channelName: string) => void;
+        setActiveChannel: (channelid: any) => void;
+        exitChannel: (channelid: any) => void;
     }
 
-    export class HelpCtrl {
-        private helper: ICentralHubProxy;
+    export class ServerActions {
+        helper: ICentralHubProxy;
 
-        static $inject = ["$scope", "$modal"];
-
-        constructor(private $scope: IHelpScope, private $modal: ModalService) {
-            $scope.loading = true;
-            this.helper = $.connection.centralHub;
-            var that = this;
-
-            $.connection.hub.start().done(() => {
-                $scope.loading = false;
-                $scope.loginModal = $modal.open($scope.loginModalOptions);
-            });
-
-            $scope.loginFromModal = () => {
-                if (isNullOrWhitespace($scope.startingModal.email) || isNullOrWhitespace($scope.startingModal.password))
-                    return;
-                that.loginUser($scope.startingModal.email, $scope.startingModal.password);
-                $scope.startingModal.password = "";
-            };
-
-            $scope.start = () => {
-                var name = $scope.startingModal.name;
-                name = name.replace(/[\s]+/g, " ");
-                var n = name.match(patt);
-                if(n.length > 0)
-                    this.setUsername(n[0]);
-                $scope.ready = true;
-            }
-
-            $scope.loginModalOptions = {
-                templateUrl: "startModal.html",
-                controller: "HelpCtrl",
-                keyboard: false,
-                backdrop: false
-            }
-
-            this.helper.client.appendChannel = (channelname: string, channelId: number) => {
-                var channel = new Channel(channelId, channelname);
-                $scope.channels.push(channel);
-                $scope.activeChannel = channel;
-                $scope.$apply();
-            }
-
-            this.helper.client.appendChannel2 = (channelname: string, channelId: number) => {
-                var channel = new Channel(channelId, channelname);
-                $scope.channels.push(channel);
-                $scope.$apply();
-            }
-
-            this.helper.client.setChannel = (channelId: number, areUserQuestioning) => {
-                for (var i = 0; i < $scope.channels.length; i++) {
-                    var channel = $scope.channels[0];
-                    channel.currentlyActive = channel.id === channelId;
-                    if (channel.currentlyActive) {
-                        $scope.activeChannel = channel;
-                    }
-                }
-                $scope.activeChannel.haveQuestion = areUserQuestioning;
-            }
-
-            this.helper.client.removeUser = (id: number, channelId: number) => {
-                for (var channel in $scope.channels) {
-                    if ($scope.channels.hasOwnProperty(channel)) {
-                        if (channel.id === channelId) {
-                            for (var i = 0; i < channel.users.length; i++) {
-                                if (channel.users[i].id === id) {
-                                    channel.users = removeFromArray(channel.users, i);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            this.helper.client.updateQuestion = (questionText: string, questionId: number, channelId: number) => {
-                for (var channel in $scope.channels) {
-                    if ($scope.channels.hasOwnProperty(channel)) {
-                        if (channel.id === channelId) {
-                            for (var question in channel.questions) {
-                                if (channel.questions.hasOwnProperty(question)) {
-                                    if (question.id === questionId) {
-                                        question.questionText = questionText;
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            this.helper.client.showChannels = (channelIds: number[], channelNames: string[]) => {
-                $scope.channels.length = 0;
-                for (var i = 0; i < channelIds.length; i++) {
-                    var channel = new Channel(channelIds[i], channelNames[i]);
-                    $scope.channels.push(channel);
-                }
-                this.requestActiveChannel();
-            }
-
-            this.helper.client.exitChannel = (channelId: number) => {
-                var index = 0;
-                for (var i = 0; i < $scope.channels.length; i++) {
-                    if ($scope.channels[i].id === channelId) {
-                        index = i;
-                        break;
-                    }
-                }
-                $scope.channels = removeFromArray($scope.channels, index);
-                if ($scope.channels.length !== 0) {
-                    $scope.activeChannel = $scope.channels[0];
-                } else {
-                    $scope.activeChannel = null;
-                }
-            }
-
-            this.helper.client.ipDiscover = (ids: number[], names: string[]) => {
-                $scope.discoveredIps.length = 0;
-                for (var i = 0; i < ids.length; i++) {
-                    var channel = new Channel(ids[i], names[i]);
-                    $scope.discoveredIps.push(channel);
-                }
-            }
-
-            //this.helper.client.addQuestions = (usernames: string[], questions: string[], questionIds: number[]) => {
-            //    for (var i = 0; i < questions.length; i++) {
-            //        var question = new Question()
-            //    }
-            //}
-
-
-            //$scope.getUser = (id) => User {
-                
-            //}
-        }
-
-        private send(action: string, parameters: string): JQueryPromise<void> {
+        send(action: string, parameters: string): JQueryPromise<void> {
             return this.helper.server.send(action, parameters);
         }
 
-        private getData(action: number): JQueryPromise<void> {
+        getData(action: number): JQueryPromise<void> {
             return this.helper.server.getData(action);
         }
 
-        private setUsername(name: string): JQueryPromise<void> {
+        setUsername(name: string): JQueryPromise<void> {
             return this.helper.server.setUsername(name);
         }
 
-        private createNewChannel(channelName: string): JQueryPromise<void> {
+        createNewChannel(channelName: string): JQueryPromise<void> {
             return this.helper.server.createNewChannel(channelName);
         }
 
-        private loadHearbyChannels(): JQueryPromise<void> {
+        loadHearbyChannels(): JQueryPromise<void> {
             return this.helper.server.loadNearbyChannels();
         }
 
-        private changeToChannel(channelId: string): JQueryPromise<void> {
-            return this.helper.server.changeToChannel(channelId);
-        }
-
-        private exitChannel(channelId): JQueryPromise<void> {
+        exitChannel(channelId): JQueryPromise<void> {
             return this.helper.server.exitChannel(channelId);
         }
 
-        private joinChannel(channelId): JQueryPromise<void> {
+        joinChannel(channelId): JQueryPromise<void> {
             return this.helper.server.joinChannel(channelId);
         }
 
-        private removeQuestion(channelId): JQueryPromise<void> {
+        removeQuestion(channelId): JQueryPromise<void> {
             return this.helper.server.removeQuestion(channelId);
         }
 
-        private removeChatMessage(messageId: string): JQueryPromise<void> {
+        removeChatMessage(messageId: number): JQueryPromise<void> {
             return this.helper.server.removeChatMessage(messageId);
         }
 
-        private searchForChannel(channelId: string): JQueryPromise<void> {
-            return this.helper.server.searchForChannel(channelId);
+        chat(message: string, channelid: number): JQueryPromise<void> {
+            return this.helper.server.chat(message, channelid);
         }
 
-        private chat(message: string): JQueryPromise<void> {
-            return this.helper.server.chat(message);
-        }
-
-        private clearChat(): JQueryPromise<void> {
+        clearChat(): JQueryPromise<void> {
             return this.helper.server.clearChat();
         }
 
-        private createNewUser(username: string, email: string, password: string): JQueryPromise<void> {
+        createNewUser(username: string, email: string, password: string): JQueryPromise<void> {
             return this.helper.server.createNewUser(username, email, password);
         }
 
-        private requestActiveChannel(): JQueryPromise<void> {
+        requestActiveChannel(): JQueryPromise<void> {
             return this.helper.server.requestActiveChannel();
         }
 
-        private loginUser(mail: string, pass: string): JQueryPromise<void> {
+        loginUser(mail: string, pass: string): JQueryPromise<void> {
             return this.helper.server.loginUser(mail, pass);
         }
 
-        private logoutUser(): JQueryPromise<void> {
+        logoutUser(): JQueryPromise<void> {
             return this.helper.server.logoutUser();
         }
 
-        private removeUserFromChannel(id: string): JQueryPromise<void> {
+        removeUserFromChannel(id: string): JQueryPromise<void> {
             return this.helper.server.removeUserFromChannel(id);
         }
     }
 
+    export class HelpCtrl extends ServerActions {
+
+        static $inject = ["$scope", "$modal"];
+
+        constructor(public $scope: IHelpScope, public $Modal: ModalService) {
+            super();
+            $scope.Loading = true;
+            $scope.StartingModal = new LoginOptions();
+            $scope.Me = new Me();
+            $scope.Channels = {};
+            $scope.ActiveChannel = 0;
+            this.helper = $.connection.centralHub;
+            //var that = this;
+            $scope.LoginModalOptions = {
+                templateUrl: "/startModal.html",
+                scope: $scope,
+                keyboard: false,
+                backdrop: "static"
+            }
+
+            $scope.setActiveChannel = (channelid) => {
+                $scope.ActiveChannel = channelid;
+            }
+
+            $scope.Start = () => {
+                var name = $scope.StartingModal.Name;
+                name = name.replace(/[\s]+/g, " ");
+                var n = name.match(patt);
+                if (n.length > 0) {
+                    this.setUsername(n[0]);
+                    console.log(n[0]);
+                }
+                $scope.Ready = true;
+                $scope.LoginModal.close();
+            }
+
+            $.connection.hub.start().done(() => {
+                $scope.Loading = false;
+                console.log($scope.LoginModalOptions);
+                $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+            });
+
+            $scope.exitChannel = (channelid) => {
+                console.log(typeof (channelid));
+                this.exitChannel(channelid);
+            }
+
+            $scope.CreateNewChannel = (channelName) => {
+                if (isNaN(Number(channelName))) {
+                    this.createNewChannel(channelName);
+                } else {
+                    this.joinChannel(Number(channelName));
+                }
+            }
+
+            this.helper.client.updateUsername = (name) => {
+                $scope.Me.Name = name;
+                $scope.$apply();
+            }
+
+            this.helper.client.appendChannel = (channel) => {
+                $scope.ActiveChannel = channel.Id;
+                $scope.Channels[channel.Id] = channel;
+                //$scope.Channels.push(channel);
+                $scope.$apply();
+                console.log(channel);
+            }
+
+        }
+
+
+    }
+
     app.controller("HelpCtrl", HelpCtrl);
+    app.filter("keylength", () => input => {
+        if (!angular.isObject(input)) {
+            throw Error("Usage of non-objects with keylength filter!!");
+        }
+        return Object.keys(input).length;
+    });
 
     export enum QuestionState {
         HaveQuestion,
@@ -368,52 +304,67 @@ module Help {
     }
 
     export class Question {
-        public id: number;
-        public user: User;
-        public questionText: string;
+        Id: number;
+        User: User;
+        QuestionText: string;
 
         constructor(id: number, user: User, questionText: string) {
-            this.id = id;
-            this.user = user;
-            this.questionText = questionText;
+            this.Id = id;
+            this.User = user;
+            this.QuestionText = questionText;
         }
     }
 
     export class User {
-        public name: string;
-        public id: number;
+        Name: string;
+        Id: number;
 
         constructor(id: number, name: string) {
-            this.id = id;
-            this.name = name;
+            this.Id = id;
+            this.Name = name;
+        }
+    }
+
+    export class Me {
+        Name: string;
+        LoggedIn: boolean;
+
+        constructor() {
+            this.Name = null;
+            this.LoggedIn = false;
         }
     }
 
     export class Channel {
-        public id: number;
-        public chatMessages: ChatMessage[];
-        public questions: Question[];
-        public channelName: string;
-        public users: User[];
-        public questionState: QuestionState;
-        public currentlyActive: boolean;
-        public haveQuestion: boolean;
-        public isAdmin: boolean;
+        Id: number;
+        ChatMessages: {[id: number]: ChatMessage};
+        Questions: { [id: number]: Question };
+        ChannelName: string;
+        Users: { [id: number]: User };
+        QuestionState: QuestionState;
+        HaveQuestion: boolean;
+        IsAdmin: boolean;
 
         constructor(id: number, channelName: string) {
-            this.id = id;
-            this.channelName = channelName;
+            this.Id = id;
+            this.ChannelName = channelName;
         }
     }
 
     export class ChatMessage {
-        public text: string;
-        public author: User;
+        Text: string;
+        Author: User;
     }
 
     export class LoginOptions {
-        public name: string;
-        public email: string;
-        public password: string;
+        Name: string;
+        Email: string;
+        Password: string;
+
+        constructor() {
+            this.Name = "";
+            this.Email = "";
+            this.Password = "";
+        }
     }
 }

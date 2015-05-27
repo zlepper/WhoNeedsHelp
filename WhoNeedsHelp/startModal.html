@@ -6,10 +6,10 @@
     <form onsubmit=" return false; " id="usernameModalForm">
         <div class="form-group" id="usernameGroup">
             <label for="usernameModalInput">Navn</label>
-            <input type="text" class="form-control" id="usernameModalInput" ng-model="startingModal.name" />
+            <input type="text" class="form-control" id="usernameModalInput" ng-model="StartingModal.Name" />
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary" id="selectUsernameButton" ng-click="start()">Start</button>
+            <button type="submit" class="btn btn-primary" id="selectUsernameButton" ng-click="Start()">Start</button>
         </div>
     </form>
     <hr />
@@ -18,11 +18,11 @@
         <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
         <div class="form-group">
             <label for="LoginUserEmailModal">Email</label>
-            <input required="required" type="email" class="form-control" id="LoginUserEmailModal" ng-model="startingModal.email" />
+            <input required="required" type="email" class="form-control" id="LoginUserEmailModal" ng-model="StartingModal.Email" />
         </div>
         <div class="form-group">
             <label for="LoginUserPasswordModal">Kodeord</label>
-            <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" ng-model="loginOptions.password" />
+            <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" ng-model="StartingModal.Password" />
         </div>
         <button class="btn btn-primary" type="submit" ng-click="loginFromModal">Login</button>
     </form>

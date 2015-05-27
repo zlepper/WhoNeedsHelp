@@ -1,19 +1,25 @@
+using System.Collections.Generic;
+using WhoNeedsHelp.server;
+using WhoNeedsHelp.Simples;
+
 namespace WhoNeedsHelp
 {
     public interface IClient
     {
-        void AppendChannel(string channelname, int channelid);
-        void AppendChannel2(string channelname, int channelid);
-        void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
-        void AddQuestion(string username, string question, string questionId, bool admin = false);
-        void RemoveQuestion(string questionId);
+        void AppendChannel(SimpleChannel simpleChannel);
+        void AppendChannel2(SimpleChannel simpleChannel);
+        //void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
+        //void AddQuestion(string username, string question, string questionId, bool admin = false);
+        void AddQuestions(List<SimpleQuestion> questions);
+        void AddQuestion(SimpleQuestion question);
+        void RemoveQuestion(int questionId);
         void ErrorChannelAlreadyMade();
         void Log(string text);
         void ExitChannel(int channelId);
         void SetChannel(int channelId, bool areUserQuestioning);
-        void UpdateChannelCount(int activeUsers, int connectedUsers, string channelId);
+        void UpdateChannelCount(int activeUsers, int connectedUsers, int channelId);
         void SendQuestion(string question);
-        void UpdateQuestion(string question, string questionId);
+        void UpdateQuestion(string questionText, int questionId);
         void ReloadPage();
         void SetLayout(int layout);
         void SendChatMessage(string text, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
