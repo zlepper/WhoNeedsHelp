@@ -275,16 +275,16 @@ module Help {
                 }
             }
 
-            this.helper.client.addQuestions = (usernames: string[], questions: string[], questionIds: number[]) => {
-                for (var i = 0; i < questions.length; i++) {
-                    var question = new Question()
-                }
-            }
+            //this.helper.client.addQuestions = (usernames: string[], questions: string[], questionIds: number[]) => {
+            //    for (var i = 0; i < questions.length; i++) {
+            //        var question = new Question()
+            //    }
+            //}
 
 
-            $scope.getUser = (id) => User {
+            //$scope.getUser = (id) => User {
                 
-            }
+            //}
         }
 
         private send(action: string, parameters: string): JQueryPromise<void> {
