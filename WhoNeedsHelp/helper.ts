@@ -19,7 +19,7 @@ interface ICentralHubProxy {
 interface ICentralClient {
     appendChannel: (channel: Help.Channel) => void;
     addQuestions: (questions: Help.Question[]) => void;
-    addQuestion: (username: string, question: string, questionId: string) => void;
+    addQuestion: (question: Help.Question, channelid: number) => void;
     userAreQuesting: () => void;
     removeQuestion: (questionId: number) => void;
     errorChannelAlreadyMade: () => void;
@@ -29,7 +29,8 @@ interface ICentralClient {
     sendQuestion: (question: string) => void;
     updateQuestion: (question: string, questionId: number, channelId: number) => void;
     reloadPage: () => void;
-    setLayout: (layout: number) => void;
+    //void SetQuestionState(bool hasQuestion, int channelid);
+    setQuestionState: (hasQuestion: boolean, channelid: number) => void;
     sendChatMessage: (text: string, author: string, messageId: number, sender: boolean, appendToLast: boolean, canEdit: boolean) => void;
     sendChatMessages: (text: string[], author: string[], messageId: number[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
@@ -145,8 +146,10 @@ module Help {
          */
         GetUser: (id: number) => User;
         CreateNewChannel: (channelName: string) => void;
-        setActiveChannel: (channelid: any) => void;
-        exitChannel: (channelid: any) => void;
+        setActiveChannel: (channelid: number) => void;
+        exitChannel: (channelid: number) => void;
+        RequestHelp: () => void;
+        RemoveQuestion: (questionid: number) => void;
     }
 
     export class ServerActions {
@@ -202,6 +205,10 @@ module Help {
 
         requestActiveChannel(): JQueryPromise<void> {
             return this.helper.server.requestActiveChannel();
+        }
+
+        requestHelp(question: string, channelid: number): JQueryPromise<void> {
+            return this.helper.server.requestHelp(question, channelid);
         }
 
         loginUser(mail: string, pass: string): JQueryPromise<void> {
@@ -271,6 +278,21 @@ module Help {
                 }
             }
 
+            $scope.RequestHelp = () => {
+                var qt: string = $scope.Channels[$scope.ActiveChannel].QuestionText;
+                console.log($scope.Channels[$scope.ActiveChannel].QuestionText);
+                this.requestHelp(qt, $scope.ActiveChannel);
+            }
+
+            $scope.RemoveQuestion = (questionid) => {
+                this.removeQuestion(questionid);
+            }
+
+            this.helper.client.setQuestionState = (hasQuestion, channelid) => {
+                if($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                $scope.$apply();
+            }
+
             this.helper.client.updateUsername = (name) => {
                 $scope.Me.Name = name;
                 $scope.$apply();
@@ -279,7 +301,6 @@ module Help {
             this.helper.client.appendChannel = (channel) => {
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
-                //$scope.Channels.push(channel);
                 $scope.$apply();
             }
 
@@ -288,6 +309,13 @@ module Help {
                 $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
                 $scope.$apply();
             }
+
+            this.helper.client.addQuestion = (question, channelid) => {
+                console.log(question);
+                console.log(channelid);
+                $scope.Channels[channelid].Questions[question.Id] = question;
+                $scope.$apply();
+            } 
         }
 
 
@@ -352,6 +380,8 @@ module Help {
             this.Id = id;
             this.ChannelName = channelName;
         }
+
+        QuestionText: string;
     }
 
     export class ChatMessage {

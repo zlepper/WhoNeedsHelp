@@ -141,7 +141,7 @@
                         <div class="panel-body">
                             <div class="list-group ChannelList" id="ChannelList">
                                 <!--Current channels will appear here-->
-                                <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#" 
+                                <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#"
                                    ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
                                     <span class="glyphicon glyphicon-remove close" ng-click="exitChannel(channel.Id)"></span>
                                     <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
@@ -157,7 +157,7 @@
                                     <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                     <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
                                            placeholder="Tilslut eller opret kanal" class="form-control" data-toggle="popover"
-                                           data-container="body" data-trigger="focus" title="Info" 
+                                           data-container="body" data-trigger="focus" title="Info"
                                            data-content="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 </div>
                                 <div class="form-group hidden">
@@ -187,20 +187,32 @@
                         </div>
                         <div class="panel-body" id="HelpList">
                             <!--Help panels will appear here-->
+                            <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
+                                <div class="panel-heading">
+                                    <button aria-label="Fjern spørgsmål" class="close"
+                                            type="button" ng-click="RemoveQuestion(question.id)">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h3 class="panel-title">{{question.User.Name}}</h3>
+                                </div>
+                                <div class="panel-body" ng-if="question.Text">
+                                    {{question.Text}}
+                                </div>
+                            </div>
                         </div>
                         <div class="panel-footer">
 
-                            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="!activeChannel.haveQuestion">
+                            <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel" ng-submit="RequestHelp()">
                                 <div class="form-group">
-                                    <label for="question"></label>
-                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" />
+                                    <label class="sr-only" for="question">Spørgsmåls Tekst</label>
+                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].QuestionText" />
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
+                                    <input type="submit" class="btn btn-primary" value="Efterspørg hjælp" />
                                 </div>
                             </form>
 
-                            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; " ng-show="activeChannel.haveQuestion">
+                            <form class="form-inline" id="requestingHelp" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
                                 <div class="form-group">
                                     <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
                                 </div>
@@ -209,7 +221,7 @@
                                 </div>
                             </form>
 
-                            <p id="noChannelsSelected" ng-show="activeChannel === null || activeChannel === undefined">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+                            <p id="noChannelsSelected" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
                         </div>
                     </div>
                 </div>

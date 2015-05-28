@@ -45,19 +45,23 @@ namespace WhoNeedsHelp.server
             Connections = new List<Connection>();
         }
 
-        public Question RequestHelp(string question = null)
+        public Question RequestHelp(int channelid, string question = null)
         {
-            if (Channel != null)
+            if (channelid != 0)
             {
-                bool help = Channel.RequestHelp(this);
-                if (!help) return null;
-                if(AreUserQuestioning(Channel))
-                    return null;
-                Question q = new Question(Channel, question, this);
-                //db.Questions.Add(q);
-                //Questions.Add(q);
-                //db.SaveChanges();
-                return q;
+                using (HelpContext db = new HelpContext())
+                {
+                    Channel ch = db.Channels.Find(channelid);
+                    bool help = ch.RequestHelp(this);
+                    if (!help) return null;
+                    if (AreUserQuestioning(ch))
+                        return null;
+                    Question q = new Question(ch, question, this);
+                    //db.Questions.Add(q);
+                    //Questions.Add(q);
+                    //db.SaveChanges();
+                    return q;
+                }
             }
             return null;
         }
@@ -91,7 +95,7 @@ namespace WhoNeedsHelp.server
             {
                 return false;
             }*/
-            Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(Channel));
+            Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(c));
             if (q != null)
             {
                 q.Text = question;

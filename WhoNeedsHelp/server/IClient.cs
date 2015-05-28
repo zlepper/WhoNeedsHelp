@@ -10,8 +10,8 @@ namespace WhoNeedsHelp
         void AppendChannel2(SimpleChannel simpleChannel);
         //void AddQuestions(string[] usernames, string[] questions, string[] questionIds, bool admin = false);
         //void AddQuestion(string username, string question, string questionId, bool admin = false);
-        void AddQuestions(List<SimpleQuestion> questions);
-        void AddQuestion(SimpleQuestion question);
+        void AddQuestions(List<SimpleQuestion> questions, int channelid);
+        void AddQuestion(SimpleQuestion question, int channelid);
         void RemoveQuestion(int questionId);
         void ErrorChannelAlreadyMade();
         void Log(string text);
@@ -21,7 +21,6 @@ namespace WhoNeedsHelp
         void SendQuestion(string question);
         void UpdateQuestion(string questionText, int questionId);
         void ReloadPage();
-        void SetLayout(int layout);
         void SendChatMessage(string text, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
         void SendChatMessages(string[] text, string[] author, string[] messageIds, bool[] sender, bool[] appendToLast, bool[] canEdit);
         void CheckVersion(int version);
@@ -42,5 +41,6 @@ namespace WhoNeedsHelp
         void AppendUser(string name, int id, bool admin);
         void RemoveUser(int id);
         void Alert(string message, string title, string type);
+        void SetQuestionState(bool hasQuestion, int channelid);
     }
 }

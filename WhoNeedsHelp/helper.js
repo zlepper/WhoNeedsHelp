@@ -66,6 +66,9 @@ var Help;
         ServerActions.prototype.requestActiveChannel = function () {
             return this.helper.server.requestActiveChannel();
         };
+        ServerActions.prototype.requestHelp = function (question, channelid) {
+            return this.helper.server.requestHelp(question, channelid);
+        };
         ServerActions.prototype.loginUser = function (mail, pass) {
             return this.helper.server.loginUser(mail, pass);
         };
@@ -128,6 +131,19 @@ var Help;
                     _this.joinChannel(Number(channelName));
                 }
             };
+            $scope.RequestHelp = function () {
+                var qt = $scope.Channels[$scope.ActiveChannel].QuestionText;
+                console.log($scope.Channels[$scope.ActiveChannel].QuestionText);
+                _this.requestHelp(qt, $scope.ActiveChannel);
+            };
+            $scope.RemoveQuestion = function (questionid) {
+                _this.removeQuestion(questionid);
+            };
+            this.helper.client.setQuestionState = function (hasQuestion, channelid) {
+                if ($scope.Channels[channelid] != null)
+                    $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                $scope.$apply();
+            };
             this.helper.client.updateUsername = function (name) {
                 $scope.Me.Name = name;
                 $scope.$apply();
@@ -135,12 +151,17 @@ var Help;
             this.helper.client.appendChannel = function (channel) {
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
-                //$scope.Channels.push(channel);
                 $scope.$apply();
             };
             this.helper.client.exitChannel = function (channelId) {
                 delete $scope.Channels[channelId];
                 $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                $scope.$apply();
+            };
+            this.helper.client.addQuestion = function (question, channelid) {
+                console.log(question);
+                console.log(channelid);
+                $scope.Channels[channelid].Questions[question.Id] = question;
                 $scope.$apply();
             };
         }
