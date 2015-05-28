@@ -179,11 +179,11 @@ module Help {
             return this.helper.server.exitChannel(channelId);
         }
 
-        joinChannel(channelId): JQueryPromise<void> {
+        joinChannel(channelId: number): JQueryPromise<void> {
             return this.helper.server.joinChannel(channelId);
         }
 
-        removeQuestion(channelId): JQueryPromise<void> {
+        removeQuestion(channelId: number): JQueryPromise<void> {
             return this.helper.server.removeQuestion(channelId);
         }
 
@@ -285,6 +285,7 @@ module Help {
             }
 
             $scope.RemoveQuestion = (questionid) => {
+                console.log("Called " + questionid);
                 this.removeQuestion(questionid);
             }
 
@@ -311,11 +312,22 @@ module Help {
             }
 
             this.helper.client.addQuestion = (question, channelid) => {
-                console.log(question);
-                console.log(channelid);
                 $scope.Channels[channelid].Questions[question.Id] = question;
                 $scope.$apply();
             } 
+
+            this.helper.client.removeQuestion = (questionid) => {
+                console.log("Removing question with id: " + questionid);
+                for (let channelid in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channelid)) {
+                        if ($scope.Channels[channelid].Questions[questionid] != null) {
+                            console.log("Removing from channel with id: " + channelid);
+                            delete $scope.Channels[channelid].Questions[questionid];
+                        }
+                    }
+                }
+                $scope.$apply();
+            }
         }
 
 

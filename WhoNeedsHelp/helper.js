@@ -137,6 +137,7 @@ var Help;
                 _this.requestHelp(qt, $scope.ActiveChannel);
             };
             $scope.RemoveQuestion = function (questionid) {
+                console.log("Called " + questionid);
                 _this.removeQuestion(questionid);
             };
             this.helper.client.setQuestionState = function (hasQuestion, channelid) {
@@ -159,9 +160,19 @@ var Help;
                 $scope.$apply();
             };
             this.helper.client.addQuestion = function (question, channelid) {
-                console.log(question);
-                console.log(channelid);
                 $scope.Channels[channelid].Questions[question.Id] = question;
+                $scope.$apply();
+            };
+            this.helper.client.removeQuestion = function (questionid) {
+                console.log("Removing question with id: " + questionid);
+                for (var channelid in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channelid)) {
+                        if ($scope.Channels[channelid].Questions[questionid] != null) {
+                            console.log("Removing from channel with id: " + channelid);
+                            delete $scope.Channels[channelid].Questions[questionid];
+                        }
+                    }
+                }
                 $scope.$apply();
             };
         }

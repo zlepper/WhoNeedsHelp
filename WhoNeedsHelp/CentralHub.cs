@@ -300,12 +300,13 @@ namespace WhoNeedsHelp
 
         public void RemoveQuestion(int questionId)
         {
+            Debug.WriteLine(questionId);
             if (questionId == 0)
             {
                 using (var db = new HelpContext())
                 {
                     //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                    var con = db.Connections.Find(Context.ConnectionId);
+                    /*var con = db.Connections.Find(Context.ConnectionId);
                     if (con == null) return;
                     var user = con.User;
                     if (user == null) return;
@@ -322,13 +323,14 @@ namespace WhoNeedsHelp
                         Clients.Client(connection.ConnectionId).RemoveQuestion(question.Id);
                     }
                     db.Questions.Remove(question);
-                    db.SaveChanges();
+                    db.SaveChanges();*/
                 }
             }
             else
             {
                 using (var db = new HelpContext())
                 {
+                    Debug.WriteLine("Here");
                     Question q = db.Questions.Include(qu => qu.User).Include(qu => qu.Channel).SingleOrDefault(qu => qu.Id.Equals(questionId));
                     if (q == null)
                     {
