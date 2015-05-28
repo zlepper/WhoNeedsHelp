@@ -260,7 +260,6 @@ module Help {
             });
 
             $scope.exitChannel = (channelid) => {
-                console.log(typeof (channelid));
                 this.exitChannel(channelid);
             }
 
@@ -282,9 +281,13 @@ module Help {
                 $scope.Channels[channel.Id] = channel;
                 //$scope.Channels.push(channel);
                 $scope.$apply();
-                console.log(channel);
             }
 
+            this.helper.client.exitChannel = (channelId) => {
+                delete $scope.Channels[channelId];
+                $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                $scope.$apply();
+            }
         }
 
 

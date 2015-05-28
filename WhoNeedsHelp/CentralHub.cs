@@ -456,6 +456,7 @@ namespace WhoNeedsHelp
 
         public void ExitChannel(int channelId)
         {
+            Debug.WriteLine(channelId);
             if (channelId == 0) return;
             using (var db = new HelpContext())
             {

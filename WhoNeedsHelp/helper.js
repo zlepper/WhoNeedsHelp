@@ -118,7 +118,6 @@ var Help;
                 $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
             });
             $scope.exitChannel = function (channelid) {
-                console.log(typeof (channelid));
                 _this.exitChannel(channelid);
             };
             $scope.CreateNewChannel = function (channelName) {
@@ -138,7 +137,11 @@ var Help;
                 $scope.Channels[channel.Id] = channel;
                 //$scope.Channels.push(channel);
                 $scope.$apply();
-                console.log(channel);
+            };
+            this.helper.client.exitChannel = function (channelId) {
+                delete $scope.Channels[channelId];
+                $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                $scope.$apply();
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];
