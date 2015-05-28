@@ -245,25 +245,39 @@ namespace WhoNeedsHelp
             }
         }
 
-        public void ChangeQuestion(string question)
+        public void ChangeQuestion(string question, int channelId)
         {
             using (var db = new HelpContext())
             {
                 //var user = db.Users.Include(u => u.Channel).Include(u => u.Questions).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                var con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                var user = con.User;
+                var user = db.Connections.Find(Context.ConnectionId).User;
                 if (user == null) return;
-                Channel channel = user.Channel;
+                Channel channel = db.Channels.Find(channelId);
                 if (channel == null) return;
-                user.UpdateQuestion(channel, question);
-                Question q = user.GetQuestion(channel);
+                Question q = user.UpdateQuestion(channel, question);
                 if (q == null) return;
-                foreach (Connection connection in channel.ActiveUsers.SelectMany(use => use.Connections))
+                foreach (Connection connection in channel.Users.SelectMany(use => use.Connections))
                 {
-                    Clients.Client(connection.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id);
+                    Clients.Client(connection.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id, channelId);
                 }
                 db.SaveChanges();
+            }
+        }
+
+        public void EditOwnQuestion(int channelId)
+        {
+            using (var db = new HelpContext())
+            {
+                var user = db.Connections.Find(Context.ConnectionId).User;
+                Channel channel = user.GetChannel(channelId);
+                if (channel == null) return;
+                Question question = user.GetQuestion(channel);
+                if (question == null)
+                {
+                    Clients.Caller.SetQuestionState(false, channelId);
+                    return;
+                }
+                Clients.Caller.SendQuestion(question.Text);
             }
         }
 
@@ -298,61 +312,66 @@ namespace WhoNeedsHelp
             }
         }
 
-        public void RemoveQuestion(int questionId)
+        public void RemoveOwnQuestion(int channelId)
         {
-            Debug.WriteLine(questionId);
-            if (questionId == 0)
+            using (var db = new HelpContext())
             {
-                using (var db = new HelpContext())
+                Channel channel = db.Channels.Find(channelId);
+                if (channel == null) return;
+                User user = db.Connections.Find(Context.ConnectionId).User;
+                if (user == null) return;
+                Question question = user.GetQuestion(channel);
+                if (user.AreUserQuestioning(channel))
                 {
-                    //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                    /*var con = db.Connections.Find(Context.ConnectionId);
-                    if (con == null) return;
-                    var user = con.User;
-                    if (user == null) return;
-                    Question question = db.Questions.Find(questionId);
-                    Channel channel = question.Channel;
-                    user.RemoveQuestion(question);
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).SetQuestionState(false, channel.Id);
-                    }
                     channel.RemoveUserRequestingHelp(user);
                     foreach (Connection connection in channel.Users.SelectMany(u => u.Connections))
                     {
                         Clients.Client(connection.ConnectionId).RemoveQuestion(question.Id);
                     }
-                    db.Questions.Remove(question);
-                    db.SaveChanges();*/
-                }
-            }
-            else
-            {
-                using (var db = new HelpContext())
-                {
-                    Debug.WriteLine("Here");
-                    Question q = db.Questions.Include(qu => qu.User).Include(qu => qu.Channel).SingleOrDefault(qu => qu.Id.Equals(questionId));
-                    if (q == null)
-                    {
-                        Clients.Caller.RemoveQuestion(questionId);
-                        return;
-                    }
-                    User user = q.User;
-                    Channel channel = q.Channel;
-                    if (channel == null || user == null) return;
-                    channel.RemoveUserRequestingHelp(user);
-                    foreach (Connection connection in channel.Users.SelectMany(use => use.Connections))
-                    {
-                        Clients.Client(connection.ConnectionId).RemoveQuestion(questionId);
-                    }
-                    //Clients.Client(user.ConnectionId).SetLayout(1);
                     foreach (Connection connection in user.Connections)
                     {
                         Clients.Client(connection.ConnectionId).SetQuestionState(false, channel.Id);
                     }
-                    db.Questions.Remove(q);
+                    db.Questions.Remove(question);
                     db.SaveChanges();
                 }
+                else
+                {
+                    Clients.Caller.SetQuestionState(false, channelId);
+                }
+            }
+        }
+
+        public void RemoveQuestion(int questionId)
+        {
+            if (questionId == 0)
+            {
+                return;
+            }
+            using (var db = new HelpContext())
+            {
+                Question q = db.Questions.Include(qu => qu.User).Include(qu => qu.Channel).SingleOrDefault(qu => qu.Id.Equals(questionId));
+                if (q == null)
+                {
+                    Clients.Caller.RemoveQuestion(questionId);
+                    return;
+                }
+                User user = q.User;
+                Channel channel = q.Channel;
+                if (channel == null || user == null) return;
+                channel.RemoveUserRequestingHelp(user);
+                Debug.WriteLine(channel.Users.Count);
+                foreach (Connection connection in channel.Users.SelectMany(use => use.Connections))
+                {
+                    Clients.Client(connection.ConnectionId).RemoveQuestion(questionId);
+                }
+                //Clients.Client(user.ConnectionId).SetLayout(1);
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).SetQuestionState(false, channel.Id);
+                }
+                db.Questions.Remove(q);
+                db.SaveChanges();
             }
         }
 
@@ -525,6 +544,7 @@ namespace WhoNeedsHelp
                 {
                     Clients.Client(connection.ConnectionId).AppendChannel(sc);
                 }
+                Debug.WriteLine(channel.Users.Count);
             }
         }
 
@@ -590,21 +610,26 @@ namespace WhoNeedsHelp
                 {
                     return;
                 }
-                Question q = userFromDb.RequestHelp(channelid, question);
+                Channel channel = db.Channels.Find(channelid);
+                if (userFromDb.AreUserQuestioning(channel))
+                {
+                    Clients.Caller.SetQuestionState(true, channelid);
+                    return;
+                }
+                Question q = userFromDb.RequestHelp(channel, question);
                 if (q == null) return;
                 db.Questions.Add(q);
                 db.SaveChanges();
-                Channel channel = userFromDb.Channel;
                 SimpleUser su = new SimpleUser(userFromDb.Id, userFromDb.Name);
                 SimpleQuestion sq = new SimpleQuestion(q.Id, q.Text, su);
                 foreach (Connection connection in channel.Users.SelectMany(user => user.Connections))
                 {
                     Clients.Client(connection.ConnectionId).AddQuestion(sq, channel.Id);
                 }
-                //foreach (Connection connection in userFromDb.Connections)
-                //{
-                //    Clients.Client(connection.ConnectionId).SetLayout(3);
-                //}
+                foreach (Connection connection in userFromDb.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).SetQuestionState(true, channelid);
+                }
             }
 
         }

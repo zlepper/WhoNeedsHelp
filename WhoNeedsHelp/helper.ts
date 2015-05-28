@@ -73,6 +73,8 @@ interface ICentralServer {
     loginUser(mail: string, pass: string): JQueryPromise<void>;
     logoutUser(): JQueryPromise<void>;
     removeUserFromChannel(tmpid: string): JQueryPromise<void>;
+    removeOwnQuestion(channelid: number): JQueryPromise<void>;
+    editOwnQuestion(channelId: number): JQueryPromise<void>;
 }
 
 function isNullOrWhitespace(input: any) {
@@ -97,7 +99,7 @@ module Help {
         /**
          * The channels the local user are in.
          */
-        Channels: {[id: number]: Channel};
+        Channels: { [id: number]: Channel };
         /**
          * Indicates if the signalr connection is ready.
          */
@@ -150,6 +152,13 @@ module Help {
         exitChannel: (channelid: number) => void;
         RequestHelp: () => void;
         RemoveQuestion: (questionid: number) => void;
+        RemoveOwnQuestion: () => void;
+        EditOwnQuestion: () => void;
+        changeQuestionModalOptions: ModalSettings;
+        changeQuestionModal: ModalServiceInstance;
+        UpdateQuestion: () => void;
+        CloseEditModal: () => void;
+        editQuestionText: { text: string };
     }
 
     export class ServerActions {
@@ -222,6 +231,18 @@ module Help {
         removeUserFromChannel(id: string): JQueryPromise<void> {
             return this.helper.server.removeUserFromChannel(id);
         }
+
+        removeOwnQuestion(channelid: number): JQueryPromise<void> {
+            return this.helper.server.removeOwnQuestion(channelid);
+        }
+
+        editOwnQuestion(channelId: number): JQueryPromise<void> {
+            return this.helper.server.editOwnQuestion(channelId);
+        }
+
+        changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
+            return this.helper.server.changeQuestion(questionText, channelId);
+        }
     }
 
     export class HelpCtrl extends ServerActions {
@@ -235,6 +256,7 @@ module Help {
             $scope.Me = new Me();
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
+            $scope.editQuestionText = {text: ""};
             this.helper = $.connection.centralHub;
             //var that = this;
             $scope.LoginModalOptions = {
@@ -242,12 +264,16 @@ module Help {
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
-            }
-
+            };
+            $scope.changeQuestionModalOptions = {
+                templateUrl: "/editQuestionModal.html",
+                scope: $scope,
+                keyboard: false,
+                backdrop: "static"
+            };
             $scope.setActiveChannel = (channelid) => {
                 $scope.ActiveChannel = channelid;
-            }
-
+            };
             $scope.Start = () => {
                 var name = $scope.StartingModal.Name;
                 name = name.replace(/[\s]+/g, " ");
@@ -258,8 +284,7 @@ module Help {
                 }
                 $scope.Ready = true;
                 $scope.LoginModal.close();
-            }
-
+            };
             $.connection.hub.start().done(() => {
                 $scope.Loading = false;
                 console.log($scope.LoginModalOptions);
@@ -268,54 +293,53 @@ module Help {
 
             $scope.exitChannel = (channelid) => {
                 this.exitChannel(channelid);
-            }
-
+            };
             $scope.CreateNewChannel = (channelName) => {
                 if (isNaN(Number(channelName))) {
                     this.createNewChannel(channelName);
                 } else {
                     this.joinChannel(Number(channelName));
                 }
-            }
-
+            };
             $scope.RequestHelp = () => {
-                var qt: string = $scope.Channels[$scope.ActiveChannel].QuestionText;
-                console.log($scope.Channels[$scope.ActiveChannel].QuestionText);
+                var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
+                console.log($scope.Channels[$scope.ActiveChannel].Text);
                 this.requestHelp(qt, $scope.ActiveChannel);
-            }
-
+            };
             $scope.RemoveQuestion = (questionid) => {
                 console.log("Called " + questionid);
                 this.removeQuestion(questionid);
-            }
-
+            };
+            $scope.RemoveOwnQuestion = () => {
+                this.removeOwnQuestion($scope.ActiveChannel);
+            };
+            $scope.EditOwnQuestion = () => {
+                this.editOwnQuestion($scope.ActiveChannel);
+            };
             this.helper.client.setQuestionState = (hasQuestion, channelid) => {
-                if($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                if ($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
                 $scope.$apply();
-            }
-
+            };
             this.helper.client.updateUsername = (name) => {
                 $scope.Me.Name = name;
                 $scope.$apply();
-            }
-
+            };
             this.helper.client.appendChannel = (channel) => {
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
                 $scope.$apply();
-            }
-
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
             this.helper.client.exitChannel = (channelId) => {
                 delete $scope.Channels[channelId];
                 $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
                 $scope.$apply();
-            }
-
+            };
             this.helper.client.addQuestion = (question, channelid) => {
                 $scope.Channels[channelid].Questions[question.Id] = question;
                 $scope.$apply();
-            } 
-
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
             this.helper.client.removeQuestion = (questionid) => {
                 console.log("Removing question with id: " + questionid);
                 for (let channelid in $scope.Channels) {
@@ -327,7 +351,35 @@ module Help {
                     }
                 }
                 $scope.$apply();
-            }
+            };
+            this.helper.client.sendQuestion = (questionText) => {
+                $scope.editQuestionText.text = questionText;
+                $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+            };
+            /*$scope.$watch(() => {
+                return $scope.editQuestionText;
+            }, () => {
+                var math = MathJax.Hub.getAllJax("editQuestionPreview")[0];
+                MathJax.Hub.Queue(["Text", math,"x+1"]);
+            }, true);*/
+            $scope.UpdateQuestion = () => {
+                console.log($scope.editQuestionText);
+                this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
+                $scope.changeQuestionModal.close();
+            };
+            this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Questions[questionid] != null) {
+                        console.log("Updated Question");
+                        $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                    }
+                }
+                $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
+            $scope.CloseEditModal = () => {
+                $scope.changeQuestionModal.close();
+            };
         }
 
 
@@ -349,12 +401,12 @@ module Help {
     export class Question {
         Id: number;
         User: User;
-        QuestionText: string;
+        Text: string;
 
         constructor(id: number, user: User, questionText: string) {
             this.Id = id;
             this.User = user;
-            this.QuestionText = questionText;
+            this.Text = questionText;
         }
     }
 
@@ -380,20 +432,19 @@ module Help {
 
     export class Channel {
         Id: number;
-        ChatMessages: {[id: number]: ChatMessage};
+        ChatMessages: { [id: number]: ChatMessage };
         Questions: { [id: number]: Question };
         ChannelName: string;
         Users: { [id: number]: User };
         QuestionState: QuestionState;
         HaveQuestion: boolean;
         IsAdmin: boolean;
+        Text: string;
 
         constructor(id: number, channelName: string) {
             this.Id = id;
             this.ChannelName = channelName;
         }
-
-        QuestionText: string;
     }
 
     export class ChatMessage {

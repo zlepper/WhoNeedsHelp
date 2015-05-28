@@ -19,7 +19,7 @@ namespace WhoNeedsHelp
         void SetChannel(int channelId, bool areUserQuestioning);
         void UpdateChannelCount(int activeUsers, int connectedUsers, int channelId);
         void SendQuestion(string question);
-        void UpdateQuestion(string questionText, int questionId);
+        void UpdateQuestion(string questionText, int questionId, int channelId);
         void ReloadPage();
         void SendChatMessage(string text, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
         void SendChatMessages(string[] text, string[] author, string[] messageIds, bool[] sender, bool[] appendToLast, bool[] canEdit);

@@ -30,27 +30,28 @@ a:focus {
     padding: 0;
     max-height: 600px;
     overflow-y: auto;
+
+    li {
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px dotted #B3A9A9;
+
+        &.left .chat-body {
+            margin-left: 30px;
+        }
+
+        &.right .chat-body {
+            margin-right: 30px;
+        }
+
+        .chat-body p {
+            margin: 0;
+            color: #777777;
+        }
+    }
 }
 
-li {
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted #B3A9A9;
 
-    &.left .chat-body {
-        margin-left: 30px;
-    }
-
-    &.right .chat-body {
-        margin-right: 30px;
-    }
-
-    .chat-body p {
-        margin: 0;
-        color: #777777;
-    }
-
-}
 
 
 

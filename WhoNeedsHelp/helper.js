@@ -78,6 +78,15 @@ var Help;
         ServerActions.prototype.removeUserFromChannel = function (id) {
             return this.helper.server.removeUserFromChannel(id);
         };
+        ServerActions.prototype.removeOwnQuestion = function (channelid) {
+            return this.helper.server.removeOwnQuestion(channelid);
+        };
+        ServerActions.prototype.editOwnQuestion = function (channelId) {
+            return this.helper.server.editOwnQuestion(channelId);
+        };
+        ServerActions.prototype.changeQuestion = function (questionText, channelId) {
+            return this.helper.server.changeQuestion(questionText, channelId);
+        };
         return ServerActions;
     })();
     Help.ServerActions = ServerActions;
@@ -93,10 +102,17 @@ var Help;
             $scope.Me = new Me();
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
+            $scope.editQuestionText = { text: "" };
             this.helper = $.connection.centralHub;
             //var that = this;
             $scope.LoginModalOptions = {
                 templateUrl: "/startModal.html",
+                scope: $scope,
+                keyboard: false,
+                backdrop: "static"
+            };
+            $scope.changeQuestionModalOptions = {
+                templateUrl: "/editQuestionModal.html",
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
@@ -132,13 +148,19 @@ var Help;
                 }
             };
             $scope.RequestHelp = function () {
-                var qt = $scope.Channels[$scope.ActiveChannel].QuestionText;
-                console.log($scope.Channels[$scope.ActiveChannel].QuestionText);
+                var qt = $scope.Channels[$scope.ActiveChannel].Text;
+                console.log($scope.Channels[$scope.ActiveChannel].Text);
                 _this.requestHelp(qt, $scope.ActiveChannel);
             };
             $scope.RemoveQuestion = function (questionid) {
                 console.log("Called " + questionid);
                 _this.removeQuestion(questionid);
+            };
+            $scope.RemoveOwnQuestion = function () {
+                _this.removeOwnQuestion($scope.ActiveChannel);
+            };
+            $scope.EditOwnQuestion = function () {
+                _this.editOwnQuestion($scope.ActiveChannel);
             };
             this.helper.client.setQuestionState = function (hasQuestion, channelid) {
                 if ($scope.Channels[channelid] != null)
@@ -153,6 +175,7 @@ var Help;
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
                 $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.exitChannel = function (channelId) {
                 delete $scope.Channels[channelId];
@@ -162,6 +185,7 @@ var Help;
             this.helper.client.addQuestion = function (question, channelid) {
                 $scope.Channels[channelid].Questions[question.Id] = question;
                 $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.removeQuestion = function (questionid) {
                 console.log("Removing question with id: " + questionid);
@@ -174,6 +198,34 @@ var Help;
                     }
                 }
                 $scope.$apply();
+            };
+            this.helper.client.sendQuestion = function (questionText) {
+                $scope.editQuestionText.text = questionText;
+                $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+            };
+            /*$scope.$watch(() => {
+                return $scope.editQuestionText;
+            }, () => {
+                var math = MathJax.Hub.getAllJax("editQuestionPreview")[0];
+                MathJax.Hub.Queue(["Text", math,"x+1"]);
+            }, true);*/
+            $scope.UpdateQuestion = function () {
+                console.log($scope.editQuestionText);
+                _this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
+                $scope.changeQuestionModal.close();
+            };
+            this.helper.client.updateQuestion = function (questionText, questionid, channelid) {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Questions[questionid] != null) {
+                        console.log("Updated Question");
+                        $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                    }
+                }
+                $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
+            $scope.CloseEditModal = function () {
+                $scope.changeQuestionModal.close();
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];
@@ -196,7 +248,7 @@ var Help;
         function Question(id, user, questionText) {
             this.Id = id;
             this.User = user;
-            this.QuestionText = questionText;
+            this.Text = questionText;
         }
         return Question;
     })();

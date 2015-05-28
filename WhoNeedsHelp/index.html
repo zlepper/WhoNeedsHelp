@@ -22,7 +22,7 @@
     <script src="Scripts/pnotify.custom.min.js" type="text/javascript"></script>
     <link href="Content/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
     <!--Add script to update the page and send messages.-->
-    <script src="Scripts/angular.min.js"></script>
+    <script src="Scripts/angular.js"></script>
     <script src="Scripts/angular-animate.js"></script>
     <script src="Scripts/angular-ui/ui-bootstrap.min.js"></script>
     <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>
@@ -98,7 +98,7 @@
                 <button class="btn btn-primary" type="submit">Skift</button>
             </form>
         </div>
-        <div id="interface" ng-show="!loading">
+        <div ng-show="!loading">
             <div class="row">
                 <nav class="navbar navbar-default">
                     <div class="container">
@@ -166,7 +166,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="panel panel-primary" id="ip-discovery-panel">
+                    <!--<div class="panel panel-primary" id="ip-discovery-panel">
                         <div class="panel-heading">
                             <h3 class="panel-title">
                                 Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a>
@@ -178,7 +178,7 @@
 
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-primary">
@@ -191,7 +191,7 @@
                                 <div class="panel-heading">
                                     <button aria-label="Fjern spørgsmål" class="close"
                                             type="button" ng-click="RemoveQuestion(question.Id)">
-                                        <span aria-hidden="true">&times;</span>
+                                        <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
                                     </button>
                                     <h3 class="panel-title">{{question.User.Name}}</h3>
                                 </div>
@@ -202,10 +202,10 @@
                         </div>
                         <div class="panel-footer">
 
-                            <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel" ng-submit="RequestHelp()">
+                            <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
                                 <div class="form-group">
                                     <label class="sr-only" for="question">Spørgsmåls Tekst</label>
-                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].QuestionText" />
+                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].Text" />
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" class="btn btn-primary" value="Efterspørg hjælp" />
@@ -214,10 +214,10 @@
 
                             <form class="form-inline" id="requestingHelp" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
                                 <div class="form-group">
-                                    <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
+                                    <button type="button" class="btn btn-danger" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
                                 </div>
                                 <div class="form-group">
-                                    <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
+                                    <button type="button" class="btn btn-primary" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
                                 </div>
                             </form>
 
@@ -256,7 +256,7 @@
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
-                                    <div class="list-group-item" ng-repeat></div>
+                                    <div class="list-group-item"></div>
                                 </div>
                             </div>
                         </div>

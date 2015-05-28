@@ -22,18 +22,17 @@ a:active, a:hover, a:focus {
   padding: 0;
   max-height: 600px;
   overflow-y: auto; }
-
-li {
-  margin-bottom: 10px;
-  padding-bottom: 5px;
-  border-bottom: 1px dotted #B3A9A9; }
-  li.left .chat-body {
-    margin-left: 30px; }
-  li.right .chat-body {
-    margin-right: 30px; }
-  li .chat-body p {
-    margin: 0;
-    color: #777777; }
+  .chat li {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #B3A9A9; }
+    .chat li.left .chat-body {
+      margin-left: 30px; }
+    .chat li.right .chat-body {
+      margin-right: 30px; }
+    .chat li .chat-body p {
+      margin: 0;
+      color: #777777; }
 
 .panel .slidedown .glyphicon, .chat .glyphicon {
   margin-right: 5px; }

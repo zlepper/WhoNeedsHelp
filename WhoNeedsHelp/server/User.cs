@@ -45,13 +45,12 @@ namespace WhoNeedsHelp.server
             Connections = new List<Connection>();
         }
 
-        public Question RequestHelp(int channelid, string question = null)
+        public Question RequestHelp(Channel ch, string question = null)
         {
-            if (channelid != 0)
+            if (ch != null)
             {
                 using (HelpContext db = new HelpContext())
                 {
-                    Channel ch = db.Channels.Find(channelid);
                     bool help = ch.RequestHelp(this);
                     if (!help) return null;
                     if (AreUserQuestioning(ch))
@@ -71,6 +70,11 @@ namespace WhoNeedsHelp.server
             return Questions.SingleOrDefault(q => q.Channel.Equals(c));
         }
 
+        public Channel GetChannel(int channelId)
+        {
+            return ChannelsIn.SingleOrDefault(c => c.Id == channelId);
+        }
+
         private void AskQuestion(Channel c, string question)
         {
             if (AreUserQuestioning(c)) 
@@ -88,20 +92,13 @@ namespace WhoNeedsHelp.server
         /// </summary>
         /// <param name="c">The channel Guid to change question in</param>
         /// <param name="question">The question to change to</param>
-        /// <returns>true if the question was changed. false if the question was added</returns>
-        public bool UpdateQuestion(Channel c, string question)
+        /// <returns>Returns the question if it was edited</returns>
+        public Question UpdateQuestion(Channel c, string question)
         {
-            /*if (AreUserQuestioning(c))
-            {
-                return false;
-            }*/
             Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(c));
-            if (q != null)
-            {
-                q.Text = question;
-                return true;
-            }
-            return false;
+            if (q == null) return null;
+            q.Text = question;
+            return q;
         }
 
         public void RemoveQuestion(Question q)
