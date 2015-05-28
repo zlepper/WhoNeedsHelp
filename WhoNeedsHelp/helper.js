@@ -379,16 +379,19 @@ function showNotification(typ, text, title) {
 }
 function setQuestionLayout(layout) {
     switch (layout) {
+        // Standard Layout
         case 1:
             $("#requestingHelp").hide();
             $("#noChannelsSelected").hide();
             $("#requestHelpForm").show();
             break;
+        // No channel selected
         case 2:
             $("#requestingHelp").hide();
             $("#noChannelsSelected").show();
             $("#requestHelpForm").hide();
             break;
+        // Have question in current channel
         case 3:
             $("#requestingHelp").show();
             $("#noChannelsSelected").hide();
@@ -399,6 +402,7 @@ function setQuestionLayout(layout) {
 }
 function setLoginState(layout) {
     switch (layout) {
+        // Logged in
         case 1:
             $(".not-logged-in").hide();
             $(".logged-in").show();
@@ -440,6 +444,8 @@ $.connection.hub.start().done(function () {
     $("#usernameModalInput").focus();
     $(document).on("click", "span.channel-remove", function (e) {
         e.preventDefault();
+        if (!confirm("Er du sikker på at du vil fjerne denne kanal?"))
+            return;
         var tmpid = $(this).parent().attr("id");
         chat.server.exitChannel(tmpid);
     });

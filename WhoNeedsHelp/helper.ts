@@ -479,6 +479,7 @@ $.connection.hub.start().done(() => {
 
     $(document).on("click", "span.channel-remove", function (e) {
         e.preventDefault();
+        if (!confirm("Er du sikker på at du vil fjerne denne kanal?")) return;
         var tmpid = $(this).parent().attr("id");
         chat.server.exitChannel(tmpid);
     });
