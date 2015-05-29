@@ -49,7 +49,7 @@ interface ICentralClient {
     updateChatMessageAuthorName: (name: string, ids: number[]) => void;
     errorChat: (errorMessage: string) => void;
     appendUsers(usernames: string[], userids: number[], isAdmin: boolean[]);
-    appendUser(username: string, id: number, isAdmin: boolean);
+    appendUser(user: Help.User, channelid: number);
     removeUser(id: number, channelId: number);
     alert: (message: string, title: string, t: string) => void;
 }
@@ -159,6 +159,7 @@ module Help {
         UpdateQuestion: () => void;
         CloseEditModal: () => void;
         editQuestionText: { text: string };
+        RemoveUser: (userid: number) => void;
     }
 
     export class ServerActions {
@@ -256,7 +257,7 @@ module Help {
             $scope.Me = new Me();
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
-            $scope.editQuestionText = {text: ""};
+            $scope.editQuestionText = { text: "" };
             this.helper = $.connection.centralHub;
             //var that = this;
             $scope.LoginModalOptions = {
@@ -356,12 +357,6 @@ module Help {
                 $scope.editQuestionText.text = questionText;
                 $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
             };
-            /*$scope.$watch(() => {
-                return $scope.editQuestionText;
-            }, () => {
-                var math = MathJax.Hub.getAllJax("editQuestionPreview")[0];
-                MathJax.Hub.Queue(["Text", math,"x+1"]);
-            }, true);*/
             $scope.UpdateQuestion = () => {
                 console.log($scope.editQuestionText);
                 this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
@@ -380,6 +375,23 @@ module Help {
             $scope.CloseEditModal = () => {
                 $scope.changeQuestionModal.close();
             };
+            this.helper.client.appendUser = (user, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    $scope.Channels[channelid].Users[user.Id] = user;
+                    $scope.$apply();
+                }
+            }
+            this.helper.client.removeUser = (userid, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Users[userid] != null) {
+                        delete $scope.Channels[channelid].Users[userid];
+                        $scope.$apply();
+                    }
+                }
+            }
+            $scope.RemoveUser = (userid) => {
+                
+            }
         }
 
 

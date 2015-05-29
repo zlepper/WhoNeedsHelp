@@ -38,8 +38,8 @@ namespace WhoNeedsHelp
         void UpdateChatMessageAuthorName(string name, string[] chatMessageIds);
         void ErrorChat(string errorMessage);
         void AppendUsers(string[] toArray, int[] ids, bool admin);
-        void AppendUser(string name, int id, bool admin);
-        void RemoveUser(int id);
+        void AppendUser(SimpleUser user, int channelId);
+        void RemoveUser(int id, int channelid);
         void Alert(string message, string title, string type);
         void SetQuestionState(bool hasQuestion, int channelid);
     }

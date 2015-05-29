@@ -203,12 +203,6 @@ var Help;
                 $scope.editQuestionText.text = questionText;
                 $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
             };
-            /*$scope.$watch(() => {
-                return $scope.editQuestionText;
-            }, () => {
-                var math = MathJax.Hub.getAllJax("editQuestionPreview")[0];
-                MathJax.Hub.Queue(["Text", math,"x+1"]);
-            }, true);*/
             $scope.UpdateQuestion = function () {
                 console.log($scope.editQuestionText);
                 _this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
@@ -226,6 +220,22 @@ var Help;
             };
             $scope.CloseEditModal = function () {
                 $scope.changeQuestionModal.close();
+            };
+            this.helper.client.appendUser = function (user, channelid) {
+                if ($scope.Channels[channelid] != null) {
+                    $scope.Channels[channelid].Users[user.Id] = user;
+                    $scope.$apply();
+                }
+            };
+            this.helper.client.removeUser = function (userid, channelid) {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Users[userid] != null) {
+                        delete $scope.Channels[channelid].Users[userid];
+                        $scope.$apply();
+                    }
+                }
+            };
+            $scope.RemoveUser = function (userid) {
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];

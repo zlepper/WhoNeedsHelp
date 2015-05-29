@@ -190,8 +190,9 @@
                             <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
                                 <div class="panel-heading">
                                     <button aria-label="Fjern spørgsmål" class="close"
-                                            type="button" ng-click="RemoveQuestion(question.Id)">
-                                        <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                                            type="button" ng-click="RemoveQuestion(question.Id)"
+                                            ng-if="Channels[ActiveChannel].IsAdmin">
+                                        <span aria-hidden="true">&times;</span>
                                     </button>
                                     <h3 class="panel-title">{{question.User.Name}}</h3>
                                 </div>
@@ -256,7 +257,12 @@
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
-                                    <div class="list-group-item"></div>
+                                    <div class="list-group-item" ng-repeat="(id, user) in Channels[ActiveChannel].Users">
+                                        {{user.Id}}
+                                        <button type="button" class="close" aria-label="luk" ng-if="Channels[ActiveChannel].IsAdmin" ng-click="RemoveUser(user.Id)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -11,11 +11,11 @@ namespace WhoNeedsHelp.Simples
         public Dictionary<int, SimpleQuestion> Questions { get; set; }
         public Dictionary<int, SimpleChatMessage> ChatMessages { get; set; }
         public Dictionary<int, SimpleUser> Users { get; set; }
-        public bool HasAdmin { get; set; }
+        public bool IsAdmin { get; set; }
 
-        public SimpleChannel(int id, bool hasAdmin = false)
+        public SimpleChannel(int id, bool isAdmin = false)
         {
-            HasAdmin = hasAdmin;
+            IsAdmin = isAdmin;
             using (HelpContext db = new HelpContext())
             {
                 Channel c = db.Channels.Find(id);
