@@ -75,8 +75,8 @@ var Help;
         ServerActions.prototype.logoutUser = function () {
             return this.helper.server.logoutUser();
         };
-        ServerActions.prototype.removeUserFromChannel = function (id) {
-            return this.helper.server.removeUserFromChannel(id);
+        ServerActions.prototype.removeUserFromChannel = function (id, channelid) {
+            return this.helper.server.removeUserFromChannel(id, channelid);
         };
         ServerActions.prototype.removeOwnQuestion = function (channelid) {
             return this.helper.server.removeOwnQuestion(channelid);
@@ -236,6 +236,7 @@ var Help;
                 }
             };
             $scope.RemoveUser = function (userid) {
+                _this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];

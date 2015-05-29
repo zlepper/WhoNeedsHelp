@@ -72,7 +72,7 @@ interface ICentralServer {
     requestActiveChannel(): JQueryPromise<void>;
     loginUser(mail: string, pass: string): JQueryPromise<void>;
     logoutUser(): JQueryPromise<void>;
-    removeUserFromChannel(tmpid: string): JQueryPromise<void>;
+    removeUserFromChannel(userid: number, channelid: number): JQueryPromise<void>;
     removeOwnQuestion(channelid: number): JQueryPromise<void>;
     editOwnQuestion(channelId: number): JQueryPromise<void>;
 }
@@ -229,8 +229,8 @@ module Help {
             return this.helper.server.logoutUser();
         }
 
-        removeUserFromChannel(id: string): JQueryPromise<void> {
-            return this.helper.server.removeUserFromChannel(id);
+        removeUserFromChannel(id: number, channelid: number): JQueryPromise<void> {
+            return this.helper.server.removeUserFromChannel(id, channelid);
         }
 
         removeOwnQuestion(channelid: number): JQueryPromise<void> {
@@ -390,7 +390,7 @@ module Help {
                 }
             }
             $scope.RemoveUser = (userid) => {
-                
+                this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
             }
         }
 
