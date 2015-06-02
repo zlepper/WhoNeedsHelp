@@ -73,7 +73,8 @@ namespace WhoNeedsHelp.server
 
         public bool IsUserAdministrator(User u)
         {
-            return Administrators.Contains(u);
+            bool ad = Administrators.Contains(u);
+            return ad;
         }
 
         public void AddAdministrator(User u)

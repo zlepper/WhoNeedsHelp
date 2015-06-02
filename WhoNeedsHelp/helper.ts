@@ -52,6 +52,7 @@ interface ICentralClient {
     appendUser(user: Help.User, channelid: number);
     removeUser(id: number, channelId: number);
     alert: (message: string, title: string, t: string) => void;
+    sendUserId: (id: number) => void;
 }
 
 interface ICentralServer {
@@ -161,6 +162,7 @@ module Help {
         editQuestionText: { text: string };
         RemoveUser: (userid: number) => void;
         newChannelName: string;
+        RemoveChatMessage: (messageId: number) => void;
     }
 
     export class ServerActions {
@@ -282,7 +284,6 @@ module Help {
                 var n = name.match(patt);
                 if (n.length > 0) {
                     this.setUsername(n[0]);
-                    console.log(n[0]);
                 }
                 $scope.Ready = true;
                 $scope.LoginModal.close();
@@ -291,6 +292,7 @@ module Help {
                 $scope.Loading = false;
                 console.log($scope.LoginModalOptions);
                 $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                $scope.$apply();
             });
 
             $scope.exitChannel = (channelid) => {
@@ -327,6 +329,10 @@ module Help {
                 $scope.Me.Name = name;
                 $scope.$apply();
             };
+            this.helper.client.sendUserId = (id) => {
+                $scope.Me.Id = id;
+                $scope.$apply();
+            }
             this.helper.client.appendChannel = (channel) => {
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
@@ -350,6 +356,7 @@ module Help {
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
                             console.log("Removing from channel with id: " + channelid);
                             delete $scope.Channels[channelid].Questions[questionid];
+                            console.log($scope.Channels[channelid]);
                         }
                     }
                 }
@@ -394,6 +401,9 @@ module Help {
             $scope.RemoveUser = (userid) => {
                 this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
             }
+            $scope.RemoveChatMessage = (messageId) => {
+                this.helper.server.removeChatMessage(messageId);
+            }
         }
 
 
@@ -437,6 +447,7 @@ module Help {
     export class Me {
         Name: string;
         LoggedIn: boolean;
+        Id: number;
 
         constructor() {
             this.Name = null;
