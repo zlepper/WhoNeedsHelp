@@ -160,6 +160,7 @@ module Help {
         CloseEditModal: () => void;
         editQuestionText: { text: string };
         RemoveUser: (userid: number) => void;
+        newChannelName: string;
     }
 
     export class ServerActions {
@@ -301,6 +302,7 @@ module Help {
                 } else {
                     this.joinChannel(Number(channelName));
                 }
+                $scope.newChannelName = "";
             };
             $scope.RequestHelp = () => {
                 var qt: string = $scope.Channels[$scope.ActiveChannel].Text;

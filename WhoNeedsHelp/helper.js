@@ -146,6 +146,7 @@ var Help;
                 else {
                     _this.joinChannel(Number(channelName));
                 }
+                $scope.newChannelName = "";
             };
             $scope.RequestHelp = function () {
                 var qt = $scope.Channels[$scope.ActiveChannel].Text;
