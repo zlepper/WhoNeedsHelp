@@ -126,7 +126,6 @@ var Help;
                 var n = name.match(patt);
                 if (n.length > 0) {
                     _this.setUsername(n[0]);
-                    console.log(n[0]);
                 }
                 $scope.Ready = true;
                 $scope.LoginModal.close();
@@ -135,6 +134,7 @@ var Help;
                 $scope.Loading = false;
                 console.log($scope.LoginModalOptions);
                 $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                $scope.$apply();
             });
             $scope.exitChannel = function (channelid) {
                 _this.exitChannel(channelid);
@@ -146,6 +146,7 @@ var Help;
                 else {
                     _this.joinChannel(Number(channelName));
                 }
+                $scope.newChannelName = "";
             };
             $scope.RequestHelp = function () {
                 var qt = $scope.Channels[$scope.ActiveChannel].Text;
@@ -171,6 +172,10 @@ var Help;
                 $scope.Me.Name = name;
                 $scope.$apply();
             };
+            this.helper.client.sendUserId = function (id) {
+                $scope.Me.Id = id;
+                $scope.$apply();
+            };
             this.helper.client.appendChannel = function (channel) {
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
@@ -194,6 +199,7 @@ var Help;
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
                             console.log("Removing from channel with id: " + channelid);
                             delete $scope.Channels[channelid].Questions[questionid];
+                            console.log($scope.Channels[channelid]);
                         }
                     }
                 }
@@ -237,6 +243,9 @@ var Help;
             };
             $scope.RemoveUser = function (userid) {
                 _this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
+            };
+            $scope.RemoveChatMessage = function (messageId) {
+                _this.helper.server.removeChatMessage(messageId);
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];

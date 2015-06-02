@@ -235,30 +235,37 @@
                         </ul>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active fade in" id="chat">
-                                <!--<div class="panel panel-primary">-->
-                                <!--<div class="panel-heading">
-                                    <h3 class="panel-title">
-                                        <span class="pull-left glyphicon glyphicon-comment"></span> Chat
-                                    </h3>
-                                </div>-->
-                                <!--<div class="panel-body">-->
-                                <ul class="chat"></ul>
-                                <!--</div>-->
+                                <ul class="chat">
+                                    <li class="clearfix" ng-repeat="(id, message) in Channels[ActiveChannel].ChatMessages" ng-class="right: message.User.Id == Me.Id, left: message.User.Id != Me.Id">
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <strong class="primary-font">
+                                                    {{message.User.Id}}
+                                                </strong>
+                                            </div>
+                                            <p class="clearfix" id="26">
+                                                <button aria-label="luk" class="close" type="button"
+                                                        ng-if="Channels[ActiveChannel].IsAdmin"
+                                                        ng-click="RemoveChatMessage(message.Id)">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            <p>{{message.Text}}</p>
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
                                 <!--Chat input-->
-                                <!--<div class="panel-footer">-->
                                 <form class="form" onsubmit=" return false; " id="chatForm">
                                     <div class="form-group">
                                         <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control" />
                                     </div>
                                 </form>
                                 <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
-                                <!--</div>
-                                </div>-->
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
                                     <div class="list-group-item" ng-repeat="(id, user) in Channels[ActiveChannel].Users">
-                                        {{user.Id}}
+                                        {{user.Name}}
                                         <button type="button" class="close" aria-label="luk" ng-if="Channels[ActiveChannel].IsAdmin" ng-click="RemoveUser(user.Id)">
                                             <span aria-hidden="true">&times;</span>
                                         </button>

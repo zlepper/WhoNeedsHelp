@@ -47,19 +47,21 @@ namespace WhoNeedsHelp
             }
         }
 
-        public void RemoveChatMessage(string messageId)
+        public void RemoveChatMessage(int messageId)
         {
-            if (String.IsNullOrWhiteSpace(messageId)) return;
+            if (messageId == 0) return;
             using (HelpContext db = new HelpContext())
             {
                 //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                User user = con.User;
+                User user = db.Connections.Find(Context.ConnectionId).User;
                 if (user == null) return;
+                ChatMessage message = db.ChatMessages.Find(messageId);
+                if (message == null)
+                {
+                    
+                }
                 Channel c = user.Channel;
                 if (c == null) return;
-                ChatMessage message = db.ChatMessages.Find(Int32.Parse(messageId));
                 if (message == null || (!c.IsUserAdministrator(user) && !message.User.Equals(user)))
                     return;
                 foreach (Connection connection in c.Users.SelectMany(u => u.Connections))
@@ -356,9 +358,13 @@ namespace WhoNeedsHelp
                     Clients.Caller.RemoveQuestion(questionId);
                     return;
                 }
+                User callingUser = db.Connections.Find(Context.ConnectionId).User;
                 User user = q.User;
                 Channel channel = q.Channel;
-                if (channel == null || user == null || channel.IsUserAdministrator(user)) return;
+                if (channel == null || user == null || !channel.IsUserAdministrator(callingUser))
+                {
+                    return;
+                }
                 channel.RemoveUserRequestingHelp(user);
                 foreach (Connection connection in channel.Users.SelectMany(use => use.Connections))
                 {
@@ -579,6 +585,10 @@ namespace WhoNeedsHelp
                         {
                             Clients.Client(connection.ConnectionId).UpdateChatMessageAuthorName(name, ids.ToArray());
                         }
+                    }
+                    foreach (Connection connection in user.Connections)
+                    {
+                        Clients.Client(connection.ConnectionId).SendUserId(user.Id);
                     }
                 }
                 db.SaveChanges();

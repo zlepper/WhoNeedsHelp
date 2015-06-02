@@ -42,5 +42,6 @@ namespace WhoNeedsHelp
         void RemoveUser(int id, int channelid);
         void Alert(string message, string title, string type);
         void SetQuestionState(bool hasQuestion, int channelid);
+        void SendUserId(int id);
     }
 }
