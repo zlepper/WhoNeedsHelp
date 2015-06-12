@@ -38,14 +38,19 @@ a:active, a:hover, a:focus {
   margin-right: 5px; }
 
 #chatMessageInput {
-  -moz-resize: vertical;
-  -ms-resize: vertical;
-  -o-resize: vertical;
   resize: vertical;
   max-height: 200px;
   min-height: 2.5em; }
 
 .header {
   display: block; }
+
+.astext {
+  background: none;
+  border: none;
+  margin: 0;
+  outline: none; }
+  .astext:hover {
+    cursor: pointer; }
 
 /*# sourceMappingURL=custom.css.map */

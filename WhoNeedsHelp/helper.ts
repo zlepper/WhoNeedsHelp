@@ -31,7 +31,7 @@ interface ICentralClient {
     reloadPage: () => void;
     //void SetQuestionState(bool hasQuestion, int channelid);
     setQuestionState: (hasQuestion: boolean, channelid: number) => void;
-    sendChatMessage: (text: string, author: string, messageId: number, sender: boolean, appendToLast: boolean, canEdit: boolean) => void;
+    sendChatMessage: (message: Help.ChatMessage, channelId: number) => void;
     sendChatMessages: (text: string[], author: string[], messageId: number[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
     removeChatMessage: (messageId: number) => void;
@@ -163,6 +163,11 @@ module Help {
         RemoveUser: (userid: number) => void;
         newChannelName: string;
         RemoveChatMessage: (messageId: number) => void;
+        Chat: () => void;
+        createUserPopover: PopoverOptions;
+        createUserOptions: LoginOptions;
+        createUser: () => void;
+        logout: () => void;
     }
 
     export class ServerActions {
@@ -247,6 +252,44 @@ module Help {
         changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
             return this.helper.server.changeQuestion(questionText, channelId);
         }
+        showNotification(typ: string, text: string, title: string) {
+            var notice = new PNotify({
+                title: title,
+                text: text,
+                type: typ,
+                animation: "show",
+                styling: "fontawesome",
+                mouse_reset: false,
+                desktop: {
+                    desktop: document.hidden
+                }
+            });
+            notice.elem.click(() => {
+                notice.remove();
+            });
+        }
+        confirm(text: string, title: string, callback: Function) {
+            var notice = new PNotify(<any>{
+                title: title,
+                text: text,
+                icon: "glyphicon glyphicon-question-sign",
+                mouse_reset: false,
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            });
+            notice.elem.on("pnotify.confirm", () => {
+                callback();
+            }).on("pnotify.cancel", () => false);
+        }
     }
 
     export class HelpCtrl extends ServerActions {
@@ -261,16 +304,21 @@ module Help {
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
+            $scope.createUserOptions = new LoginOptions(); 
             this.helper = $.connection.centralHub;
-            //var that = this;
+            var that = this;
+            $scope.createUserPopover = {
+                templateUrl: "/templates/createUserPopover.html",
+                title: "Opret bruger"
+            };
             $scope.LoginModalOptions = {
-                templateUrl: "/startModal.html",
+                templateUrl: "/templates/startModal.html",
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
             };
             $scope.changeQuestionModalOptions = {
-                templateUrl: "/editQuestionModal.html",
+                templateUrl: "/templates/editQuestionModal.html",
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
@@ -296,7 +344,9 @@ module Help {
             });
 
             $scope.exitChannel = (channelid) => {
-                this.exitChannel(channelid);
+                this.confirm("Are du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", () => {
+                    that.exitChannel(channelid);
+                });
             };
             $scope.CreateNewChannel = (channelName) => {
                 if (isNaN(Number(channelName))) {
@@ -312,7 +362,6 @@ module Help {
                 this.requestHelp(qt, $scope.ActiveChannel);
             };
             $scope.RemoveQuestion = (questionid) => {
-                console.log("Called " + questionid);
                 this.removeQuestion(questionid);
             };
             $scope.RemoveOwnQuestion = () => {
@@ -349,12 +398,10 @@ module Help {
                 $scope.$apply();
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
-            this.helper.client.removeQuestion = (questionid) => {
-                console.log("Removing question with id: " + questionid);
+            this.helper.client.removeQuestion = (questionid: number) => {
                 for (let channelid in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(channelid)) {
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
-                            console.log("Removing from channel with id: " + channelid);
                             delete $scope.Channels[channelid].Questions[questionid];
                             console.log($scope.Channels[channelid]);
                         }
@@ -374,7 +421,6 @@ module Help {
             this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
                 if ($scope.Channels[channelid] != null) {
                     if ($scope.Channels[channelid].Questions[questionid] != null) {
-                        console.log("Updated Question");
                         $scope.Channels[channelid].Questions[questionid].Text = questionText;
                     }
                 }
@@ -399,10 +445,63 @@ module Help {
                 }
             }
             $scope.RemoveUser = (userid) => {
-                this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
+                this.removeUserFromChannel(userid, $scope.ActiveChannel);
             }
             $scope.RemoveChatMessage = (messageId) => {
-                this.helper.server.removeChatMessage(messageId);
+                console.log(messageId);
+                this.removeChatMessage(messageId);
+            }
+            this.helper.client.removeChatMessage = (messageId: number) => {
+                for (let channel in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channel)) {
+                        const ch = $scope.Channels[channel];
+                        for (let chatMessage in ch.ChatMessages) {
+                            if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
+                                const id = Number(chatMessage);
+                                if (id === messageId) {
+                                    delete ch.ChatMessages[id];
+                                }
+                            }
+                        }
+                    }
+                }
+                $scope.$apply();
+            }
+            $scope.Chat = () => {
+                var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
+                if (mes) {
+                    this.chat(mes, $scope.ActiveChannel);
+                }
+                $scope.Channels[$scope.ActiveChannel].MessageText = "";
+            }
+            this.helper.client.sendChatMessage = (message, channelId) => {
+                $scope.Channels[channelId].ChatMessages[message.Id] = message;
+                $scope.$apply();
+            }
+            this.helper.client.alert = (message, heading, oftype) => {
+                console.log("ALERT!");
+                this.showNotification(oftype, message, heading);
+            }
+            $scope.createUser = () => {
+                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy || !$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                    return;
+                }
+                var email = $scope.createUserOptions.Email;
+                var pass = $scope.createUserOptions.Password;
+                var name = $scope.createUserOptions.Name;
+                // Simple checks to see if this is an email
+                if (email.indexOf("@") === 0 || email.indexOf("@") === email.length - 1 || email.indexOf(".") === 0 || email.indexOf(".") === email.length - 1) {
+                    return;
+                }
+                this.createNewUser(name, email, pass);
+            }
+            this.helper.client.userCreationSuccess = () => {
+                $scope.Me.LoggedIn = true;
+                $scope.createUserOptions = new LoginOptions();
+                $scope.$apply();
+            }
+            $scope.logout = () => {
+                
             }
         }
 
@@ -465,6 +564,7 @@ module Help {
         HaveQuestion: boolean;
         IsAdmin: boolean;
         Text: string;
+        MessageText: string;
 
         constructor(id: number, channelName: string) {
             this.Id = id;
@@ -473,6 +573,7 @@ module Help {
     }
 
     export class ChatMessage {
+        Id: number;
         Text: string;
         Author: User;
     }
@@ -481,11 +582,13 @@ module Help {
         Name: string;
         Email: string;
         Password: string;
+        Passwordcopy: string;
 
         constructor() {
             this.Name = "";
             this.Email = "";
             this.Password = "";
+            this.Passwordcopy = "";
         }
     }
 }

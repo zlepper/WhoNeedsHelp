@@ -53,40 +53,43 @@ namespace WhoNeedsHelp
             using (HelpContext db = new HelpContext())
             {
                 //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+                Debug.WriteLine("Here");
                 User user = db.Connections.Find(Context.ConnectionId).User;
                 if (user == null) return;
+                Debug.WriteLine("1");
                 ChatMessage message = db.ChatMessages.Find(messageId);
                 if (message == null)
                 {
-                    
-                }
-                Channel c = user.Channel;
-                if (c == null) return;
-                if (message == null || (!c.IsUserAdministrator(user) && !message.User.Equals(user)))
+                    Debug.WriteLine("3");
                     return;
+                }
+                Channel c = message.Channel;
+                if (c == null) return;
+                Debug.WriteLine("4");
+                if (!c.IsUserAdministrator(user) && !message.User.Equals(user))
+                    return;
+                Debug.WriteLine("5");
+                Debug.WriteLine(c.Users.Count);
                 foreach (Connection connection in c.Users.SelectMany(u => u.Connections))
                 {
-                    Clients.Client(connection.ConnectionId).RemoveChatMessage(message.Id.ToString());
+                    Clients.Client(connection.ConnectionId).RemoveChatMessage(message.Id);
                 }
             }
 
         }
 
 
-        public void Chat(string message)
+        public void Chat(string message, int channelId)
         {
             if (String.IsNullOrWhiteSpace(message)) return;
             using (HelpContext db = new HelpContext())
             {
-                //var user = db.Users.Include(u => u.Channel).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                User user = con.User;
+                User user = db.Connections.Find(Context.ConnectionId).User;
                 if (user == null) return;
-                Channel channel = user.Channel;
+                Channel channel = db.Channels.Find(channelId);
                 if (channel == null)
                 {
-                    Clients.Caller.ErrorChat("Du er ikke i nogen kanal");
+                    Clients.Caller.Alert("Something went odd", "ehh", "error");
                     return;
                 }
                 if (message.StartsWith("/"))
@@ -114,16 +117,8 @@ namespace WhoNeedsHelp
                     {
                         db.ChatMessages.Add(chatMessage);
                         db.SaveChanges();
-                        foreach (User u in channel.Users)
-                        {
-                            foreach (Connection connection in u.Connections)
-                            {
-                                //Clients.Client(connection.ConnectionId)
-                                //    .SendChatMessage(chatMessage.Text, user.Name, chatMessage.Id.ToString(),
-                                //        chatMessage.User.Equals(u), channel.AppendMessageToLast(chatMessage),
-                                //        chatMessage.User.Equals(u) || channel.IsUserAdministrator(u));
-                            }
-                        }
+                        SimpleChatMessage scm = chatMessage.ToSimpleChatMessage();
+                        Clients.Clients(channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList()).SendChatMessage(scm, channelId);
                     }
                 }
 
@@ -446,7 +441,6 @@ namespace WhoNeedsHelp
 
         public void ExitChannel(int channelId)
         {
-            Debug.WriteLine(channelId);
             if (channelId == 0) return;
             using (HelpContext db = new HelpContext())
             {
@@ -537,7 +531,6 @@ namespace WhoNeedsHelp
                 {
                     Clients.Client(connection.ConnectionId).AppendChannel(sc);
                 }
-                Debug.WriteLine(channel.Users.Count);
             }
         }
 
@@ -778,9 +771,10 @@ namespace WhoNeedsHelp
 
         public void CreateNewUser(string username, string email, string pw)
         {
+            Debug.WriteLine("Here");
             if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(pw))
             {
-                Clients.Caller.UserCreationFailed("En af værdier er ikke blevet sat.");
+                Clients.Caller.Alert("En af værdier er ikke blevet sat.", "Fejl under oprettelse af bruger", "error");
                 return;
             }
             using (HelpContext db = new HelpContext())
@@ -788,7 +782,7 @@ namespace WhoNeedsHelp
                 User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
                 if (user != null)
                 {
-                    Clients.Caller.UserCreationFailed("Emailadressen er allerede i brug.");
+                    Clients.Caller.Alert("Emailadressen er allerede i brug.", "Fejl under oprettelse af bruger", "error");
                     return;
                 }
                 Connection con = db.Connections.Find(Context.ConnectionId);
@@ -797,7 +791,7 @@ namespace WhoNeedsHelp
                 if (user == null) return;
                 if (!String.IsNullOrWhiteSpace(user.Pw) || !String.IsNullOrWhiteSpace(user.EmailAddress))
                 {
-                    Clients.Caller.UserCreationFailed("Du er allerede logget ind.");
+                    Clients.Caller.Alert("Du er allerede logget ind.", "Fejl under oprettelse af bruger", "error");
                     return;
                 }
                 string pass = PasswordHash.CreateHash(pw);

@@ -21,10 +21,10 @@ namespace WhoNeedsHelp
         void SendQuestion(string question);
         void UpdateQuestion(string questionText, int questionId, int channelId);
         void ReloadPage();
-        void SendChatMessage(string text, string author, string messageId, bool sender, bool appendToLast, bool canEdit);
+        void SendChatMessage(SimpleChatMessage message, int channelId);
         void SendChatMessages(string[] text, string[] author, string[] messageIds, bool[] sender, bool[] appendToLast, bool[] canEdit);
         void CheckVersion(int version);
-        void RemoveChatMessage(string messageId);
+        void RemoveChatMessage(int messageId);
         void IpDiscover(string[] channelIds, string[] channelNames);
         void ClearChat();
         void LoginSuccess();

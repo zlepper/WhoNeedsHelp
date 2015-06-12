@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!--<!DOCTYPE html>-->
 <html lang="dk" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -36,36 +36,6 @@
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
     <div class="container">
-        <!--Create User hidden content-->
-        <div style="display: none;" id="createUserContent">
-            <div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
-            <div class="alert alert-success" role="alert" style="display: none;" id="userCreationSuccess">
-                <strong>Tillykke!</strong> Din bruger er nu oprettet!
-            </div>
-            <form onsubmit=" return false; " id="createUserForm">
-                <div class="form-group">
-                    <label for="CreateUserName">Navn</label>
-                    <input required="required" type="text" class="form-control" id="CreateUserName" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserEmail">Email</label>
-                    <input required="required" type="email" class="form-control" id="CreateUserEmail" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserPw">Kodeord</label>
-                    <input required="required" type="password" class="form-control" id="CreateUserPw" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserPwConfirm">Gentag kodeord</label>
-                    <input required="required" type="password" class="form-control" id="CreateUserPwConfirm" />
-                </div>
-                <button class="btn btn-primary" type="submit">Opret</button>
-            </form>
-        </div>
-        <!--Create User hidden title-->
-        <div style="display: none;" id="createUserTitle">
-            Opret Bruger
-        </div>
         <!--login hidden content-->
         <div style="display: none;" id="loginUserContent">
             <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessage">Ugyldigt email eller kodeord</div>
@@ -123,10 +93,22 @@
                                     <p class="navbar-text">Navn: <span ng-if="!Me.Name">Navn endnu ikke valgt</span><span ng-if="Me.Name">{{Me.Name}}</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
                                 </li>
                                 <!--Should only be shown when the user is not logged in-->
-                                <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
-                                <li class="beta not-logged-in"><a id="LoginButton" href="#">Log in</a></li>
+                                <li ng-show="!Me.LoggedIn">
+                                    <button class="btn btn-default navbar-btn"
+                                            popover-append-to-body="true"
+                                            popover-template="createUserPopover.templateUrl"
+                                            popover-title="{{createUserPopover.title}}"
+                                            popover-placement="bottom">
+                                        Opret Bruger
+                                    </button>
+                                </li>
+                                <li ng-show="!Me.LoggedIn">
+                                    <button class="btn btn-default navbar-btn">Log in</button>
+                                </li>
                                 <!--Should only be shown when the user is logged in-->
-                                <li style="display: none;" class="beta logged-in"><a id="logoutButton" href="#">Log ud</a></li>
+                                <li ng-show="Me.LoggedIn">
+                                    <button class="btn btn-default navbar-btn" ng-click="logout()">Log ud</button>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -156,9 +138,9 @@
                                 <div class="form-group">
                                     <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                     <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
-                                           placeholder="Tilslut eller opret kanal" class="form-control" data-toggle="popover"
-                                           data-container="body" data-trigger="focus" title="Info"
-                                           data-content="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
+                                           placeholder="Tilslut eller opret kanal" class="form-control" popover-animation="true"
+                                           popover-append-to-body="true" popover-trigger="mouseenter"
+                                           popover="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 </div>
                                 <div class="form-group hidden">
                                     <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
@@ -236,28 +218,31 @@
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active fade in" id="chat">
                                 <ul class="chat">
-                                    <li class="clearfix" ng-repeat="(id, message) in Channels[ActiveChannel].ChatMessages" ng-class="right: message.User.Id == Me.Id, left: message.User.Id != Me.Id">
+                                    <li class="clearfix" ng-repeat="(id, message) in Channels[ActiveChannel].ChatMessages | orderBy: 'id'" 
+                                        ng-class="{right: message.User.Id != Me.Id, left: message.User.Id == Me.Id}">
                                         <div class="chat-body clearfix">
                                             <div class="header">
                                                 <strong class="primary-font">
-                                                    {{message.User.Id}}
+                                                    {{message.User.Name}}
                                                 </strong>
                                             </div>
-                                            <p class="clearfix" id="26">
+                                            <p class="clearfix">
                                                 <button aria-label="luk" class="close" type="button"
-                                                        ng-if="Channels[ActiveChannel].IsAdmin"
+                                                        ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id"
                                                         ng-click="RemoveChatMessage(message.Id)">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
-                                            <p>{{message.Text}}</p>
+                                                <span>
+                                                    {{message.Text}}
+                                                </span>
                                             </p>
                                         </div>
                                     </li>
                                 </ul>
                                 <!--Chat input-->
-                                <form class="form" onsubmit=" return false; " id="chatForm">
+                                <form class="form" onsubmit=" return false; " ng-submit="Chat()">
                                     <div class="form-group">
-                                        <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control" />
+                                        <input type="text" ng-model="Channels[ActiveChannel].MessageText" placeholder="Chat" class="form-control" />
                                     </div>
                                 </form>
                                 <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>

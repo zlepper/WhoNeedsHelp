@@ -87,6 +87,44 @@ var Help;
         ServerActions.prototype.changeQuestion = function (questionText, channelId) {
             return this.helper.server.changeQuestion(questionText, channelId);
         };
+        ServerActions.prototype.showNotification = function (typ, text, title) {
+            var notice = new PNotify({
+                title: title,
+                text: text,
+                type: typ,
+                animation: "show",
+                styling: "fontawesome",
+                mouse_reset: false,
+                desktop: {
+                    desktop: document.hidden
+                }
+            });
+            notice.elem.click(function () {
+                notice.remove();
+            });
+        };
+        ServerActions.prototype.confirm = function (text, title, callback) {
+            var notice = new PNotify({
+                title: title,
+                text: text,
+                icon: "glyphicon glyphicon-question-sign",
+                mouse_reset: false,
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            });
+            notice.elem.on("pnotify.confirm", function () {
+                callback();
+            }).on("pnotify.cancel", function () { return false; });
+        };
         return ServerActions;
     })();
     Help.ServerActions = ServerActions;
@@ -103,16 +141,21 @@ var Help;
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
+            $scope.createUserOptions = new LoginOptions();
             this.helper = $.connection.centralHub;
-            //var that = this;
+            var that = this;
+            $scope.createUserPopover = {
+                templateUrl: "/templates/createUserPopover.html",
+                title: "Opret bruger"
+            };
             $scope.LoginModalOptions = {
-                templateUrl: "/startModal.html",
+                templateUrl: "/templates/startModal.html",
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
             };
             $scope.changeQuestionModalOptions = {
-                templateUrl: "/editQuestionModal.html",
+                templateUrl: "/templates/editQuestionModal.html",
                 scope: $scope,
                 keyboard: false,
                 backdrop: "static"
@@ -137,7 +180,9 @@ var Help;
                 $scope.$apply();
             });
             $scope.exitChannel = function (channelid) {
-                _this.exitChannel(channelid);
+                _this.confirm("Are du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", function () {
+                    that.exitChannel(channelid);
+                });
             };
             $scope.CreateNewChannel = function (channelName) {
                 if (isNaN(Number(channelName))) {
@@ -154,7 +199,6 @@ var Help;
                 _this.requestHelp(qt, $scope.ActiveChannel);
             };
             $scope.RemoveQuestion = function (questionid) {
-                console.log("Called " + questionid);
                 _this.removeQuestion(questionid);
             };
             $scope.RemoveOwnQuestion = function () {
@@ -193,11 +237,9 @@ var Help;
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.removeQuestion = function (questionid) {
-                console.log("Removing question with id: " + questionid);
                 for (var channelid in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(channelid)) {
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
-                            console.log("Removing from channel with id: " + channelid);
                             delete $scope.Channels[channelid].Questions[questionid];
                             console.log($scope.Channels[channelid]);
                         }
@@ -217,7 +259,6 @@ var Help;
             this.helper.client.updateQuestion = function (questionText, questionid, channelid) {
                 if ($scope.Channels[channelid] != null) {
                     if ($scope.Channels[channelid].Questions[questionid] != null) {
-                        console.log("Updated Question");
                         $scope.Channels[channelid].Questions[questionid].Text = questionText;
                     }
                 }
@@ -242,10 +283,62 @@ var Help;
                 }
             };
             $scope.RemoveUser = function (userid) {
-                _this.helper.server.removeUserFromChannel(userid, $scope.ActiveChannel);
+                _this.removeUserFromChannel(userid, $scope.ActiveChannel);
             };
             $scope.RemoveChatMessage = function (messageId) {
-                _this.helper.server.removeChatMessage(messageId);
+                console.log(messageId);
+                _this.removeChatMessage(messageId);
+            };
+            this.helper.client.removeChatMessage = function (messageId) {
+                for (var channel in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channel)) {
+                        var ch = $scope.Channels[channel];
+                        for (var chatMessage in ch.ChatMessages) {
+                            if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
+                                var id = Number(chatMessage);
+                                if (id === messageId) {
+                                    delete ch.ChatMessages[id];
+                                }
+                            }
+                        }
+                    }
+                }
+                $scope.$apply();
+            };
+            $scope.Chat = function () {
+                var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
+                if (mes) {
+                    _this.chat(mes, $scope.ActiveChannel);
+                }
+                $scope.Channels[$scope.ActiveChannel].MessageText = "";
+            };
+            this.helper.client.sendChatMessage = function (message, channelId) {
+                $scope.Channels[channelId].ChatMessages[message.Id] = message;
+                $scope.$apply();
+            };
+            this.helper.client.alert = function (message, heading, oftype) {
+                console.log("ALERT!");
+                _this.showNotification(oftype, message, heading);
+            };
+            $scope.createUser = function () {
+                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy || !$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                    return;
+                }
+                var email = $scope.createUserOptions.Email;
+                var pass = $scope.createUserOptions.Password;
+                var name = $scope.createUserOptions.Name;
+                // Simple checks to see if this is an email
+                if (email.indexOf("@") === 0 || email.indexOf("@") === email.length - 1 || email.indexOf(".") === 0 || email.indexOf(".") === email.length - 1) {
+                    return;
+                }
+                _this.createNewUser(name, email, pass);
+            };
+            this.helper.client.userCreationSuccess = function () {
+                $scope.Me.LoggedIn = true;
+                $scope.createUserOptions = new LoginOptions();
+                $scope.$apply();
+            };
+            $scope.logout = function () {
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal"];
@@ -308,6 +401,7 @@ var Help;
             this.Name = "";
             this.Email = "";
             this.Password = "";
+            this.Passwordcopy = "";
         }
         return LoginOptions;
     })();
