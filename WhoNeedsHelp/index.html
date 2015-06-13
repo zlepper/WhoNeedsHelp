@@ -3,8 +3,11 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Hvem behøver hjælp</title>
-    <link rel="stylesheet" href="Content/bootstrap.min.css" />
-    <link rel="stylesheet" href="custom.css" />
+    <link rel="stylesheet" href="Content/bootstrap.min.css"/>
+    <link rel="stylesheet" href="Content/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="Content/animate.min.css" />
+    <link rel="stylesheet" href="custom.css"/>
+    <link rel="stylesheet" href="Content/perfect-scrollbar.min.css"/>
     <script src="Scripts/analytics.js"></script>
     <!--Script references. -->
     <!--Reference the jQuery library. -->
@@ -30,44 +33,15 @@
     <script type="text/javascript" src="helper.js"></script>
     <script type="text/javascript" src="loading.js"></script>
     <link href="loading.css" type="text/css" rel="stylesheet" />
+    <script>
+        Notification.requestPermission();
+    </script>
 
 
 
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
     <div class="container">
-        <!--login hidden content-->
-        <div style="display: none;" id="loginUserContent">
-            <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessage">Ugyldigt email eller kodeord</div>
-            <form onsubmit="return false;" id="loginUserForm">
-                <div class="form-group">
-                    <label for="LoginUserEmail">Email</label>
-                    <input required="required" type="email" class="form-control" id="LoginUserEmail" />
-                </div>
-                <div class="form-group">
-                    <label for="LoginUserPassword">Kodeord</label>
-                    <input type="password" required="required" class="form-control" id="LoginUserPassword" />
-                </div>
-                <button class="btn btn-primary" type="submit">Login</button>
-            </form>
-        </div>
-        <!--login hidden title-->
-        <div style="display: none;" id="loginUserTitle">
-            Login
-        </div>
-        <!--Change username title-->
-        <div style="display: none;" id="changeUsernameTitle">
-            Skift brugernavn
-        </div>
-        <div id="changeusernameContent" style="display: none;">
-            <form onsubmit="return false;" id="changeusernameForm">
-                <div class="form-group">
-                    <label for="changeusernameInput">Brugernavn</label>
-                    <input required="required" type="text" class="form-control" id="changeusernameInput" />
-                </div>
-                <button class="btn btn-primary" type="submit">Skift</button>
-            </form>
-        </div>
         <div ng-show="!loading">
             <div class="row">
                 <nav class="navbar navbar-default">
@@ -90,11 +64,27 @@
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <p class="navbar-text">Navn: <span ng-if="!Me.Name">Navn endnu ikke valgt</span><span ng-if="Me.Name">{{Me.Name}}</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
+                                    <p class="navbar-text">
+                                        Navn:
+                                        <span ng-if="!Me.Name">Navn endnu ikke valgt</span>
+                                        <span ng-if="Me.Name">
+                                            {{Me.Name}} {{Me.Id}}
+                                            <span aria-hidden="true"
+                                                  class="glyphicon glyphicon-pencil close"
+                                                  id="editUsername"
+                                                  popover-trigger="click"
+                                                  popover-append-to-body="true"
+                                                  popover-template="changeUsernamePopover.templateUrl"
+                                                  popover-title="{{changeUsernamePopover.title}}"
+                                                  popover-placement="bottom"></span>
+                                        </span>
+
+                                    </p>
                                 </li>
                                 <!--Should only be shown when the user is not logged in-->
                                 <li ng-show="!Me.LoggedIn">
-                                    <button class="btn btn-default navbar-btn"
+                                    <button id="createUserBtn" class="btn btn-default navbar-btn"
+                                            popover-trigger="click"
                                             popover-append-to-body="true"
                                             popover-template="createUserPopover.templateUrl"
                                             popover-title="{{createUserPopover.title}}"
@@ -103,7 +93,14 @@
                                     </button>
                                 </li>
                                 <li ng-show="!Me.LoggedIn">
-                                    <button class="btn btn-default navbar-btn">Log in</button>
+                                    <button id="loginBtn" class="btn btn-default navbar-btn"
+                                            popover-trigger="click"
+                                            popover-append-to-body="true"
+                                            popover-template="loginUserPopover.templateUrl"
+                                            popover-title="{{loginUserPopover.title}}"
+                                            popover-placement="bottom">
+                                        Log in
+                                    </button>
                                 </li>
                                 <!--Should only be shown when the user is logged in-->
                                 <li ng-show="Me.LoggedIn">
@@ -122,13 +119,17 @@
                         </div>
                         <div class="panel-body">
                             <div class="list-group ChannelList" id="ChannelList">
-                                <!--Current channels will appear here-->
-                                <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#"
-                                   ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
-                                    <span class="glyphicon glyphicon-remove close" ng-click="exitChannel(channel.Id)"></span>
-                                    <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
-                                    {{channel.ChannelName}}
-                                </a>
+                                <div class="wrapper">
+                                    <inner class="box">
+                                        <!--Current channels will appear here-->
+                                        <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#"
+                                           ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
+                                            <span class="glyphicon glyphicon-remove close" ng-click="exitChannel(channel.Id)"></span>
+                                            <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
+                                            {{channel.ChannelName}}
+                                        </a>
+                                    </inner>
+                                </div>
                             </div>
                         </div>
 
@@ -138,9 +139,11 @@
                                 <div class="form-group">
                                     <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                     <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
-                                           placeholder="Tilslut eller opret kanal" class="form-control" popover-animation="true"
-                                           popover-append-to-body="true" popover-trigger="mouseenter"
-                                           popover="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
+                                           placeholder="Tilslut eller opret kanal" class="form-control"
+                                           tooltip-placement="top"
+                                           tooltip-trigger="mouseenter"
+                                           tooltip-enable="!newChannelName && (Channels | keylength) == 0"
+                                           tooltip="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 </div>
                                 <div class="form-group hidden">
                                     <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
@@ -148,19 +151,6 @@
                             </form>
                         </div>
                     </div>
-                    <!--<div class="panel panel-primary" id="ip-discovery-panel">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a>
-                            </h3>
-
-                        </div>
-                        <div class="panel-body">
-                            <div class="list-group ChannelList joinChannel" id="ip-discovery">
-
-                            </div>
-                        </div>
-                    </div>-->
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-primary">
@@ -168,19 +158,23 @@
                             <h3 class="panel-title">Hj&aelig;lpeliste</h3>
                         </div>
                         <div class="panel-body" id="HelpList">
-                            <!--Help panels will appear here-->
-                            <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
-                                <div class="panel-heading">
-                                    <button aria-label="Fjern spørgsmål" class="close"
-                                            type="button" ng-click="RemoveQuestion(question.Id)"
-                                            ng-if="Channels[ActiveChannel].IsAdmin">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h3 class="panel-title">{{question.User.Name}}</h3>
-                                </div>
-                                <div class="panel-body" ng-if="question.Text">
-                                    {{question.Text}}
-                                </div>
+                            <div class="wrapper">
+                                <inner class="box">
+                                    <!--Help panels will appear here-->
+                                    <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
+                                        <div class="panel-heading">
+                                            <button aria-label="Fjern spørgsmål" class="close"
+                                                    type="button" ng-click="RemoveQuestion(question.Id)"
+                                                    ng-if="Channels[ActiveChannel].IsAdmin">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h3 class="panel-title">{{question.User.Name}}</h3>
+                                        </div>
+                                        <div class="panel-body" ng-if="question.Text">
+                                            {{question.Text}}
+                                        </div>
+                                    </div>
+                                </inner>
                             </div>
                         </div>
                         <div class="panel-footer">
@@ -218,7 +212,7 @@
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active fade in" id="chat">
                                 <ul class="chat">
-                                    <li class="clearfix" ng-repeat="(id, message) in Channels[ActiveChannel].ChatMessages | orderBy: 'id'" 
+                                    <li class="clearfix" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'"
                                         ng-class="{right: message.User.Id != Me.Id, left: message.User.Id == Me.Id}">
                                         <div class="chat-body clearfix">
                                             <div class="header">
@@ -245,7 +239,7 @@
                                         <input type="text" ng-model="Channels[ActiveChannel].MessageText" placeholder="Chat" class="form-control" />
                                     </div>
                                 </form>
-                                <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
+                                <button class="btn btn-danger" id="ClearChatButton" ng-click="ClearChat()">Ryd chat</button>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">

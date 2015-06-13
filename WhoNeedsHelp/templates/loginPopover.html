@@ -1,0 +1,11 @@
+﻿<form onsubmit="return false;" id="loginUserForm" ng-submit="login()">
+    <div class="form-group">
+        <label for="LoginUserEmail">Email</label>
+        <input required="required" type="email" class="form-control" id="LoginUserEmail" ng-model="StartingModal.Email" />
+    </div>
+    <div class="form-group">
+        <label for="LoginUserPassword">Kodeord</label>
+        <input type="password" required="required" class="form-control" id="LoginUserPassword" ng-model="StartingModal.Password" />
+    </div>
+    <button class="btn btn-primary" type="submit">Login</button>
+</form>

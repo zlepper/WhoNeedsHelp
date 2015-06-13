@@ -3,27 +3,24 @@
 </div>
 <div class="modal-body">
     <h2>Brug uden login</h2>
-    <form onsubmit=" return false; " id="usernameModalForm">
+    <form onsubmit=" return false; " id="usernameModalForm" ng-submit="Start()">
         <div class="form-group" id="usernameGroup">
             <label for="usernameModalInput">Navn</label>
-            <input type="text" class="form-control" id="usernameModalInput" ng-model="StartingModal.Name" />
+            <input type="text" class="form-control" id="usernameModalInput" ng-model="StartingModal.Name" required="required"/>
         </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary" id="selectUsernameButton" ng-click="Start()">Start</button>
-        </div>
+        <input type="submit" class="btn btn-primary" id="selectUsernameButton" value="Start" />
     </form>
     <hr />
     <h2>Login</h2>
-    <form onsubmit="return false;" id="loginUserFormModal">
-        <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
+    <form onsubmit="return false;" id="loginUserFormModal" ng-submit="login()">
         <div class="form-group">
             <label for="LoginUserEmailModal">Email</label>
-            <input required="required" type="email" class="form-control" id="LoginUserEmailModal" ng-model="StartingModal.Email" />
+            <input type="email" class="form-control" id="LoginUserEmailModal" ng-model="StartingModal.Email" />
         </div>
         <div class="form-group">
             <label for="LoginUserPasswordModal">Kodeord</label>
-            <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" ng-model="StartingModal.Password" />
+            <input type="password" class="form-control" id="LoginUserPasswordModal" ng-model="StartingModal.Password" />
         </div>
-        <button class="btn btn-primary" type="submit" ng-click="loginFromModal">Login</button>
+        <input class="btn btn-primary" type="submit" value="Login"/>
     </form>
 </div>

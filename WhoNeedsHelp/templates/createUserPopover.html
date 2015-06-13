@@ -1,8 +1,4 @@
-﻿<div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
-<div class="alert alert-success" role="alert" style="display: none;" id="userCreationSuccess">
-    <strong>Tillykke!</strong> Din bruger er nu oprettet!
-</div>
-<form onsubmit=" return false; " id="createUserForm" name="createUserForm" ng-init="createUserOptions.Name = Me.Name" ng-submit="createUser()">
+﻿<form onsubmit=" return false; " id="createUserForm" name="createUserForm" ng-init="createUserOptions.Name = Me.Name" ng-submit="createUser()">
     <div class="form-group">
         <label for="CreateUserName">Navn</label>
         <input name="CreateUserName" id="CreateUserName" required="required" type="text" class="form-control" ng-model="createUserOptions.Name" />

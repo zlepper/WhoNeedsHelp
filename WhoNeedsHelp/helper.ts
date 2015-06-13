@@ -29,14 +29,13 @@ interface ICentralClient {
     sendQuestion: (question: string) => void;
     updateQuestion: (question: string, questionId: number, channelId: number) => void;
     reloadPage: () => void;
-    //void SetQuestionState(bool hasQuestion, int channelid);
     setQuestionState: (hasQuestion: boolean, channelid: number) => void;
     sendChatMessage: (message: Help.ChatMessage, channelId: number) => void;
     sendChatMessages: (text: string[], author: string[], messageId: number[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
     removeChatMessage: (messageId: number) => void;
     ipDiscover: (channelIds: number[], channelNames: string[]) => void;
-    clearChat: () => void;
+    clearChat: (channelId: number) => void;
     loginSuccess: () => void;
     loginFailed: () => void;
     showChannels: (channelIds: number[], channelNames: string[]) => void;
@@ -53,6 +52,8 @@ interface ICentralClient {
     removeUser(id: number, channelId: number);
     alert: (message: string, title: string, t: string) => void;
     sendUserId: (id: number) => void;
+    updateOtherUsername: (name: string, userid: number, channelid: number) => void;
+    setAdminState: (channelId: number, isAdmin: boolean) => void;
 }
 
 interface ICentralServer {
@@ -68,7 +69,7 @@ interface ICentralServer {
     requestHelp(question: string, channelid: number): JQueryPromise<void>;
     changeQuestion(question: string, channelid: number): JQueryPromise<void>;
     chat(message: string, channelid: number): JQueryPromise<void>;
-    clearChat(): JQueryPromise<void>;
+    clearChat(channelId: number): JQueryPromise<void>;
     createNewUser(username: string, email: string, password: string): JQueryPromise<void>;
     requestActiveChannel(): JQueryPromise<void>;
     loginUser(mail: string, pass: string): JQueryPromise<void>;
@@ -90,7 +91,7 @@ module Help {
     import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
     import ModalService = angular.ui.bootstrap.IModalService;
     import ModalSettings = angular.ui.bootstrap.IModalSettings;
-    var app = angular.module("Help", ["ui.bootstrap"]);
+    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate"]);
 
     export interface IHelpScope extends ng.IScope {
         /**
@@ -168,6 +169,11 @@ module Help {
         createUserOptions: LoginOptions;
         createUser: () => void;
         logout: () => void;
+        loginUserPopover: PopoverOptions;
+        login: () => void;
+        lastActiveChannel: number;
+        changeUsernamePopover: PopoverOptions;
+        ClearChat: () => void;
     }
 
     export class ServerActions {
@@ -213,8 +219,8 @@ module Help {
             return this.helper.server.chat(message, channelid);
         }
 
-        clearChat(): JQueryPromise<void> {
-            return this.helper.server.clearChat();
+        clearChat(channelId: number): JQueryPromise<void> {
+            return this.helper.server.clearChat(channelId);
         }
 
         createNewUser(username: string, email: string, password: string): JQueryPromise<void> {
@@ -252,7 +258,7 @@ module Help {
         changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
             return this.helper.server.changeQuestion(questionText, channelId);
         }
-        showNotification(typ: string, text: string, title: string) {
+        alert(typ: string, text: string, title: string) {
             var notice = new PNotify({
                 title: title,
                 text: text,
@@ -294,9 +300,9 @@ module Help {
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", "$modal"];
+        static $inject = ["$scope", "$modal", "$timeout"];
 
-        constructor(public $scope: IHelpScope, public $Modal: ModalService) {
+        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any) {
             super();
             $scope.Loading = true;
             $scope.StartingModal = new LoginOptions();
@@ -304,13 +310,27 @@ module Help {
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
-            $scope.createUserOptions = new LoginOptions(); 
+            $scope.createUserOptions = $scope.StartingModal;
+            $scope.lastActiveChannel = 0;
             this.helper = $.connection.centralHub;
             var that = this;
+
+            $scope.$watch("ActiveChannel", (newValue, oldValue) => {
+                $scope.lastActiveChannel = oldValue;
+            });
+
+            $scope.changeUsernamePopover = {
+                templateUrl: "/templates/changeUsernamePopover.html",
+                title: "Skift brugernavn"
+            }
             $scope.createUserPopover = {
                 templateUrl: "/templates/createUserPopover.html",
                 title: "Opret bruger"
             };
+            $scope.loginUserPopover = {
+                templateUrl: "/templates/loginPopover.html",
+                title: "Login"
+            }
             $scope.LoginModalOptions = {
                 templateUrl: "/templates/startModal.html",
                 scope: $scope,
@@ -332,13 +352,20 @@ module Help {
                 var n = name.match(patt);
                 if (n.length > 0) {
                     this.setUsername(n[0]);
+                    if ($scope.LoginModal) {
+                        $scope.Ready = true;
+                        $scope.LoginModal.close();
+                        $scope.LoginModal = null;
+                    } else {
+                        $timeout(() => {
+                            jQuery("#editUsername").click();
+                        });
+                    }
+
                 }
-                $scope.Ready = true;
-                $scope.LoginModal.close();
             };
             $.connection.hub.start().done(() => {
                 $scope.Loading = false;
-                console.log($scope.LoginModalOptions);
                 $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                 $scope.$apply();
             });
@@ -358,7 +385,6 @@ module Help {
             };
             $scope.RequestHelp = () => {
                 var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
-                console.log($scope.Channels[$scope.ActiveChannel].Text);
                 this.requestHelp(qt, $scope.ActiveChannel);
             };
             $scope.RemoveQuestion = (questionid) => {
@@ -375,14 +401,28 @@ module Help {
                 $scope.$apply();
             };
             this.helper.client.updateUsername = (name) => {
-                $scope.Me.Name = name;
-                $scope.$apply();
+                $timeout(() => {
+                    $scope.Me.Name = name;
+                }, 0);
             };
             this.helper.client.sendUserId = (id) => {
-                $scope.Me.Id = id;
-                $scope.$apply();
+                $timeout(() => {
+                    $scope.Me.Id = id;
+                }, 0);
             }
             this.helper.client.appendChannel = (channel) => {
+                for (let questionId in channel.Questions) {
+                    if (channel.Questions.hasOwnProperty(questionId)) {
+                        var question = channel.Questions[questionId];
+                        question.User = channel.Users[question.User.Id];
+                    }
+                }
+                for (let chatMessageId in channel.ChatMessages) {
+                    if (channel.ChatMessages.hasOwnProperty(chatMessageId)) {
+                        var chatMessage = channel.ChatMessages[chatMessageId];
+                        chatMessage.User = channel.Users[chatMessage.User.Id];
+                    }
+                }
                 $scope.ActiveChannel = channel.Id;
                 $scope.Channels[channel.Id] = channel;
                 $scope.$apply();
@@ -390,20 +430,37 @@ module Help {
             };
             this.helper.client.exitChannel = (channelId) => {
                 delete $scope.Channels[channelId];
-                $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                if ($scope.ActiveChannel === channelId) {
+                    if ($scope.Channels[$scope.lastActiveChannel] != null) {
+                        $scope.ActiveChannel = $scope.lastActiveChannel;
+                    } else {
+                        if (Object.keys($scope.Channels).length > 0) {
+                            $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                        } else {
+                            $scope.ActiveChannel = 0;
+                            $scope.lastActiveChannel = 0;
+                        }
+                    }
+                }
                 $scope.$apply();
             };
             this.helper.client.addQuestion = (question, channelid) => {
+                question.User = $scope.Channels[channelid].Users[question.User.Id];
                 $scope.Channels[channelid].Questions[question.Id] = question;
                 $scope.$apply();
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                if ($scope.Channels[channelid].IsAdmin) {
+                    if (document.hidden) {
+                        this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? `
+Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
+                    }
+                }
             };
             this.helper.client.removeQuestion = (questionid: number) => {
                 for (let channelid in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(channelid)) {
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
                             delete $scope.Channels[channelid].Questions[questionid];
-                            console.log($scope.Channels[channelid]);
                         }
                     }
                 }
@@ -414,7 +471,6 @@ module Help {
                 $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
             };
             $scope.UpdateQuestion = () => {
-                console.log($scope.editQuestionText);
                 this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
                 $scope.changeQuestionModal.close();
             };
@@ -448,7 +504,6 @@ module Help {
                 this.removeUserFromChannel(userid, $scope.ActiveChannel);
             }
             $scope.RemoveChatMessage = (messageId) => {
-                console.log(messageId);
                 this.removeChatMessage(messageId);
             }
             this.helper.client.removeChatMessage = (messageId: number) => {
@@ -475,15 +530,20 @@ module Help {
                 $scope.Channels[$scope.ActiveChannel].MessageText = "";
             }
             this.helper.client.sendChatMessage = (message, channelId) => {
+                message.User = $scope.Channels[channelId].Users[message.User.Id];
                 $scope.Channels[channelId].ChatMessages[message.Id] = message;
                 $scope.$apply();
             }
             this.helper.client.alert = (message, heading, oftype) => {
-                console.log("ALERT!");
-                this.showNotification(oftype, message, heading);
+                this.alert(oftype, message, heading);
             }
             $scope.createUser = () => {
-                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy || !$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy) {
+                    this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
+                    return;
+                }
+                if (!$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                    this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
                     return;
                 }
                 var email = $scope.createUserOptions.Email;
@@ -496,16 +556,79 @@ module Help {
                 this.createNewUser(name, email, pass);
             }
             this.helper.client.userCreationSuccess = () => {
-                $scope.Me.LoggedIn = true;
-                $scope.createUserOptions = new LoginOptions();
-                $scope.$apply();
+                $("#createUserBtn").click();
+                setTimeout(() => {
+                    $scope.Me.LoggedIn = true;
+                    $scope.createUserOptions.Passwordcopy = "";
+                    $scope.createUserOptions.Password = "";
+                    $scope.$apply();
+                }, 1000);
+                this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
             }
             $scope.logout = () => {
-                
+                this.logoutUser();
+            }
+            this.helper.client.userLoggedOut = () => {
+                $scope.Me.LoggedIn = false;
+                for (let ch in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(ch)) {
+                        delete $scope.Channels[ch];
+                    }
+                }
+                $scope.setActiveChannel(0);
+                $scope.$apply();
+            }
+            $scope.login = () => {
+                if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {
+                    this.alert("error", "Manglende info", "Manglende info");
+                    return;
+                }
+                this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password);
+            }
+            function loginClear() {
+                $scope.Me.LoggedIn = true;
+                $scope.createUserOptions.Passwordcopy = "";
+                $scope.createUserOptions.Password = "";
+                $scope.$apply();
+            }
+            this.helper.client.loginSuccess = () => {
+                if ($scope.LoginModal) {
+                    $scope.LoginModal.close();
+                    $scope.LoginModal = null;
+                    loginClear();
+                } else {
+                    $("#loginBtn").click();
+                    setTimeout(loginClear(), 1000);
+                }
+                this.alert("success", "Du er nu logget ind.", "Login successfuld");
+            }
+            this.helper.client.updateOtherUsername = (name, userid, channelid) => {
+                $timeout(() => {
+                    $scope.Channels[channelid].Users[userid].Name = name;
+                });
+            }
+            this.helper.client.setAdminState = (channelId, isAdmin) => {
+                $timeout(() => {
+                    $scope.Channels[channelId].IsAdmin = isAdmin;
+                });
+            }
+            $scope.ClearChat = () => {
+                this.confirm("Er du sikker på at du vil ryde chatten?", "Bekræftelse nødvendigt", () => {
+                    this.clearChat($scope.ActiveChannel);
+                });
+            }
+            this.helper.client.clearChat = (channelId: number) => {
+                console.log("Called");
+                $timeout(() => {
+                    const chatMessages = $scope.Channels[channelId].ChatMessages;
+                    for (let chatMessageId in chatMessages) {
+                        if (chatMessages.hasOwnProperty(chatMessageId)) {
+                            delete chatMessages[chatMessageId];
+                        }
+                    }
+                });
             }
         }
-
-
     }
 
     app.controller("HelpCtrl", HelpCtrl);
@@ -514,7 +637,34 @@ module Help {
             throw Error("Usage of non-objects with keylength filter!!");
         }
         return Object.keys(input).length;
-    });
+    }).filter("toArray", () => obj => {
+        if (!(obj instanceof Object)) {
+            return obj;
+        }
+
+        return Object.keys(obj).map(key => Object.defineProperty(obj[key], "$key", { __proto__: null, value: key }));
+    });;
+
+    app.directive("wrapper", [
+
+        () => {
+            return {
+                restrict: "C",
+                link(scope, element) {
+
+                    var innerElement = element.find("inner");
+
+                    scope.$watch(
+                        () => {
+                            return innerElement[0].offsetHeight;
+                        },
+                        (value) => {
+                            element.css("height", value + "px");
+                        }, true);
+                }
+            };
+        }
+    ]);
 
     export enum QuestionState {
         HaveQuestion,
@@ -525,6 +675,7 @@ module Help {
         Id: number;
         User: User;
         Text: string;
+        Class: string;
 
         constructor(id: number, user: User, questionText: string) {
             this.Id = id;
@@ -575,7 +726,7 @@ module Help {
     export class ChatMessage {
         Id: number;
         Text: string;
-        Author: User;
+        User: User;
     }
 
     export class LoginOptions {

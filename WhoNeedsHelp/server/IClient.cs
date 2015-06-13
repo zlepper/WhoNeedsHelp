@@ -26,7 +26,7 @@ namespace WhoNeedsHelp
         void CheckVersion(int version);
         void RemoveChatMessage(int messageId);
         void IpDiscover(string[] channelIds, string[] channelNames);
-        void ClearChat();
+        void ClearChat(int channelId);
         void LoginSuccess();
         void LoginFailed();
         void ShowChannels(string[] channelId, string[] channelName);
@@ -43,5 +43,7 @@ namespace WhoNeedsHelp
         void Alert(string message, string title, string type);
         void SetQuestionState(bool hasQuestion, int channelid);
         void SendUserId(int id);
+        void UpdateOtherUsername(string name, int userid, int channelid);
+        void SetAdminState(int id, bool isAdmin);
     }
 }
