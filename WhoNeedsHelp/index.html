@@ -1,11 +1,13 @@
-﻿<!DOCTYPE html>
+﻿<!--<!DOCTYPE html>-->
 <html lang="dk" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Hvem behøver hjælp</title>
     <link rel="stylesheet" href="Content/bootstrap.min.css"/>
     <link rel="stylesheet" href="Content/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="Content/animate.min.css" />
     <link rel="stylesheet" href="custom.css"/>
+    <link rel="stylesheet" href="Content/perfect-scrollbar.min.css"/>
     <script src="Scripts/analytics.js"></script>
     <!--Script references. -->
     <!--Reference the jQuery library. -->
@@ -23,140 +25,24 @@
     <script src="Scripts/pnotify.custom.min.js" type="text/javascript"></script>
     <link href="Content/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
     <!--Add script to update the page and send messages.-->
+    <script src="Scripts/angular.js"></script>
+    <script src="Scripts/angular-animate.js"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap.min.js"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="helper.js"></script>
     <script type="text/javascript" src="loading.js"></script>
     <link href="loading.css" type="text/css" rel="stylesheet" />
+    <script>
+        Notification.requestPermission();
+    </script>
 
 
 
 </head>
-<body>
+<body ng-app="Help" ng-controller="HelpCtrl">
     <div class="container">
-        <div data-backdrop="static" data-keyboard="false" class="modal fade" id="usernameModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Velkommen</h4>
-                    </div>
-                    <div class="modal-body">
-                        <h2>Brug uden login</h2>
-                        <form onsubmit=" return false; " id="usernameModalForm">
-                            <div class="form-group" id="usernameGroup">
-                                <label for="usernameModal">Navn</label>
-                                <input type="text" class="form-control" id="usernameModalInput" onkeyup=" validate() " on />
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary" id="selectUsernameButton">Start</button>
-                            </div>
-                        </form>
-                        <hr />
-                        <h2>Login</h2>
-                        <form onsubmit="return false;" id="loginUserFormModal">
-                            <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessageModal">Ugyldigt email eller kodeord</div>
-                            <div class="form-group">
-                                <label for="LoginUserEmailModal">Email</label>
-                                <input required="required" type="email" class="form-control" id="LoginUserEmailModal" />
-                            </div>
-                            <div class="form-group">
-                                <label for="LoginUserPasswordModal">Kodeord</label>
-                                <input type="password" required="required" class="form-control" id="LoginUserPasswordModal" />
-                            </div>
-                            <button class="btn btn-primary" type="submit">Login</button>
-                        </form>
-                    </div>
-                    <div class="modal-footer beta" style="display: none;">
-                        <button type="button" class="btn btn-default" id="LoginFromModalButton">Log in</button>
-                    </div>
-                </div> <!--</modal-content>-->
-            </div> <!--</modal-dialog>-->
-        </div> <!--</modal>-->
-
-        <div class="modal fade" id="changeQuestionModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Rediger Spørgsmål</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form onsubmit=" return false; " id="newQuestionForm">
-                            <div class="form-group">
-                                <label class="sr-only" for="newQuestionText">Nyt spørgsmål tekst</label>
-                                <input type="text" class="form-control" id="newQuestionText" />
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Luk</button>
-                        <button id="newQuestionSubmit" type="button" class="btn btn-primary" value="Rediger">Rediger</button>
-                    </div>
-                </div> <!--</modal-content>-->
-            </div> <!--</modal-dialog>-->
-        </div> <!--</modal>-->
-        <!--Create User hidden content-->
-        <div style="display: none;" id="createUserContent">
-            <div class="alert alert-danger" role="alert" id="userCreationError" style="display: none;"></div>
-            <div class="alert alert-success" role="alert" style="display: none;" id="userCreationSuccess">
-                <strong>Tillykke!</strong> Din bruger er nu oprettet!
-            </div>
-            <form onsubmit=" return false; " id="createUserForm">
-                <div class="form-group">
-                    <label for="CreateUserName">Navn</label>
-                    <input required="required" type="text" class="form-control" id="CreateUserName" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserEmail">Email</label>
-                    <input required="required" type="email" class="form-control" id="CreateUserEmail" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserPw">Kodeord</label>
-                    <input required="required" type="password" class="form-control" id="CreateUserPw" />
-                </div>
-                <div class="form-group">
-                    <label for="CreateUserPwConfirm">Gentag kodeord</label>
-                    <input required="required" type="password" class="form-control" id="CreateUserPwConfirm" />
-                </div>
-                <button class="btn btn-primary" type="submit">Opret</button>
-            </form>
-        </div>
-        <!--Create User hidden title-->
-        <div style="display: none;" id="createUserTitle">
-            Opret Bruger
-        </div>
-        <!--login hidden content-->
-        <div style="display: none;" id="loginUserContent">
-            <div class="alert alert-danger" role="alert" style="display: none;" id="invalidLoginMessage">Ugyldigt email eller kodeord</div>
-            <form onsubmit="return false;" id="loginUserForm">
-                <div class="form-group">
-                    <label for="LoginUserEmail">Email</label>
-                    <input required="required" type="email" class="form-control" id="LoginUserEmail" />
-                </div>
-                <div class="form-group">
-                    <label for="LoginUserPassword">Kodeord</label>
-                    <input type="password" required="required" class="form-control" id="LoginUserPassword" />
-                </div>
-                <button class="btn btn-primary" type="submit">Login</button>
-            </form>
-        </div>
-        <!--login hidden title-->
-        <div style="display: none;" id="loginUserTitle">
-            Login
-        </div>
-        <!--Change username title-->
-        <div style="display: none;" id="changeUsernameTitle">
-            Skift brugernavn
-        </div>
-        <div id="changeusernameContent" style="display: none;">
-            <form onsubmit="return false;" id="changeusernameForm">
-                <div class="form-group">
-                    <label for="changeusernameInput">Brugernavn</label>
-                    <input required="required" type="text" class="form-control" id="changeusernameInput" />
-                </div>
-                <button class="btn btn-primary" type="submit">Skift</button>
-            </form>
-        </div>
-        <div id="interface" style="display: none;">
+        <div ng-show="!loading">
             <div class="row">
                 <nav class="navbar navbar-default">
                     <div class="container">
@@ -173,18 +59,53 @@
                         <div class="collapse navbar-collapse" id="navbar">
                             <ul class="nav navbar-nav">
                                 <li>
-                                    <p class="navbar-text">Nuværende kanal ID: <span id="CurrentChannelId">Ikke forbundet til nogen kanal</span></p>
+                                    <p class="navbar-text">Nuværende kanal ID: <span ng-if="!ActiveChannel">Ikke forbundet til nogen kanal</span><span ng-if="ActiveChannel">{{ActiveChannel}}</span></p>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li>
-                                    <p class="navbar-text">Navn: <span id="CurrentUserName">Navn endnu ikke valgt</span><span style="margin-left: 1em" aria-hidden="true" class="glyphicon glyphicon-pencil close" id="editUsername"></span></p>
+                                    <p class="navbar-text">
+                                        Navn:
+                                        <span ng-if="!Me.Name">Navn endnu ikke valgt</span>
+                                        <span ng-if="Me.Name">
+                                            {{Me.Name}} {{Me.Id}}
+                                            <span aria-hidden="true"
+                                                  class="glyphicon glyphicon-pencil close"
+                                                  id="editUsername"
+                                                  popover-trigger="click"
+                                                  popover-append-to-body="true"
+                                                  popover-template="changeUsernamePopover.templateUrl"
+                                                  popover-title="{{changeUsernamePopover.title}}"
+                                                  popover-placement="bottom"></span>
+                                        </span>
+
+                                    </p>
                                 </li>
                                 <!--Should only be shown when the user is not logged in-->
-                                <li class="beta not-logged-in"><a id="CreateUserButton" href="#">Opret Bruger</a></li>
-                                <li class="beta not-logged-in"><a id="LoginButton" href="#">Log in</a></li>
+                                <li ng-show="!Me.LoggedIn">
+                                    <button id="createUserBtn" class="btn btn-default navbar-btn"
+                                            popover-trigger="click"
+                                            popover-append-to-body="true"
+                                            popover-template="createUserPopover.templateUrl"
+                                            popover-title="{{createUserPopover.title}}"
+                                            popover-placement="bottom">
+                                        Opret Bruger
+                                    </button>
+                                </li>
+                                <li ng-show="!Me.LoggedIn">
+                                    <button id="loginBtn" class="btn btn-default navbar-btn"
+                                            popover-trigger="click"
+                                            popover-append-to-body="true"
+                                            popover-template="loginUserPopover.templateUrl"
+                                            popover-title="{{loginUserPopover.title}}"
+                                            popover-placement="bottom">
+                                        Log in
+                                    </button>
+                                </li>
                                 <!--Should only be shown when the user is logged in-->
-                                <li style="display: none;" class="beta logged-in"><a id="logoutButton" href="#">Log ud</a></li>
+                                <li ng-show="Me.LoggedIn">
+                                    <button class="btn btn-default navbar-btn" ng-click="logout()">Log ud</button>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -198,34 +119,36 @@
                         </div>
                         <div class="panel-body">
                             <div class="list-group ChannelList" id="ChannelList">
-                                <!--Current channels will appear here-->
+                                <div class="wrapper">
+                                    <inner class="box">
+                                        <!--Current channels will appear here-->
+                                        <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="list-group-item" href="#"
+                                           ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
+                                            <span class="glyphicon glyphicon-remove close" ng-click="exitChannel(channel.Id)"></span>
+                                            <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
+                                            {{channel.ChannelName}}
+                                        </a>
+                                    </inner>
+                                </div>
                             </div>
                         </div>
 
                         <div class="panel-footer">
                             <!--Create new channel form-->
-                            <form onsubmit=" return false; " class="form" id="CreateChannelForm">
+                            <form onsubmit=" return false; " class="form" id="CreateChannelForm" ng-submit="CreateNewChannel(newChannelName)">
                                 <div class="form-group">
                                     <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
-                                    <input pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName" placeholder="Tilslut eller opret kanal" class="form-control" data-toggle="popover" data-container="body" data-trigger="focus" title="Info" data-content="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
+                                    <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
+                                           placeholder="Tilslut eller opret kanal" class="form-control"
+                                           tooltip-placement="top"
+                                           tooltip-trigger="mouseenter"
+                                           tooltip-enable="!newChannelName && (Channels | keylength) == 0"
+                                           tooltip="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 </div>
                                 <div class="form-group hidden">
                                     <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                    <div class="panel panel-primary" id="ip-discovery-panel">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                Kanaler i nærheden<a href="#" id="reloadNearbyChannels" class="pull-right glyphicon glyphicon-refresh"></a>
-                            </h3>
-
-                        </div>
-                        <div class="panel-body">
-                            <div class="list-group ChannelList joinChannel" id="ip-discovery">
-
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -235,27 +158,47 @@
                             <h3 class="panel-title">Hj&aelig;lpeliste</h3>
                         </div>
                         <div class="panel-body" id="HelpList">
-                            <!--Help panels will appear here-->
+                            <div class="wrapper">
+                                <inner class="box">
+                                    <!--Help panels will appear here-->
+                                    <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
+                                        <div class="panel-heading">
+                                            <button aria-label="Fjern spørgsmål" class="close"
+                                                    type="button" ng-click="RemoveQuestion(question.Id)"
+                                                    ng-if="Channels[ActiveChannel].IsAdmin">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h3 class="panel-title">{{question.User.Name}}</h3>
+                                        </div>
+                                        <div class="panel-body" ng-if="question.Text">
+                                            {{question.Text}}
+                                        </div>
+                                    </div>
+                                </inner>
+                            </div>
                         </div>
                         <div class="panel-footer">
-                            <form style="display: none;" class="form-inline" id="requestHelpForm" onsubmit=" return false; ">
+
+                            <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
                                 <div class="form-group">
-                                    <label for="question"></label>
-                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control"/>
+                                    <label class="sr-only" for="question">Spørgsmåls Tekst</label>
+                                    <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].Text" />
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Efterspørg hjælp</button>
-                                </div>
-                            </form>
-                            <form style="display: none;" class="form-inline" id="requestingHelp" onsubmit=" return false; ">
-                                <div class="form-group">
-                                    <button id="removeQuestion" type="button" class="btn btn-danger">Fjern Spørgsmål</button>
-                                </div>
-                                <div class="form-group">
-                                    <button id="editQuestion" type="button" class="btn btn-primary">Rediger Spørgsmål</button>
+                                    <input type="submit" class="btn btn-primary" value="Efterspørg hjælp" />
                                 </div>
                             </form>
-                            <p id="noChannelsSelected">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+
+                            <form class="form-inline" id="requestingHelp" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-danger" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
+                                </div>
+                            </form>
+
+                            <p id="noChannelsSelected" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
                         </div>
                     </div>
                 </div>
@@ -268,71 +211,86 @@
                         </ul>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active fade in" id="chat">
-                                <!--<div class="panel panel-primary">-->
-                                    <!--<div class="panel-heading">
-                                        <h3 class="panel-title">
-                                            <span class="pull-left glyphicon glyphicon-comment"></span> Chat
-                                        </h3>
-                                    </div>-->
-                                    <!--<div class="panel-body">-->
-                                        <ul class="chat"></ul>
-                                    <!--</div>-->
-                                    <!--Chat input-->
-                                    <!--<div class="panel-footer">-->
-                                        <form class="form" onsubmit=" return false; " id="chatForm">
-                                            <div class="form-group">
-                                                <input type="text" id="chatMessageInput" placeholder="Chat" class="form-control"/>
+                                <ul class="chat">
+                                    <li class="clearfix" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'"
+                                        ng-class="{right: message.User.Id != Me.Id, left: message.User.Id == Me.Id}">
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <strong class="primary-font">
+                                                    {{message.User.Name}}
+                                                </strong>
                                             </div>
-                                        </form>
-                                        <button class="btn btn-danger" id="ClearChatButton">Ryd chat</button>
-                                    <!--</div>
-                                </div>-->
+                                            <p class="clearfix">
+                                                <button aria-label="luk" class="close" type="button"
+                                                        ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id"
+                                                        ng-click="RemoveChatMessage(message.Id)">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <span>
+                                                    {{message.Text}}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <!--Chat input-->
+                                <form class="form" onsubmit=" return false; " ng-submit="Chat()">
+                                    <div class="form-group">
+                                        <input type="text" ng-model="Channels[ActiveChannel].MessageText" placeholder="Chat" class="form-control" />
+                                    </div>
+                                </form>
+                                <button class="btn btn-danger" id="ClearChatButton" ng-click="ClearChat()">Ryd chat</button>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="userlist">
                                 <div class="list-group" id="userlistlist">
-                                    
+                                    <div class="list-group-item" ng-repeat="(id, user) in Channels[ActiveChannel].Users">
+                                        {{user.Name}}
+                                        <button type="button" class="close" aria-label="luk" ng-if="Channels[ActiveChannel].IsAdmin" ng-click="RemoveUser(user.Id)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-                <footer>
-                    <p>&copy; Rasmus Hansen 2015</p>
-                    <p>
-                        Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
-                    </p>
-                </footer>
-            </div>
-            <div id="loadingAnimation">
-                <div class="loading">
-                    <div class="finger finger-1">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+            <footer>
+                <p>&copy; Rasmus Hansen 2015</p>
+                <p>
+                    Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
+                </p>
+            </footer>
+        </div>
+        <div id="loadingAnimation" ng-show="loading">
+            <div class="loading">
+                <div class="finger finger-1">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-2">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-2">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-3">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-3">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="finger finger-4">
-                        <div class="finger-item">
-                            <span></span><i></i>
-                        </div>
+                </div>
+                <div class="finger finger-4">
+                    <div class="finger-item">
+                        <span></span><i></i>
                     </div>
-                    <div class="last-finger">
-                        <div class="last-finger-item">
-                            <i></i>
-                        </div>
+                </div>
+                <div class="last-finger">
+                    <div class="last-finger-item">
+                        <i></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </body>
 </html>

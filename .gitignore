@@ -23,6 +23,7 @@ bld/
 [Oo]bj/
 WhoNeedsHelp/[Oo]bj/
 WhoNeedsHelp/[Bb]in/
+*.pdb
 
 # Visual Studo 2015 cache/options directory
 .vs/

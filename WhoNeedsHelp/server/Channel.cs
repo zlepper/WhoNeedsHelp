@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using WhoNeedsHelp.Simples;
 
 namespace WhoNeedsHelp.server
 {
@@ -72,7 +73,8 @@ namespace WhoNeedsHelp.server
 
         public bool IsUserAdministrator(User u)
         {
-            return Administrators.Contains(u);
+            bool ad = Administrators.Contains(u);
+            return ad;
         }
 
         public void AddAdministrator(User u)
@@ -162,6 +164,11 @@ namespace WhoNeedsHelp.server
             if (ReferenceEquals(this, o)) return true;
             if (o.GetType() != this.GetType()) return false;
             return Equals((Channel) o);
+        }
+
+        public SimpleChannel ToSimpleChannel()
+        {
+            return new SimpleChannel(Id);
         }
     }
 }

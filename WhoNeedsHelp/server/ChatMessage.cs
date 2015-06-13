@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 using WhoNeedsHelp.server;
+using WhoNeedsHelp.Simples;
 
 namespace WhoNeedsHelp
 {
@@ -27,6 +28,11 @@ namespace WhoNeedsHelp
             User = user;
             Channel = channel;
             Time = DateTime.Now;
+        }
+
+        public SimpleChatMessage ToSimpleChatMessage()
+        {
+            return new SimpleChatMessage(this.Id, this.Text, User.ToSimpleUser());
         }
     }
 }

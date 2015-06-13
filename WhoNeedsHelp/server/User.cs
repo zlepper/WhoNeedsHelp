@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Data;
-using System.Data.Entity;
+using WhoNeedsHelp.Simples;
 
 namespace WhoNeedsHelp.server
 {
@@ -48,19 +45,22 @@ namespace WhoNeedsHelp.server
             Connections = new List<Connection>();
         }
 
-        public Question RequestHelp(string question = null)
+        public Question RequestHelp(Channel ch, string question = null)
         {
-            if (Channel != null)
+            if (ch != null)
             {
-                bool help = Channel.RequestHelp(this);
-                if (!help) return null;
-                if(AreUserQuestioning(Channel))
-                    return null;
-                Question q = new Question(Channel, question, this);
-                //db.Questions.Add(q);
-                //Questions.Add(q);
-                //db.SaveChanges();
-                return q;
+                using (HelpContext db = new HelpContext())
+                {
+                    bool help = ch.RequestHelp(this);
+                    if (!help) return null;
+                    if (AreUserQuestioning(ch))
+                        return null;
+                    Question q = new Question(ch, question, this);
+                    //db.Questions.Add(q);
+                    //Questions.Add(q);
+                    //db.SaveChanges();
+                    return q;
+                }
             }
             return null;
         }
@@ -68,6 +68,11 @@ namespace WhoNeedsHelp.server
         public Question GetQuestion(Channel c)
         {
             return Questions.SingleOrDefault(q => q.Channel.Equals(c));
+        }
+
+        public Channel GetChannel(int channelId)
+        {
+            return ChannelsIn.SingleOrDefault(c => c.Id == channelId);
         }
 
         private void AskQuestion(Channel c, string question)
@@ -87,20 +92,13 @@ namespace WhoNeedsHelp.server
         /// </summary>
         /// <param name="c">The channel Guid to change question in</param>
         /// <param name="question">The question to change to</param>
-        /// <returns>true if the question was changed. false if the question was added</returns>
-        public bool UpdateQuestion(Channel c, string question)
+        /// <returns>Returns the question if it was edited</returns>
+        public Question UpdateQuestion(Channel c, string question)
         {
-            /*if (AreUserQuestioning(c))
-            {
-                return false;
-            }*/
-            Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(Channel));
-            if (q != null)
-            {
-                q.Text = question;
-                return true;
-            }
-            return false;
+            Question q = Questions.SingleOrDefault(qu => qu.Channel.Equals(c));
+            if (q == null) return null;
+            q.Text = question;
+            return q;
         }
 
         public void RemoveQuestion(Question q)
@@ -152,8 +150,13 @@ namespace WhoNeedsHelp.server
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((User) obj);
+        }
+
+        public SimpleUser ToSimpleUser()
+        {
+            return new SimpleUser(Id, Name);
         }
     }
 }

@@ -1,706 +1,745 @@
 ﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts" />
 /// <reference path="Scripts/typings/signalr/signalr.d.ts" />
-/// <reference path="Client/IServer.ts"/>
 /// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="Scripts/typings/jqueryui/jqueryui.d.ts"/>
 /// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
+/// <reference path="scripts/typings/angularjs/angular.d.ts" />
+/// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
+/// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 
-"use strict";
-// The pattern for the username
-var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
-
-// Make a connection to the correct hub
-// In this case the CentralHub which handles this application.
-var chat = $.connection.centralHub;
-var fetchTables;
-var createUserPopover: JQuery;
-var loginUserPopover: JQuery;
-var changeUsernamePopover: JQuery;
-var firstName: Boolean;
-var ready = false;
-firstName = false;
-PNotify.prototype.options.styling = "fontawesome";
-//var validate;
-
-function setUserName() {
-    var input = $("#usernameModalInput");
-    var name = input.val();
-    name = name.replace(/[\s]+/g, " ");
-    var n = name.match(patt);
-    chat.server.setUsername(n[0]);
-    $("#CurrentUserName").html(n[0]);
-    $("#usernameModal").modal("hide");
-    var id = getUrlParameter("id");
-    if (!isNullOrWhitespace(id)) {
-        chat.server.joinChannel(id);
-    }
-    ready = true;
-    return false;
+interface SignalR {
+    centralHub: ICentralHubProxy;
 }
 
-function getUrlParameter(sParam) {
-    var sPageUrl = window.location.search.substring(1);
-    var sUrlVariables = sPageUrl.split("&");
-    for (var i = 0; i < sUrlVariables.length; i++) {
-        var sParameterName = sUrlVariables[i].split("=");
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1];
-        }
-    }
-    return "";
+interface ICentralHubProxy {
+    client: ICentralClient;
+    server: ICentralServer;
 }
 
-function validate() {
-    var t = $("#usernameModalInput").val();
-    if (patt.test(t)) {
-        $("#usernameGroup").addClass("has-success").removeClass("has-error");
-    } else {
-        $("#usernameGroup").addClass("has-error").removeClass("has-success");
-    }
+interface ICentralClient {
+    appendChannel: (channel: Help.Channel) => void;
+    addQuestions: (questions: Help.Question[]) => void;
+    addQuestion: (question: Help.Question, channelid: number) => void;
+    userAreQuesting: () => void;
+    removeQuestion: (questionId: number) => void;
+    errorChannelAlreadyMade: () => void;
+    log: (text: string) => void;
+    exitChannel: (channelId: number) => void;
+    setChannel: (channel: number, areUserQuestioning: boolean) => void;
+    sendQuestion: (question: string) => void;
+    updateQuestion: (question: string, questionId: number, channelId: number) => void;
+    reloadPage: () => void;
+    setQuestionState: (hasQuestion: boolean, channelid: number) => void;
+    sendChatMessage: (message: Help.ChatMessage, channelId: number) => void;
+    sendChatMessages: (text: string[], author: string[], messageId: number[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
+    checkVersion: (version: number) => void;
+    removeChatMessage: (messageId: number) => void;
+    ipDiscover: (channelIds: number[], channelNames: string[]) => void;
+    clearChat: (channelId: number) => void;
+    loginSuccess: () => void;
+    loginFailed: () => void;
+    showChannels: (channelIds: number[], channelNames: string[]) => void;
+    userCreationFailed: (errorMessage: string) => void;
+    userCreationSuccess: () => void;
+    userLoggedOut: () => void;
+    appendChannel2: (channelname: string, channelid: number) => void;
+    updateUsername: (name: string) => void;
+    updateQuestionAuthorName: (name: string, id: number) => void;
+    updateChatMessageAuthorName: (name: string, ids: number[]) => void;
+    errorChat: (errorMessage: string) => void;
+    appendUsers(usernames: string[], userids: number[], isAdmin: boolean[]);
+    appendUser(user: Help.User, channelid: number);
+    removeUser(id: number, channelId: number);
+    alert: (message: string, title: string, t: string) => void;
+    sendUserId: (id: number) => void;
+    updateOtherUsername: (name: string, userid: number, channelid: number) => void;
+    setAdminState: (channelId: number, isAdmin: boolean) => void;
 }
 
-chat.client.log = text => {
-    console.log(text);
+interface ICentralServer {
+    send(action: string, parameters: string): JQueryPromise<void>;
+    getData(action: number): JQueryPromise<void>;
+    setUsername(name: string): JQueryPromise<void>;
+    createNewChannel(channelName: string): JQueryPromise<void>;
+    loadNearbyChannels(): JQueryPromise<void>;
+    exitChannel(channelId: number): JQueryPromise<void>;
+    joinChannel(channelId: number): JQueryPromise<void>;
+    removeQuestion(channelId: number): JQueryPromise<void>;
+    removeChatMessage(messageId: number): JQueryPromise<void>;
+    requestHelp(question: string, channelid: number): JQueryPromise<void>;
+    changeQuestion(question: string, channelid: number): JQueryPromise<void>;
+    chat(message: string, channelid: number): JQueryPromise<void>;
+    clearChat(channelId: number): JQueryPromise<void>;
+    createNewUser(username: string, email: string, password: string): JQueryPromise<void>;
+    requestActiveChannel(): JQueryPromise<void>;
+    loginUser(mail: string, pass: string): JQueryPromise<void>;
+    logoutUser(): JQueryPromise<void>;
+    removeUserFromChannel(userid: number, channelid: number): JQueryPromise<void>;
+    removeOwnQuestion(channelid: number): JQueryPromise<void>;
+    editOwnQuestion(channelId: number): JQueryPromise<void>;
 }
 
-chat.client.appendChannel = (channelname, channelid) => {
-    var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
-    var span2 = $("<span />").addClass("badge").text("0/0");
-    var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelid).addClass("list-group-item").text(channelname).prepend(span2).prepend(span1);
-    $("#ChannelList").append(html);
-    $("#ChannelList #" + channelid).show("slide", 400);
-    chat.server.changeToChannel(channelid);
-}
-
-chat.client.appendChannel2 = (channelname, channelid) => {
-    var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
-    var span2 = $("<span />").addClass("badge").text("0/0");
-    var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelid).addClass("list-group-item").text(channelname).prepend(span2).prepend(span1);
-    $("#ChannelList").append(html);
-    $("#ChannelList #" + channelid).show("slide", 400);
-}
-
-chat.client.setChannel = (channel, areUserQuestioning) => {
-    window.history.pushState({}, "Hvem behøver hjælp", "?id=" + channel);
-    $("#CurrentChannelId").html(channel);
-    $("div#ChannelList > a").stop().removeClass("active").attr("style", "");
-    setTimeout(() => {
-        $("#" + channel).addClass("active", 400);
-        //var t = $("#ChannelList #" + channel).text();
-    }, 100);
-    if (areUserQuestioning) {
-        setQuestionLayout(3);
-    } else {
-        setQuestionLayout(1);
-    }
-}
-
-chat.client.removeUser = (id) => {
-    $("#userlistlist #" + id).hide("blind", function () {
-        $(this).remove();
-    });
-}
-
-chat.client.updateChannelCount = (activeUsers, connectedUsers, channelId) => {
-    var badge = activeUsers + "/" + connectedUsers;
-    $("a#" + channelId + " .badge").html(badge);
-}
-
-chat.client.updateQuestion = (question, questionId) => {
-    var panel = $("#" + questionId + " .panel-body");
-    if (question === "") {
-        panel.hide("blind", function () {
-            $(this).remove();
-        });
-    } else {
-        if (panel.length > 0) {
-            panel.html(question);
-        } else {
-            var html = $("<div />").attr("style", "display: none;").addClass("panel-body").text(question);
-            $("#HelpList #" + questionId).append(html);
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-            $("#HelpList #" + questionId + " .panel-body").show("blind");
-        }
-    }
-}
-
-chat.client.showChannels = (channelIds, channelNames) => {
-    $("#ChannelList").empty();
-    for (var i = 0; i < channelIds.length; i++) {
-        var span1 = $("<span />").addClass("glyphicon glyphicon-remove close channel-remove");
-        var span2 = $("<span />").addClass("badge").text("0/0");
-        var html = $("<a />").attr("href", "#").attr("style", "display: none;").attr("id", channelIds[i]).addClass("list-group-item").text(channelNames[i]).prepend(span2).prepend(span1);
-        $("#ChannelList").append(html);
-        $("#ChannelList #" + channelIds[i]).show("slide", 400);
-    }
-    chat.server.requestActiveChannel();
-}
-
-chat.client.errorChannelAlreadyMade = () => {
-    alert("This channel already exists");
-}
-
-chat.client.sendQuestion = question => {
-    $("#newQuestionText").val(question);
-}
-
-chat.client.exitChannel = e => {
-    var tmpid = $("#ChannelList #" + e);
-    window.history.pushState({}, "Hvem behøver hjælp", "?");
-    tmpid.hide("slide", {}, 400,() => {
-        tmpid.remove();
-        var id = $("#ChannelList a:first-child").attr("id");
-        if (id == undefined) {
-            setQuestionLayout(2);
-            $(".chat").empty();
-            $("#CurrentChannelId").html("Ikke forbundet til nogen kanal");
-            $("#HelpList > div").hide("blind", {}, 400, function () {
-                $(this).remove();
-            });
-            $("#userlistlist > div").each(function (index) {
-                $(this).delay(index * 300).hide("blind", {}, 400, function () {
-                    $(this).remove();
-                });
-            });
-        } else {
-            chat.server.changeToChannel(id);
-        }
-    });
-}
-
-chat.client.ipDiscover = (ids, names) => {
-    var discoverElement = $("#ip-discovery");
-    discoverElement.empty();
-
-    for (var i = 0; i < ids.length; i++) {
-        var html = $("<a />");
-        html = html.attr("href", "#").attr("id", ids[i]).attr("class", "list-group-item").text(names[i]);
-        discoverElement.append(html);
-    }
-}
-
-chat.client.addQuestions = (usernames, questions, questionIds, admin) => {
-    var helpList = $("#HelpList");
-    helpList.empty();
-    for (var i = 0; i < questionIds.length; i++) {
-        var span: JQuery, button: JQuery = $();
-        if (admin) {
-            span = $("<span />").attr("aria-hidden", "true").html("&times;");
-            button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeBox").attr("aria-label", "luk").append(span);
-        }
-        var h3 = $("<h3 />").addClass("panel-title").text(usernames[i]).prop("outerHTML");
-        var heading = $("<div />").addClass("panel-heading").html(h3).prepend(button).prop("outerHTML");
-        var body: JQuery = $();
-        if (!isNullOrWhitespace(questions[i])) {
-            body = $("<div />").addClass("panel-body").text(questions[i]).prop("outerHTML");
-        }
-        var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionIds[i]).html(heading).append(body);
-        helpList.append(html);
-        var timeout = 200 * i;
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        setTimeout(showId(questionIds[i], timeout));
-    }
-}
-
-chat.client.addQuestion = (username, question, questionId, admin) => {
-    var helpList = $("#HelpList");
-    var span, button = $();
-    if (admin) {
-        span = $("<span />").attr("aria-hidden", "true").html("&times;");
-        button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeBox").attr("aria-label", "luk").html(span);
-    }
-    var h3 = $("<h3 />").addClass("panel-title").text(username).prop("outerHTML");
-    var heading = $("<div />").addClass("panel-heading").html(h3).prepend(button).prop("outerHTML");
-    var body = $();
-    if (!isNullOrWhitespace(question)) {
-        body = $("<div />").addClass("panel-body").text(question).prop("outerHTML");
-    }
-    var html = $("<div />").attr("style", "display: none;").addClass("panel panel-primary").attr("id", questionId).html(heading).append(body);
-    helpList.append(html);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-    $("#HelpList #" + questionId).show("blind");
-}
-
-chat.client.userAreQuesting = () => {
-    setQuestionLayout(3);
-}
-
-chat.client.removeQuestion = questionId => {
-    var element = $("#HelpList #" + questionId);
-    element.hide("blind",() => {
-        element.remove();
-    });
-}
-
-chat.client.reloadPage = () => {
-    location.reload(true);
-}
-
-chat.client.setLayout = layout => {
-    setQuestionLayout(layout);
-}
-
-chat.client.errorChat = (errorMessage) => {
-    var error: JQuery = $("<div />").addClass("alert alert-danger").attr("style", "display: none;").attr("role", "alert").attr("id", "chatFejl").text(errorMessage);
-    $(".chat").append(error);
-    $("#chatFejl").show("blind");
-}
-
-chat.client.sendChatMessage = (text, author, messageId, sender, appendToLast, canEdit) => {
-    var span, button = $();
-    if (canEdit) {
-        span = $("<span />").attr("aria-hidden", "true").html("&times;");
-        button = $("<button />").attr("type", "button").addClass("close").attr("id", "closeChatMessage").attr("aria-label", "luk").html(span);
-    }
-    var intter = $("<p />").text(text).prop("outerHTML");
-    var p: JQuery = $("<p />").html(intter).attr("id", messageId).prepend(button).addClass("clearfix");
-    if (appendToLast) {
-        var location: JQuery = $(".chat li:last-child > div");
-        location.append(p);
-    } else {
-        var strong: JQuery = $("<strong />").addClass("primary-font").text(author);
-        var header: JQuery = $("<div />").addClass("header").append(strong);
-        var chatBody = $("<div />").addClass("chat-body").addClass("clearfix").append(header).append(p);
-        var li: JQuery = $("<li />").addClass("clearfix").append(chatBody);
-        if (sender) {
-            li = li.addClass("left");
-        } else {
-            li = li.addClass("right");
-        }
-        $(".chat").append(li);
-    }
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-}
-
-chat.client.removeChatMessage = messageId => {
-    var message = $("#" + messageId);
-    var parent = message.parent();
-    message.remove();
-    if (parent.children().length <= 1) {
-        parent.parent().remove();
-    }
-}
-
-chat.client.sendChatMessages = (text, author, messageId, sender, appendToLast, canEdit) => {
-    $(".chat").empty();
-    for (var i = 0; i < text.length; i++) {
-        chat.client.sendChatMessage(text[i], author[i], messageId[i], sender[i], appendToLast[i], canEdit[i]);
-    }
-}
-
-chat.client.checkVersion = version => {
-    if (version !== 4) {
-        location.reload(true);
-    }
-}
-
-chat.client.clearChat = () => {
-    $(".chat").empty();
-}
-
-chat.client.userCreationFailed = (errorMessage) => {
-    var input = createUserPopover.find("#userCreationError");
-    input.text(errorMessage);
-    input.show("blind");
-}
-
-chat.client.userCreationSuccess = () => {
-    if (createUserPopover !== undefined)
-        createUserPopover.popover("hide");
-    showNotification("success", "Din bruger er nu oprettet", "Tillykke!");
-    setLoginState(1);
-}
-
-chat.client.loginFailed = () => {
-    if (ready) {
-        if (loginUserPopover === undefined) return;
-        loginUserPopover.find("#invalidLoginMessage").show("blind");
-    } else {
-        $("#invalidLoginMessageModal").show("blind");
-    }
-}
-
-chat.client.loginSuccess = () => {
-    if (ready) {
-        if (loginUserPopover === undefined) return;
-        loginUserPopover.popover("hide");
-    } else {
-        $("#usernameModal").modal("hide");
-        ready = true;
-    }
-    showNotification("success", "Du er nu logget ind", "Login succesfuld!");
-    setLoginState(1);
-
-}
-
-chat.client.userLoggedOut = () => {
-    setLoginState(2);
-    $("#ChannelList").empty();
-    $("#HelpList").empty();
-    setQuestionLayout(2);
-    $(".chat").empty();
-    showNotification("info", "Du er nu logget ud", "Logud succesfuld");
-}
-
-chat.client.updateUsername = (name) => {
-    $("#CurrentUserName").text(name);
-    if (firstName) {
-        showNotification("info", "Dit brugernavn er blevet ændret til: \"" + name + "\"", "Brugernavn ændret");
-    } else {
-        firstName = !firstName;
-    }
-}
-
-chat.client.updateQuestionAuthorName = (name, id) => {
-    var question = $("#HelpList #" + id);
-    question.find("h3.panel-title").text(name);
-}
-
-chat.client.updateChatMessageAuthorName = (name, ids) => {
-    var chatten = $(".chat");
-    for (var i = 0; i < ids.length; i++) {
-        var element = chatten.find("#" + ids[i]);
-        var parent = element.parent();
-        var strong = parent.find("strong");
-        strong.text(name);
-    }
-}
-
-chat.client.appendUser = (username, id, admin) => {
-    var ele = $("<div />").attr("style", "display: none;").addClass("list-group-item").text(username).attr("id", id);
-    if (admin) {
-        var span = $("<span />").attr("aria-hidden", "true").html("&times;");
-        var button = $("<button />").attr("type", "button").addClass("close").attr("id", "removeUserFromChannel").attr("aria-label", "Fjern").append(span);
-        ele.append(button);
-    }
-    $("#userlistlist").append(ele);
-    $("#userlistlist #" + id).show("blind");
-}
-
-chat.client.appendUsers = (usernames, ids, admin) => {
-    $("#userlistlist").empty();
-    var span = $("<span />").attr("aria-hidden", "true").html("&times;");
-    var button = $("<button />").attr("type", "button").addClass("close").attr("id", "removeUserFromChannel").attr("aria-label", "luk").append(span);
-    for (var i = 0; i < ids.length; i++) {
-        var ele = $("<div />").attr("style", "display: none;").addClass("list-group-item").text(usernames[i]).attr("id", ids[i]);
-        if (admin) {
-            ele.append(button);
-        }
-        $("#userlistlist").append(ele);
-        $("#userlistlist #" + ids[i]).show("blind");
-    }
-}
-
-chat.client.alert = (message, title, t) => {
-    showNotification(t, message, title);
-}
-
-function showNotification(typ: string, text: string, title: string) {
-    var notice = new PNotify({
-        title: title,
-        text: text,
-        type: typ,
-        animation: "show",
-        styling: "fontawesome",
-        mouse_reset: false
-    });
-    notice.elem.click(() => {
-        notice.remove();
-    });
-}
-function setQuestionLayout(layout: any) {
-    switch (layout) {
-        // Standard Layout
-        case 1:
-            $("#requestingHelp").hide();
-            $("#noChannelsSelected").hide();
-            $("#requestHelpForm").show();
-            break;
-        // No channel selected
-        case 2:
-            $("#requestingHelp").hide();
-            $("#noChannelsSelected").show();
-            $("#requestHelpForm").hide();
-            break;
-        // Have question in current channel
-        case 3:
-            $("#requestingHelp").show();
-            $("#noChannelsSelected").hide();
-            $("#requestHelpForm").hide();
-            break;
-        default:
-    }
-}
-
-function setLoginState(layout: Number) {
-    switch (layout) {
-        // Logged in
-        case 1:
-            $(".not-logged-in").hide();
-            $(".logged-in").show();
-            break;
-        case 2:
-            // Not logged in
-            $(".not-logged-in").show();
-            $(".logged-in").hide();
-            break;
-        default:
-    }
-}
-
-function enableBetaFunctions(pass: string) {
-    if (pass === "12345") {
-        $(".beta").show();
-        return "Success";
-    } else {
-        return "Failed";
-    }
-}
-
-function showId(id, timeout) {
-    jQuery("#" + id).delay(timeout).show("drop", { "direction": "up" });
-}
-
-function isNullOrWhitespace(input) {
+function isNullOrWhitespace(input: any) {
     if (typeof input === "undefined" || input == null) return true;
     return input.replace(/\s/g, "").length < 1;
 }
+var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
+function removeFromArray(arr: any, index: any) {
+    return arr.slice(0, index).concat(arr.slice(index + 1));
+}
+module Help {
+    import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
+    import ModalService = angular.ui.bootstrap.IModalService;
+    import ModalSettings = angular.ui.bootstrap.IModalSettings;
+    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate"]);
 
-$.connection.hub.start().done(() => {
-    chat.server.getData(2);
-    setInterval(() => {
-        chat.server.getData(2);
-    }, 1000 * 60 * 10);
-    // Show the get username modal
-    $("#loadingAnimation").hide("blind");
-    $("#interface").show("blind");
-    $("#usernameModal").modal("show");
-    $("#usernameModalInput").focus();
+    export interface IHelpScope extends ng.IScope {
+        /**
+         * The local user.
+         */
+        Me: Me;
+        /**
+         * The channels the local user are in.
+         */
+        Channels: { [id: number]: Channel };
+        /**
+         * Indicates if the signalr connection is ready.
+         */
+        Loading: boolean;
+        /**
+         * Indicates if the user has choosen a username yet.
+         */
+        Ready: boolean;
 
-    $(document).on("click", "span.channel-remove", function (e) {
-        e.preventDefault();
-        if (!confirm("Er du sikker på at du vil fjerne denne kanal?")) return;
-        var tmpid = $(this).parent().attr("id");
-        chat.server.exitChannel(tmpid);
-    });
+        /**
+         * The info from the first modal
+         */
+        StartingModal: LoginOptions;
+        /**
+         * Call to have the user login from the modal
+         * @returns {} 
+         */
+        LoginFromModal: () => void;
+        /**
+         * The instance of the first modal
+         */
+        LoginModal: ModalServiceInstance;
+        /**
+         * The configuration options for the first modal
+         */
+        LoginModalOptions: ModalSettings;
+        /**
+         * Starts the application with the selected username
+         * @returns {} 
+         */
+        Start: () => void;
 
-    $(document).on("click", "div.joinChannel > a", function (e) {
-        e.preventDefault();
-        var tmpid = $(this).attr("id");
-        chat.server.joinChannel(tmpid);
-        if ($(this).parent().attr("id") === "SearchChannelResults") {
-            $(this).hide("slide", {}, 400, function () {
-                $(this).remove();
+        /**
+         * The currently active channel id
+         */
+        ActiveChannel: number;
+
+        /**
+         * The result of IP-discover
+         */
+        DiscoveredIps: Channel[];
+        /**
+         * Finds a user with a specific ID
+         * @param id The id of the user to find
+         * @returns {} 
+         */
+        GetUser: (id: number) => User;
+        CreateNewChannel: (channelName: string) => void;
+        setActiveChannel: (channelid: number) => void;
+        exitChannel: (channelid: number) => void;
+        RequestHelp: () => void;
+        RemoveQuestion: (questionid: number) => void;
+        RemoveOwnQuestion: () => void;
+        EditOwnQuestion: () => void;
+        changeQuestionModalOptions: ModalSettings;
+        changeQuestionModal: ModalServiceInstance;
+        UpdateQuestion: () => void;
+        CloseEditModal: () => void;
+        editQuestionText: { text: string };
+        RemoveUser: (userid: number) => void;
+        newChannelName: string;
+        RemoveChatMessage: (messageId: number) => void;
+        Chat: () => void;
+        createUserPopover: PopoverOptions;
+        createUserOptions: LoginOptions;
+        createUser: () => void;
+        logout: () => void;
+        loginUserPopover: PopoverOptions;
+        login: () => void;
+        lastActiveChannel: number;
+        changeUsernamePopover: PopoverOptions;
+        ClearChat: () => void;
+    }
+
+    export class ServerActions {
+        helper: ICentralHubProxy;
+
+        send(action: string, parameters: string): JQueryPromise<void> {
+            return this.helper.server.send(action, parameters);
+        }
+
+        getData(action: number): JQueryPromise<void> {
+            return this.helper.server.getData(action);
+        }
+
+        setUsername(name: string): JQueryPromise<void> {
+            return this.helper.server.setUsername(name);
+        }
+
+        createNewChannel(channelName: string): JQueryPromise<void> {
+            return this.helper.server.createNewChannel(channelName);
+        }
+
+        loadHearbyChannels(): JQueryPromise<void> {
+            return this.helper.server.loadNearbyChannels();
+        }
+
+        exitChannel(channelId): JQueryPromise<void> {
+            return this.helper.server.exitChannel(channelId);
+        }
+
+        joinChannel(channelId: number): JQueryPromise<void> {
+            return this.helper.server.joinChannel(channelId);
+        }
+
+        removeQuestion(channelId: number): JQueryPromise<void> {
+            return this.helper.server.removeQuestion(channelId);
+        }
+
+        removeChatMessage(messageId: number): JQueryPromise<void> {
+            return this.helper.server.removeChatMessage(messageId);
+        }
+
+        chat(message: string, channelid: number): JQueryPromise<void> {
+            return this.helper.server.chat(message, channelid);
+        }
+
+        clearChat(channelId: number): JQueryPromise<void> {
+            return this.helper.server.clearChat(channelId);
+        }
+
+        createNewUser(username: string, email: string, password: string): JQueryPromise<void> {
+            return this.helper.server.createNewUser(username, email, password);
+        }
+
+        requestActiveChannel(): JQueryPromise<void> {
+            return this.helper.server.requestActiveChannel();
+        }
+
+        requestHelp(question: string, channelid: number): JQueryPromise<void> {
+            return this.helper.server.requestHelp(question, channelid);
+        }
+
+        loginUser(mail: string, pass: string): JQueryPromise<void> {
+            return this.helper.server.loginUser(mail, pass);
+        }
+
+        logoutUser(): JQueryPromise<void> {
+            return this.helper.server.logoutUser();
+        }
+
+        removeUserFromChannel(id: number, channelid: number): JQueryPromise<void> {
+            return this.helper.server.removeUserFromChannel(id, channelid);
+        }
+
+        removeOwnQuestion(channelid: number): JQueryPromise<void> {
+            return this.helper.server.removeOwnQuestion(channelid);
+        }
+
+        editOwnQuestion(channelId: number): JQueryPromise<void> {
+            return this.helper.server.editOwnQuestion(channelId);
+        }
+
+        changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
+            return this.helper.server.changeQuestion(questionText, channelId);
+        }
+        alert(typ: string, text: string, title: string) {
+            var notice = new PNotify({
+                title: title,
+                text: text,
+                type: typ,
+                animation: "show",
+                styling: "fontawesome",
+                mouse_reset: false,
+                desktop: {
+                    desktop: document.hidden
+                }
+            });
+            notice.elem.click(() => {
+                notice.remove();
             });
         }
-    });
-
-    $(document).on("click", "div#ChannelList > a", function (e) {
-        e.preventDefault();
-        var tmpid = $(this).attr("id");
-        chat.server.changeToChannel(tmpid);
-    });
-
-    $(document).on("click", "#closeBox", function (e) {
-        e.preventDefault();
-        var tmpid = $(this).parent().parent().attr("id");
-        chat.server.removeQuestion(tmpid);
-    });
-
-    $(document).on("click", "#closeChatMessage", function (e) {
-        e.preventDefault();
-        var tmpid = $(this).parent().attr("id");
-        chat.server.removeChatMessage(tmpid);
-    });
-
-    $(document).on("click", "#removeUserFromChannel", function (e) {
-        e.preventDefault();
-        var tmpid = $(this).parent().attr("id");
-        chat.server.removeUserFromChannel(tmpid);
-    });
-});
-
-$(document).ready(() => {
-    var removeFirstQuestion = () => {
-        var ele = $("#HelpList").children().first();
-        var id = ele.attr("id");
-        chat.server.removeQuestion(id);
-    };
-    $("#usernameModalForm").submit(() => {
-        setUserName();
-    });
-
-    $("#loginUserFormModal").submit((e) => {
-        e.preventDefault();
-        var mail = $("#LoginUserEmailModal").val();
-        var pass = $("#LoginUserPasswordModal").val();
-        if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
-        chat.server.loginUser(mail, pass);
-    });
-
-    $("#requestHelpForm").submit(() => {
-        var question: string = $("#question").val();
-        chat.server.requestHelp(question);
-        $("#question").val("");
-        setQuestionLayout(3);
-    });
-
-    $("#CreateChannelForm").submit(() => {
-        var channelName: string = $("#newChannelName").val();
-        if (isNaN(Number(channelName))) {
-            chat.server.createNewChannel(channelName);
-        } else {
-            chat.server.joinChannel(channelName);
+        confirm(text: string, title: string, callback: Function) {
+            var notice = new PNotify(<any>{
+                title: title,
+                text: text,
+                icon: "glyphicon glyphicon-question-sign",
+                mouse_reset: false,
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            });
+            notice.elem.on("pnotify.confirm", () => {
+                callback();
+            }).on("pnotify.cancel", () => false);
         }
-        $("#newChannelName").val("");
-        var pop = $("#newChannelName").attr("aria-describedby");
-        console.log(pop);
-        $("#" + pop).popover("hide");
-    });
+    }
 
-    $("#removeQuestion").click((e) => {
-        e.preventDefault();
-        chat.server.removeQuestion(null);
-        setQuestionLayout(1);
-    });
+    export class HelpCtrl extends ServerActions {
 
-    $("#editQuestion").click((e) => {
-        e.preventDefault();
-        $("#changeQuestionModal").modal("show");
-        $("#newQuestionText").focus();
-        chat.server.getData(1);
-    });
+        static $inject = ["$scope", "$modal", "$timeout"];
 
-    $("#newQuestionSubmit").click((e) => {
-        e.preventDefault();
-        var question = $("#newQuestionText").val();
-        chat.server.changeQuestion(question);
-        $("#changeQuestionModal").modal("hide");
-    });
+        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any) {
+            super();
+            $scope.Loading = true;
+            $scope.StartingModal = new LoginOptions();
+            $scope.Me = new Me();
+            $scope.Channels = {};
+            $scope.ActiveChannel = 0;
+            $scope.editQuestionText = { text: "" };
+            $scope.createUserOptions = $scope.StartingModal;
+            $scope.lastActiveChannel = 0;
+            this.helper = $.connection.centralHub;
+            var that = this;
 
-    $("#chatForm").submit(() => {
-        var message: string = $("#chatMessageInput").val();
-        if (!isNullOrWhitespace(message)) {
-            chat.server.chat(message);
-            $("#chatMessageInput").val("");
+            $scope.$watch("ActiveChannel", (newValue, oldValue) => {
+                $scope.lastActiveChannel = oldValue;
+            });
+
+            $scope.changeUsernamePopover = {
+                templateUrl: "/templates/changeUsernamePopover.html",
+                title: "Skift brugernavn"
+            }
+            $scope.createUserPopover = {
+                templateUrl: "/templates/createUserPopover.html",
+                title: "Opret bruger"
+            };
+            $scope.loginUserPopover = {
+                templateUrl: "/templates/loginPopover.html",
+                title: "Login"
+            }
+            $scope.LoginModalOptions = {
+                templateUrl: "/templates/startModal.html",
+                scope: $scope,
+                keyboard: false,
+                backdrop: "static"
+            };
+            $scope.changeQuestionModalOptions = {
+                templateUrl: "/templates/editQuestionModal.html",
+                scope: $scope,
+                keyboard: false,
+                backdrop: "static"
+            };
+            $scope.setActiveChannel = (channelid) => {
+                $scope.ActiveChannel = channelid;
+            };
+            $scope.Start = () => {
+                var name = $scope.StartingModal.Name;
+                name = name.replace(/[\s]+/g, " ");
+                var n = name.match(patt);
+                if (n.length > 0) {
+                    this.setUsername(n[0]);
+                    if ($scope.LoginModal) {
+                        $scope.Ready = true;
+                        $scope.LoginModal.close();
+                        $scope.LoginModal = null;
+                    } else {
+                        $timeout(() => {
+                            jQuery("#editUsername").click();
+                        });
+                    }
+
+                }
+            };
+            $.connection.hub.start().done(() => {
+                $scope.Loading = false;
+                $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                $scope.$apply();
+            });
+
+            $scope.exitChannel = (channelid) => {
+                this.confirm("Are du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", () => {
+                    that.exitChannel(channelid);
+                });
+            };
+            $scope.CreateNewChannel = (channelName) => {
+                if (isNaN(Number(channelName))) {
+                    this.createNewChannel(channelName);
+                } else {
+                    this.joinChannel(Number(channelName));
+                }
+                $scope.newChannelName = "";
+            };
+            $scope.RequestHelp = () => {
+                var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
+                this.requestHelp(qt, $scope.ActiveChannel);
+            };
+            $scope.RemoveQuestion = (questionid) => {
+                this.removeQuestion(questionid);
+            };
+            $scope.RemoveOwnQuestion = () => {
+                this.removeOwnQuestion($scope.ActiveChannel);
+            };
+            $scope.EditOwnQuestion = () => {
+                this.editOwnQuestion($scope.ActiveChannel);
+            };
+            this.helper.client.setQuestionState = (hasQuestion, channelid) => {
+                if ($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                $scope.$apply();
+            };
+            this.helper.client.updateUsername = (name) => {
+                $timeout(() => {
+                    $scope.Me.Name = name;
+                }, 0);
+            };
+            this.helper.client.sendUserId = (id) => {
+                $timeout(() => {
+                    $scope.Me.Id = id;
+                }, 0);
+            }
+            this.helper.client.appendChannel = (channel) => {
+                for (let questionId in channel.Questions) {
+                    if (channel.Questions.hasOwnProperty(questionId)) {
+                        var question = channel.Questions[questionId];
+                        question.User = channel.Users[question.User.Id];
+                    }
+                }
+                for (let chatMessageId in channel.ChatMessages) {
+                    if (channel.ChatMessages.hasOwnProperty(chatMessageId)) {
+                        var chatMessage = channel.ChatMessages[chatMessageId];
+                        chatMessage.User = channel.Users[chatMessage.User.Id];
+                    }
+                }
+                $scope.ActiveChannel = channel.Id;
+                $scope.Channels[channel.Id] = channel;
+                $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
+            this.helper.client.exitChannel = (channelId) => {
+                delete $scope.Channels[channelId];
+                if ($scope.ActiveChannel === channelId) {
+                    if ($scope.Channels[$scope.lastActiveChannel] != null) {
+                        $scope.ActiveChannel = $scope.lastActiveChannel;
+                    } else {
+                        if (Object.keys($scope.Channels).length > 0) {
+                            $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                        } else {
+                            $scope.ActiveChannel = 0;
+                            $scope.lastActiveChannel = 0;
+                        }
+                    }
+                }
+                $scope.$apply();
+            };
+            this.helper.client.addQuestion = (question, channelid) => {
+                question.User = $scope.Channels[channelid].Users[question.User.Id];
+                $scope.Channels[channelid].Questions[question.Id] = question;
+                $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                if ($scope.Channels[channelid].IsAdmin) {
+                    if (document.hidden) {
+                        this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? `
+Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
+                    }
+                }
+            };
+            this.helper.client.removeQuestion = (questionid: number) => {
+                for (let channelid in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channelid)) {
+                        if ($scope.Channels[channelid].Questions[questionid] != null) {
+                            delete $scope.Channels[channelid].Questions[questionid];
+                        }
+                    }
+                }
+                $scope.$apply();
+            };
+            this.helper.client.sendQuestion = (questionText) => {
+                $scope.editQuestionText.text = questionText;
+                $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+            };
+            $scope.UpdateQuestion = () => {
+                this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
+                $scope.changeQuestionModal.close();
+            };
+            this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Questions[questionid] != null) {
+                        $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                    }
+                }
+                $scope.$apply();
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            };
+            $scope.CloseEditModal = () => {
+                $scope.changeQuestionModal.close();
+            };
+            this.helper.client.appendUser = (user, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    $scope.Channels[channelid].Users[user.Id] = user;
+                    $scope.$apply();
+                }
+            }
+            this.helper.client.removeUser = (userid, channelid) => {
+                if ($scope.Channels[channelid] != null) {
+                    if ($scope.Channels[channelid].Users[userid] != null) {
+                        delete $scope.Channels[channelid].Users[userid];
+                        $scope.$apply();
+                    }
+                }
+            }
+            $scope.RemoveUser = (userid) => {
+                this.removeUserFromChannel(userid, $scope.ActiveChannel);
+            }
+            $scope.RemoveChatMessage = (messageId) => {
+                this.removeChatMessage(messageId);
+            }
+            this.helper.client.removeChatMessage = (messageId: number) => {
+                for (let channel in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(channel)) {
+                        const ch = $scope.Channels[channel];
+                        for (let chatMessage in ch.ChatMessages) {
+                            if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
+                                const id = Number(chatMessage);
+                                if (id === messageId) {
+                                    delete ch.ChatMessages[id];
+                                }
+                            }
+                        }
+                    }
+                }
+                $scope.$apply();
+            }
+            $scope.Chat = () => {
+                var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
+                if (mes) {
+                    this.chat(mes, $scope.ActiveChannel);
+                }
+                $scope.Channels[$scope.ActiveChannel].MessageText = "";
+            }
+            this.helper.client.sendChatMessage = (message, channelId) => {
+                message.User = $scope.Channels[channelId].Users[message.User.Id];
+                $scope.Channels[channelId].ChatMessages[message.Id] = message;
+                $scope.$apply();
+            }
+            this.helper.client.alert = (message, heading, oftype) => {
+                this.alert(oftype, message, heading);
+            }
+            $scope.createUser = () => {
+                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy) {
+                    this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
+                    return;
+                }
+                if (!$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                    this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
+                    return;
+                }
+                var email = $scope.createUserOptions.Email;
+                var pass = $scope.createUserOptions.Password;
+                var name = $scope.createUserOptions.Name;
+                // Simple checks to see if this is an email
+                if (email.indexOf("@") === 0 || email.indexOf("@") === email.length - 1 || email.indexOf(".") === 0 || email.indexOf(".") === email.length - 1) {
+                    return;
+                }
+                this.createNewUser(name, email, pass);
+            }
+            this.helper.client.userCreationSuccess = () => {
+                $("#createUserBtn").click();
+                setTimeout(() => {
+                    $scope.Me.LoggedIn = true;
+                    $scope.createUserOptions.Passwordcopy = "";
+                    $scope.createUserOptions.Password = "";
+                    $scope.$apply();
+                }, 1000);
+                this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
+            }
+            $scope.logout = () => {
+                this.logoutUser();
+            }
+            this.helper.client.userLoggedOut = () => {
+                $scope.Me.LoggedIn = false;
+                for (let ch in $scope.Channels) {
+                    if ($scope.Channels.hasOwnProperty(ch)) {
+                        delete $scope.Channels[ch];
+                    }
+                }
+                $scope.setActiveChannel(0);
+                $scope.$apply();
+            }
+            $scope.login = () => {
+                if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {
+                    this.alert("error", "Manglende info", "Manglende info");
+                    return;
+                }
+                this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password);
+            }
+            function loginClear() {
+                $scope.Me.LoggedIn = true;
+                $scope.createUserOptions.Passwordcopy = "";
+                $scope.createUserOptions.Password = "";
+                $scope.$apply();
+            }
+            this.helper.client.loginSuccess = () => {
+                if ($scope.LoginModal) {
+                    $scope.LoginModal.close();
+                    $scope.LoginModal = null;
+                    loginClear();
+                } else {
+                    $("#loginBtn").click();
+                    setTimeout(loginClear(), 1000);
+                }
+                this.alert("success", "Du er nu logget ind.", "Login successfuld");
+            }
+            this.helper.client.updateOtherUsername = (name, userid, channelid) => {
+                $timeout(() => {
+                    $scope.Channels[channelid].Users[userid].Name = name;
+                });
+            }
+            this.helper.client.setAdminState = (channelId, isAdmin) => {
+                $timeout(() => {
+                    $scope.Channels[channelId].IsAdmin = isAdmin;
+                });
+            }
+            $scope.ClearChat = () => {
+                this.confirm("Er du sikker på at du vil ryde chatten?", "Bekræftelse nødvendigt", () => {
+                    this.clearChat($scope.ActiveChannel);
+                });
+            }
+            this.helper.client.clearChat = (channelId: number) => {
+                console.log("Called");
+                $timeout(() => {
+                    const chatMessages = $scope.Channels[channelId].ChatMessages;
+                    for (let chatMessageId in chatMessages) {
+                        if (chatMessages.hasOwnProperty(chatMessageId)) {
+                            delete chatMessages[chatMessageId];
+                        }
+                    }
+                });
+            }
         }
-    });
+    }
 
-    $("#editUsername").click((e) => {
-        e.preventDefault();
-        if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
-        if (createUserPopover !== undefined) createUserPopover.popover("hide");
-        setTimeout(() => {
-            changeUsernamePopover = $("#" + $("#editUsername").attr("aria-describedby"));
-            var name = $("#CurrentUserName").text();
-            var input = changeUsernamePopover.find("#changeusernameInput");
-            input.val(name);
-        });
-    }).popover({
-        html: true,
-        content: () => $("#changeusernameContent").html(),
-        title: () => $("#changeUsernameTitle").html(),
-        placement: "bottom",
-        container: "body"
-    });
-
-    $("#reloadNearbyChannels").click((e) => {
-        e.preventDefault();
-        chat.server.loadNearbyChannels();
-    });
-
-    $("#ClearChatButton").click((e) => {
-        e.preventDefault();
-        chat.server.clearChat();
-    });
-
-    $("#CreateUserButton").popover({
-        html: true,
-        content: () => $("#createUserContent").html(),
-        title: () => $("#createUserTitle").html(),
-        placement: "bottom",
-        container: "body"
-    }).click((e) => {
-        e.preventDefault();
-        if (loginUserPopover !== undefined) loginUserPopover.popover("hide");
-        if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
-        setTimeout(() => {
-            createUserPopover = $("#" + $("#CreateUserButton").attr("aria-describedby"));
-            var name = $("#CurrentUserName").text();
-            var input = createUserPopover.find("#CreateUserName");
-            input.val(name);
-        }, 500);
-
-    });
-
-
-    $(document).keydown(event => {
-        var key: Number = event.which;
-        console.log(key);
-        switch (key) {
-        case 39:
-            removeFirstQuestion();
-            break;
-        case 37:
-            chat.server.requestActiveChannel();
-            break;
+    app.controller("HelpCtrl", HelpCtrl);
+    app.filter("keylength", () => input => {
+        if (!angular.isObject(input)) {
+            throw Error("Usage of non-objects with keylength filter!!");
         }
-    });
-
-    $(document).on("submit", "#createUserForm", e => {
-        e.preventDefault();
-        var name = createUserPopover.find("#CreateUserName").val();
-        var mail = createUserPopover.find("#CreateUserEmail").val();
-        var pass = createUserPopover.find("#CreateUserPw").val();
-        var pass2 = createUserPopover.find("#CreateUserPwConfirm").val();
-        if (isNullOrWhitespace(name) || isNullOrWhitespace(mail) || isNullOrWhitespace(pass) || isNullOrWhitespace(pass2)) return;
-        if (pass === pass2) {
-            chat.server.createNewUser(name, mail, pass);
-        } else {
-            chat.client.userCreationFailed("Kodeorderne er ikke ens");
+        return Object.keys(input).length;
+    }).filter("toArray", () => obj => {
+        if (!(obj instanceof Object)) {
+            return obj;
         }
-    }).on("submit", "#loginUserForm", e => {
-        e.preventDefault();
-        var mail = loginUserPopover.find("#LoginUserEmail").val();
-        var pass = loginUserPopover.find("#LoginUserPassword").val();
-        if (isNullOrWhitespace(mail) || isNullOrWhitespace(pass)) return;
-        chat.server.loginUser(mail, pass);
-    }).on("submit", "#changeusernameForm", e => {
-        e.preventDefault();
-        console.log("submitted");
-        var input = changeUsernamePopover.find("#changeusernameInput");
-        var name = input.val();
-        name = name.replace(/[\s]+/g, " ");
-        var n = name.match(patt);
-        chat.server.setUsername(n[0]);
-        changeUsernamePopover.popover("hide");
-    });
 
-    $("#LoginButton").popover({
-        html: true,
-        content: () => $("#loginUserContent").html(),
-        title: () => $("#loginUserTitle").html(),
-        placement: "bottom",
-        container: "body"
-    }).click((e) => {
-        e.preventDefault();
-        if (createUserPopover !== undefined) createUserPopover.popover("hide");
-        if (changeUsernamePopover !== undefined) changeUsernamePopover.popover("hide");
-        setTimeout(() => {
-            loginUserPopover = $("#" + $("#LoginButton").attr("aria-describedby"));
-        }, 500);
-    });
+        return Object.keys(obj).map(key => Object.defineProperty(obj[key], "$key", { __proto__: null, value: key }));
+    });;
 
-    $("#logoutButton").click((e) => {
-        e.preventDefault();
-        chat.server.logoutUser();
-    });
+    app.directive("wrapper", [
 
-    $(() => {
-        $("[data-toggle=\"popover\"]").popover();
-    });
-});
+        () => {
+            return {
+                restrict: "C",
+                link(scope, element) {
 
-function getPopoverId() {
-    return $(this).attr("aria-describedby");
+                    var innerElement = element.find("inner");
+
+                    scope.$watch(
+                        () => {
+                            return innerElement[0].offsetHeight;
+                        },
+                        (value) => {
+                            element.css("height", value + "px");
+                        }, true);
+                }
+            };
+        }
+    ]);
+
+    export enum QuestionState {
+        HaveQuestion,
+        NoQuestion
+    }
+
+    export class Question {
+        Id: number;
+        User: User;
+        Text: string;
+        Class: string;
+
+        constructor(id: number, user: User, questionText: string) {
+            this.Id = id;
+            this.User = user;
+            this.Text = questionText;
+        }
+    }
+
+    export class User {
+        Name: string;
+        Id: number;
+
+        constructor(id: number, name: string) {
+            this.Id = id;
+            this.Name = name;
+        }
+    }
+
+    export class Me {
+        Name: string;
+        LoggedIn: boolean;
+        Id: number;
+
+        constructor() {
+            this.Name = null;
+            this.LoggedIn = false;
+        }
+    }
+
+    export class Channel {
+        Id: number;
+        ChatMessages: { [id: number]: ChatMessage };
+        Questions: { [id: number]: Question };
+        ChannelName: string;
+        Users: { [id: number]: User };
+        QuestionState: QuestionState;
+        HaveQuestion: boolean;
+        IsAdmin: boolean;
+        Text: string;
+        MessageText: string;
+
+        constructor(id: number, channelName: string) {
+            this.Id = id;
+            this.ChannelName = channelName;
+        }
+    }
+
+    export class ChatMessage {
+        Id: number;
+        Text: string;
+        User: User;
+    }
+
+    export class LoginOptions {
+        Name: string;
+        Email: string;
+        Password: string;
+        Passwordcopy: string;
+
+        constructor() {
+            this.Name = "";
+            this.Email = "";
+            this.Password = "";
+            this.Passwordcopy = "";
+        }
+    }
 }
