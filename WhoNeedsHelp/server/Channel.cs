@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using WhoNeedsHelp.Simples;
 
@@ -28,7 +26,6 @@ namespace WhoNeedsHelp.server
         //[InverseProperty("AreAdministratorIn")]
         public virtual ICollection<User> Administrators { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<User> ActiveUsers { get; set; }
         public virtual ICollection<ChatMessage> ChatMessages { get; set; }
 
         public string ChannelName { get; set; }
@@ -46,7 +43,6 @@ namespace WhoNeedsHelp.server
             Users = new List<User>();
             UsersRequestingHelp = new List<User>();
             Administrators = new List<User>();
-            ActiveUsers = new List<User>();
             AddAdministrator(user);
         }
 
@@ -90,16 +86,6 @@ namespace WhoNeedsHelp.server
             }
         }
 
-        public int GetQuestingUserCount()
-        {
-            return UsersRequestingHelp.Count;
-        }
-
-        public IEnumerable<User> GetActiveUsers()
-        {
-            return ActiveUsers;
-        }
-
         public bool RequestHelp(User user)
         {
             if (UsersRequestingHelp.Contains(user))
@@ -131,10 +117,6 @@ namespace WhoNeedsHelp.server
             {
                 UsersRequestingHelp.Remove(u);
             }
-            if (ActiveUsers.Contains(u))
-            {
-                ActiveUsers.Remove(u);
-            } 
         }
 
         /// <summary>
@@ -162,8 +144,7 @@ namespace WhoNeedsHelp.server
         {
             if (ReferenceEquals(null, o)) return false;
             if (ReferenceEquals(this, o)) return true;
-            if (o.GetType() != this.GetType()) return false;
-            return Equals((Channel) o);
+            return o.GetType() == GetType() && Equals((Channel) o);
         }
 
         public SimpleChannel ToSimpleChannel()

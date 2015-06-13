@@ -6,6 +6,7 @@
 /// <reference path="scripts/typings/angularjs/angular.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
+/// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
 
 interface SignalR {
     centralHub: ICentralHubProxy;
@@ -54,6 +55,9 @@ interface ICentralClient {
     sendUserId: (id: number) => void;
     updateOtherUsername: (name: string, userid: number, channelid: number) => void;
     setAdminState: (channelId: number, isAdmin: boolean) => void;
+    clearChannels: () => void;
+    sendReloginData: (key: string, id: number) => void;
+    tokenLoginFailed: () => void;
 }
 
 interface ICentralServer {
@@ -70,13 +74,14 @@ interface ICentralServer {
     changeQuestion(question: string, channelid: number): JQueryPromise<void>;
     chat(message: string, channelid: number): JQueryPromise<void>;
     clearChat(channelId: number): JQueryPromise<void>;
-    createNewUser(username: string, email: string, password: string): JQueryPromise<void>;
+    createNewUser(username: string, email: string, password: string, stay: boolean): JQueryPromise<void>;
     requestActiveChannel(): JQueryPromise<void>;
-    loginUser(mail: string, pass: string): JQueryPromise<void>;
-    logoutUser(): JQueryPromise<void>;
+    loginUser(mail: string, pass: string, stay: boolean): JQueryPromise<void>;
+    logoutUser(key: string): JQueryPromise<void>;
     removeUserFromChannel(userid: number, channelid: number): JQueryPromise<void>;
     removeOwnQuestion(channelid: number): JQueryPromise<void>;
     editOwnQuestion(channelId: number): JQueryPromise<void>;
+    loginWithToken(id: number, key: string): JQueryPromise<void>;
 }
 
 function isNullOrWhitespace(input: any) {
@@ -87,11 +92,12 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 function removeFromArray(arr: any, index: any) {
     return arr.slice(0, index).concat(arr.slice(index + 1));
 }
+
 module Help {
     import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
     import ModalService = angular.ui.bootstrap.IModalService;
     import ModalSettings = angular.ui.bootstrap.IModalSettings;
-    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate"]);
+    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
 
     export interface IHelpScope extends ng.IScope {
         /**
@@ -166,7 +172,6 @@ module Help {
         RemoveChatMessage: (messageId: number) => void;
         Chat: () => void;
         createUserPopover: PopoverOptions;
-        createUserOptions: LoginOptions;
         createUser: () => void;
         logout: () => void;
         loginUserPopover: PopoverOptions;
@@ -224,8 +229,8 @@ module Help {
             return this.helper.server.clearChat(channelId);
         }
 
-        createNewUser(username: string, email: string, password: string): JQueryPromise<void> {
-            return this.helper.server.createNewUser(username, email, password);
+        createNewUser(username: string, email: string, password: string, stay: boolean): JQueryPromise<void> {
+            return this.helper.server.createNewUser(username, email, password, stay);
         }
 
         requestActiveChannel(): JQueryPromise<void> {
@@ -236,12 +241,12 @@ module Help {
             return this.helper.server.requestHelp(question, channelid);
         }
 
-        loginUser(mail: string, pass: string): JQueryPromise<void> {
-            return this.helper.server.loginUser(mail, pass);
+        loginUser(mail: string, pass: string, stay: boolean): JQueryPromise<void> {
+            return this.helper.server.loginUser(mail, pass, stay);
         }
 
-        logoutUser(): JQueryPromise<void> {
-            return this.helper.server.logoutUser();
+        logoutUser(key: string): JQueryPromise<void> {
+            return this.helper.server.logoutUser(key);
         }
 
         removeUserFromChannel(id: number, channelid: number): JQueryPromise<void> {
@@ -259,8 +264,12 @@ module Help {
         changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
             return this.helper.server.changeQuestion(questionText, channelId);
         }
+        loginWithToken(id: number, key: string) {
+            return this.helper.server.loginWithToken(id, key);
+        }
         alert(typ: string, text: string, title: string) {
-            var notice = new PNotify({
+            // ReSharper disable once UnusedLocals
+            const notify = new PNotify({
                 title: title,
                 text: text,
                 type: typ,
@@ -275,6 +284,7 @@ module Help {
                 }
             });
         }
+
         confirm(text: string, title: string, callback: Function) {
             if (this.confirmNotice == null)
                 this.confirmNotice = new PNotify(<any>{
@@ -319,9 +329,9 @@ module Help {
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", "$modal", "$timeout"];
+        static $inject = ["$scope", "$modal", "$timeout", "$cookieStore"];
 
-        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any) {
+        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any, public $cookieStore: any) {
             super();
             $scope.Loading = true;
             $scope.StartingModal = new LoginOptions();
@@ -329,7 +339,6 @@ module Help {
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
-            $scope.createUserOptions = $scope.StartingModal;
             $scope.lastActiveChannel = 0;
             this.helper = $.connection.centralHub;
             var that = this;
@@ -384,11 +393,21 @@ module Help {
                 }
             };
             $.connection.hub.start().done(() => {
+                var token: LoginToken = $cookieStore.get("token");
+                if (!token) {
+                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                } else {
+                    this.loginWithToken(token.id, token.key);
+                }
+
                 $scope.Loading = false;
-                $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                 $scope.$apply();
             });
-
+            this.helper.client.tokenLoginFailed = () => {
+                $timeout(() => {
+                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                });
+            }
             $scope.exitChannel = (channelid) => {
                 this.confirm("Er du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", () => {
                     that.exitChannel(channelid);
@@ -557,35 +576,39 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 this.alert(oftype, message, heading);
             }
             $scope.createUser = () => {
-                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy) {
+                if ($scope.StartingModal.Password !== $scope.StartingModal.Passwordcopy) {
                     this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
                     return;
                 }
-                if (!$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                if (!$scope.StartingModal.Name || !$scope.StartingModal.Email) {
                     this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
                     return;
                 }
-                var email = $scope.createUserOptions.Email;
-                var pass = $scope.createUserOptions.Password;
-                var name = $scope.createUserOptions.Name;
+                var email = $scope.StartingModal.Email;
+                var pass = $scope.StartingModal.Password;
+                var name = $scope.StartingModal.Name;
                 // Simple checks to see if this is an email
                 if (email.indexOf("@") === 0 || email.indexOf("@") === email.length - 1 || email.indexOf(".") === 0 || email.indexOf(".") === email.length - 1) {
                     return;
                 }
-                this.createNewUser(name, email, pass);
+                this.createNewUser(name, email, pass, $scope.StartingModal.StayLoggedIn);
             }
             this.helper.client.userCreationSuccess = () => {
                 $("#createUserBtn").click();
                 setTimeout(() => {
                     $scope.Me.LoggedIn = true;
-                    $scope.createUserOptions.Passwordcopy = "";
-                    $scope.createUserOptions.Password = "";
+                    $scope.StartingModal.Passwordcopy = "";
+                    $scope.StartingModal.Password = "";
                     $scope.$apply();
                 }, 1000);
                 this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
             }
             $scope.logout = () => {
-                this.logoutUser();
+                var token: LoginToken = $cookieStore.get("token");
+                if (!token)
+                    this.logoutUser(null);
+                else
+                    this.logoutUser(token.key);
             }
             this.helper.client.userLoggedOut = () => {
                 $scope.Me.LoggedIn = false;
@@ -595,6 +618,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     }
                 }
                 $scope.setActiveChannel(0);
+                $cookieStore.remove("token");
                 $scope.$apply();
             }
             $scope.login = () => {
@@ -602,12 +626,12 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     this.alert("error", "Manglende info", "Manglende info");
                     return;
                 }
-                this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password);
+                this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             }
             function loginClear() {
                 $scope.Me.LoggedIn = true;
-                $scope.createUserOptions.Passwordcopy = "";
-                $scope.createUserOptions.Password = "";
+                $scope.StartingModal.Passwordcopy = "";
+                $scope.StartingModal.Password = "";
                 $scope.$apply();
             }
             this.helper.client.loginSuccess = () => {
@@ -647,7 +671,24 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     }
                 });
             }
+            this.helper.client.clearChannels = () => {
+                $timeout(() => {
+                    for (let channelId in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channelId)) {
+                            delete $scope.Channels[channelId];
+                        }
+                    }
+                });
+            }
+            this.helper.client.sendReloginData = (key: string, id: number) => {
+                $timeout(() => {
+                    var token = new LoginToken(id, key);
+                    $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
+                    $scope.Me.LoggedIn = true;
+                });
+            }
         }
+
     }
 
     app.controller("HelpCtrl", HelpCtrl);
@@ -753,12 +794,23 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
         Email: string;
         Password: string;
         Passwordcopy: string;
+        StayLoggedIn: boolean;
 
         constructor() {
             this.Name = "";
             this.Email = "";
             this.Password = "";
             this.Passwordcopy = "";
+        }
+    }
+
+    export class LoginToken {
+        id: number;
+        key: string;
+
+        constructor(i, k) {
+            this.id = i;
+            this.key = k;
         }
     }
 }

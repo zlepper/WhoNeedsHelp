@@ -19,7 +19,12 @@
         </div>
         <div class="form-group">
             <label for="LoginUserPasswordModal">Kodeord</label>
-            <input type="password" class="form-control" id="LoginUserPasswordModal" ng-model="StartingModal.Password" />
+            <input type="password" class="form-control" id="LoginUserPasswordModal" ng-model="StartingModal.Password"/>
+        </div>
+        <div class="checkbox">
+            <label ng-init="StartingModal.StayLoggedIn = false">
+                <input type="checkbox" ng-model="StartingModal.StayLoggedIn"> Forbliv logget ind
+            </label>
         </div>
         <input class="btn btn-primary" type="submit" value="Login"/>
     </form>

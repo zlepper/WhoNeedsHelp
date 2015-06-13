@@ -16,6 +16,7 @@ namespace WhoNeedsHelp
         public DbSet<Channel> Channels { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<LoginToken> LoginTokens { get; set; }
         //public DbSet<QuestionComment> QuestionComments { get; set; }
 
         public HelpContext() : base()
@@ -29,11 +30,6 @@ namespace WhoNeedsHelp
 
             // Configure the user model
             modelBuilder.Entity<User>().HasKey(u => u.Id);
-            modelBuilder.Entity<User>()
-                .HasOptional<Channel>(u => u.Channel)
-                .WithMany(c => c.ActiveUsers)
-                .HasForeignKey(u => u.ChannelId)
-                .WillCascadeOnDelete(false);
             modelBuilder.Entity<User>().Property(u => u.Pw).IsOptional();
             // Map relation between "User.ChannelsIn" and "Channel.Users"
             modelBuilder.Entity<User>()
@@ -82,11 +78,15 @@ namespace WhoNeedsHelp
                 .HasMany<Connection>(u => u.Connections)
                 .WithRequired(c => c.User)
                 .HasForeignKey(c => c.UserId);
+            modelBuilder.Entity<User>()
+                .HasMany<LoginToken>(u => u.LoginTokens)
+                .WithRequired(lk => lk.User)
+                .HasForeignKey(lk => lk.UserId);
 
 
             // Configure the channel model
             // No need to configure relations with the "User" class. 
-            // this has already been done in the lines above.
+            // this has already been done above.
             modelBuilder.Entity<Channel>().HasKey(c => c.Id);
             // Map relation between "Channel.Questions" and "Question.Channel"
             modelBuilder.Entity<Channel>()
@@ -103,12 +103,10 @@ namespace WhoNeedsHelp
 
             // Configure the ChatMessage model
             modelBuilder.Entity<ChatMessage>().HasKey(cm => cm.Id);
-            //modelBuilder.Entity<ChatMessage>().
 
             modelBuilder.Entity<Connection>().HasKey(c => c.ConnectionId);
 
-            // Configure the Question model
-            
+            modelBuilder.Entity<LoginToken>().HasKey(lk => lk.Key);
             base.OnModelCreating(modelBuilder);
         }
     }

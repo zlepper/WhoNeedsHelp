@@ -24,18 +24,17 @@ namespace WhoNeedsHelp.server
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }
-        public int? ChannelId { get; set; }
         public string Pw { get; set; }
-        public virtual Channel Channel { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Channel> ChannelsIn { get; set; }
         public virtual ICollection<Channel> ChannelsRequestingHelpIn { get; set; }
         public virtual ICollection<Channel> AreAdministratorIn { get; set; }
-        public virtual ICollection<ChatMessage> ChatMessages { get; set; } 
+        public virtual ICollection<ChatMessage> ChatMessages { get; set; }
+        public virtual ICollection<LoginToken> LoginTokens { get; set; } 
         public string Ip { get; set; }
-        //public string ConnectionId { get; set; }
         public virtual ICollection<Connection> Connections { get; set; } 
         public string EmailAddress { get; set; }
+
         public int FailedLoginAttempts { get; set; }
         public DateTime LastFailedAttempt { get; set; }
 
@@ -56,9 +55,6 @@ namespace WhoNeedsHelp.server
                     if (AreUserQuestioning(ch))
                         return null;
                     Question q = new Question(ch, question, this);
-                    //db.Questions.Add(q);
-                    //Questions.Add(q);
-                    //db.SaveChanges();
                     return q;
                 }
             }
@@ -75,18 +71,6 @@ namespace WhoNeedsHelp.server
             return ChannelsIn.SingleOrDefault(c => c.Id == channelId);
         }
 
-        private void AskQuestion(Channel c, string question)
-        {
-            if (AreUserQuestioning(c)) 
-                return;
-            Question q = new Question(c, question, this);
-            using (var db = new HelpContext())
-            {
-                db.Questions.Add(q);
-                db.SaveChanges();
-            }
-        }
-
         /// <summary>
         /// Updates the question for the selected channel
         /// </summary>
@@ -101,49 +85,11 @@ namespace WhoNeedsHelp.server
             return q;
         }
 
-        public void RemoveQuestion(Question q)
-        {
-            //using (var db = new HelpContext())
-            //{
-                //Guid channel = db.Channels.Find(ChannelId).Id;
-                //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-                //qu.Remove(channel);
-                //Questions = Serialiser.SerialiseDictionary(qu);
-                //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(Channel) && q.User.Equals(this));
-                Questions.Remove(q);
-                /*var entry = db.Entry(question);
-                if (entry.State == EntityState.Detached)
-                {
-                    db.Questions.Attach(question);
-                    db.Questions.Remove(question);
-                    db.SaveChanges();
-                }*/
-            //}
-        }
-
-        /*public void RemoveQuestion(Channel c)
-        {
-
-            //var qu = Serialiser.DesiraliseGuidStringDictionary(Questions);
-            //qu.Remove(c);
-            //Questions = Serialiser.SerialiseDictionary(qu);
-            using (var db = new HelpContext())
-            {
-                var question = Questions.SingleOrDefault(q => q.Channel.Equals(c));
-                db.Questions.Remove(question);
-                db.SaveChanges();
-            }
-        }*/
-
         public bool AreUserQuestioning(Channel c)
         {
             if (c == null) return false;
-            using (var db = new HelpContext())
-            {
-                //var question = db.Questions.SingleOrDefault(q => q.Channel.Equals(c) && q.User.Equals(this));
-                var question = Questions.SingleOrDefault(q => q.Channel.Equals(c));
-                return question != null;
-            }
+            var question = Questions.SingleOrDefault(q => q.Channel.Equals(c));
+            return question != null;
         }
 
         public override bool Equals(object obj)
@@ -157,6 +103,17 @@ namespace WhoNeedsHelp.server
         public SimpleUser ToSimpleUser()
         {
             return new SimpleUser(Id, Name);
+        }
+
+        public void GenerateLoginToken(Guid key)
+        {
+            LoginTokens.Add(new LoginToken(this, key));
+        }
+
+        public LoginToken CheckLoginToken(string key)
+        {
+            LoginToken loginToken = LoginTokens.SingleOrDefault(token => PasswordHash.ValidatePassword(key, token.Key));
+            return loginToken;
         }
     }
 }

@@ -6,6 +6,7 @@
 /// <reference path="scripts/typings/angularjs/angular.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
+/// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -23,7 +24,7 @@ function removeFromArray(arr, index) {
 }
 var Help;
 (function (Help) {
-    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate"]);
+    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
     var ServerActions = (function () {
         function ServerActions() {
         }
@@ -60,8 +61,8 @@ var Help;
         ServerActions.prototype.clearChat = function (channelId) {
             return this.helper.server.clearChat(channelId);
         };
-        ServerActions.prototype.createNewUser = function (username, email, password) {
-            return this.helper.server.createNewUser(username, email, password);
+        ServerActions.prototype.createNewUser = function (username, email, password, stay) {
+            return this.helper.server.createNewUser(username, email, password, stay);
         };
         ServerActions.prototype.requestActiveChannel = function () {
             return this.helper.server.requestActiveChannel();
@@ -69,11 +70,11 @@ var Help;
         ServerActions.prototype.requestHelp = function (question, channelid) {
             return this.helper.server.requestHelp(question, channelid);
         };
-        ServerActions.prototype.loginUser = function (mail, pass) {
-            return this.helper.server.loginUser(mail, pass);
+        ServerActions.prototype.loginUser = function (mail, pass, stay) {
+            return this.helper.server.loginUser(mail, pass, stay);
         };
-        ServerActions.prototype.logoutUser = function () {
-            return this.helper.server.logoutUser();
+        ServerActions.prototype.logoutUser = function (key) {
+            return this.helper.server.logoutUser(key);
         };
         ServerActions.prototype.removeUserFromChannel = function (id, channelid) {
             return this.helper.server.removeUserFromChannel(id, channelid);
@@ -87,8 +88,12 @@ var Help;
         ServerActions.prototype.changeQuestion = function (questionText, channelId) {
             return this.helper.server.changeQuestion(questionText, channelId);
         };
+        ServerActions.prototype.loginWithToken = function (id, key) {
+            return this.helper.server.loginWithToken(id, key);
+        };
         ServerActions.prototype.alert = function (typ, text, title) {
-            var notice = new PNotify({
+            // ReSharper disable once UnusedLocals
+            var notify = new PNotify({
                 title: title,
                 text: text,
                 type: typ,
@@ -148,19 +153,19 @@ var Help;
     Help.ServerActions = ServerActions;
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
-        function HelpCtrl($scope, $Modal, $timeout) {
+        function HelpCtrl($scope, $Modal, $timeout, $cookieStore) {
             var _this = this;
             _super.call(this);
             this.$scope = $scope;
             this.$Modal = $Modal;
             this.$timeout = $timeout;
+            this.$cookieStore = $cookieStore;
             $scope.Loading = true;
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
-            $scope.createUserOptions = $scope.StartingModal;
             $scope.lastActiveChannel = 0;
             this.helper = $.connection.centralHub;
             var that = this;
@@ -213,10 +218,21 @@ var Help;
                 }
             };
             $.connection.hub.start().done(function () {
+                var token = $cookieStore.get("token");
+                if (!token) {
+                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                }
+                else {
+                    _this.loginWithToken(token.id, token.key);
+                }
                 $scope.Loading = false;
-                $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                 $scope.$apply();
             });
+            this.helper.client.tokenLoginFailed = function () {
+                $timeout(function () {
+                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                });
+            };
             $scope.exitChannel = function (channelid) {
                 _this.confirm("Er du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", function () {
                     that.exitChannel(channelid);
@@ -388,35 +404,39 @@ var Help;
                 _this.alert(oftype, message, heading);
             };
             $scope.createUser = function () {
-                if ($scope.createUserOptions.Password !== $scope.createUserOptions.Passwordcopy) {
+                if ($scope.StartingModal.Password !== $scope.StartingModal.Passwordcopy) {
                     _this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
                     return;
                 }
-                if (!$scope.createUserOptions.Name || !$scope.createUserOptions.Email) {
+                if (!$scope.StartingModal.Name || !$scope.StartingModal.Email) {
                     _this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
                     return;
                 }
-                var email = $scope.createUserOptions.Email;
-                var pass = $scope.createUserOptions.Password;
-                var name = $scope.createUserOptions.Name;
+                var email = $scope.StartingModal.Email;
+                var pass = $scope.StartingModal.Password;
+                var name = $scope.StartingModal.Name;
                 // Simple checks to see if this is an email
                 if (email.indexOf("@") === 0 || email.indexOf("@") === email.length - 1 || email.indexOf(".") === 0 || email.indexOf(".") === email.length - 1) {
                     return;
                 }
-                _this.createNewUser(name, email, pass);
+                _this.createNewUser(name, email, pass, $scope.StartingModal.StayLoggedIn);
             };
             this.helper.client.userCreationSuccess = function () {
                 $("#createUserBtn").click();
                 setTimeout(function () {
                     $scope.Me.LoggedIn = true;
-                    $scope.createUserOptions.Passwordcopy = "";
-                    $scope.createUserOptions.Password = "";
+                    $scope.StartingModal.Passwordcopy = "";
+                    $scope.StartingModal.Password = "";
                     $scope.$apply();
                 }, 1000);
                 _this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
             };
             $scope.logout = function () {
-                _this.logoutUser();
+                var token = $cookieStore.get("token");
+                if (!token)
+                    _this.logoutUser(null);
+                else
+                    _this.logoutUser(token.key);
             };
             this.helper.client.userLoggedOut = function () {
                 $scope.Me.LoggedIn = false;
@@ -426,6 +446,7 @@ var Help;
                     }
                 }
                 $scope.setActiveChannel(0);
+                $cookieStore.remove("token");
                 $scope.$apply();
             };
             $scope.login = function () {
@@ -433,12 +454,12 @@ var Help;
                     _this.alert("error", "Manglende info", "Manglende info");
                     return;
                 }
-                _this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password);
+                _this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             };
             function loginClear() {
                 $scope.Me.LoggedIn = true;
-                $scope.createUserOptions.Passwordcopy = "";
-                $scope.createUserOptions.Password = "";
+                $scope.StartingModal.Passwordcopy = "";
+                $scope.StartingModal.Password = "";
                 $scope.$apply();
             }
             this.helper.client.loginSuccess = function () {
@@ -479,8 +500,24 @@ var Help;
                     }
                 });
             };
+            this.helper.client.clearChannels = function () {
+                $timeout(function () {
+                    for (var channelId in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channelId)) {
+                            delete $scope.Channels[channelId];
+                        }
+                    }
+                });
+            };
+            this.helper.client.sendReloginData = function (key, id) {
+                $timeout(function () {
+                    var token = new LoginToken(id, key);
+                    $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
+                    $scope.Me.LoggedIn = true;
+                });
+            };
         }
-        HelpCtrl.$inject = ["$scope", "$modal", "$timeout"];
+        HelpCtrl.$inject = ["$scope", "$modal", "$timeout", "$cookieStore"];
         return HelpCtrl;
     })(ServerActions);
     Help.HelpCtrl = HelpCtrl;
@@ -566,5 +603,13 @@ var Help;
         return LoginOptions;
     })();
     Help.LoginOptions = LoginOptions;
+    var LoginToken = (function () {
+        function LoginToken(i, k) {
+            this.id = i;
+            this.key = k;
+        }
+        return LoginToken;
+    })();
+    Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
 //# sourceMappingURL=helper.js.map

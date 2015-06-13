@@ -38,7 +38,7 @@ namespace WhoNeedsHelp.server
     /// www: http://crackstation.net/hashing-security.htm
     /// Compatibility: .NET 3.0 and later.
     /// </summary>
-    public class PasswordHash
+    public static class PasswordHash
     {
         // The following constants may be changed without breaking existing hashes.
         public const int SALT_BYTE_SIZE = 24;

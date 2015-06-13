@@ -16,16 +16,10 @@ namespace WhoNeedsHelp
     {
         public void Configuration(IAppBuilder app)
         {
-            Reset();
             Database.SetInitializer<HelpContext>( new CreateDatabaseIfNotExists<HelpContext>());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<HelpContext, Migrations.Configuration>());
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
             app.MapSignalR();
-        }
-
-        [Conditional("DEBUG")]
-        private void Reset()
-        {
-            Database.SetInitializer<HelpContext>(new DropCreateDatabaseAlways<HelpContext>());
         }
     }
 }
