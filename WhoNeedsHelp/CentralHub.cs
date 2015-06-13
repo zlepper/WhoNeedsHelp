@@ -487,7 +487,7 @@ namespace WhoNeedsHelp
                     }
                     else
                     {
-                        Clients.Caller.Alert("Channel not found", "Missing", "error");
+                        Clients.Caller.Alert("Kanalen blev ikke funder", "Kan ikke findes", "error");
                     }
                 }
                 db.SaveChanges();

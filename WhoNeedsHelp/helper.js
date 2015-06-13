@@ -97,33 +97,51 @@ var Help;
                 mouse_reset: false,
                 desktop: {
                     desktop: document.hidden
+                },
+                click: function (n) {
+                    n.remove();
                 }
-            });
-            notice.elem.click(function () {
-                notice.remove();
             });
         };
         ServerActions.prototype.confirm = function (text, title, callback) {
-            var notice = new PNotify({
-                title: title,
-                text: text,
-                icon: "glyphicon glyphicon-question-sign",
-                mouse_reset: false,
-                hide: false,
-                confirm: {
-                    confirm: true
-                },
-                buttons: {
-                    closer: false,
-                    sticker: false
-                },
-                history: {
-                    history: false
-                }
-            });
-            notice.elem.on("pnotify.confirm", function () {
-                callback();
-            }).on("pnotify.cancel", function () { return false; });
+            if (this.confirmNotice == null)
+                this.confirmNotice = new PNotify({
+                    title: title,
+                    text: text,
+                    icon: "glyphicon glyphicon-question-sign",
+                    mouse_reset: false,
+                    hide: false,
+                    /*confirm: {
+                        confirm: true
+                    },*/
+                    confirm: {
+                        confirm: true,
+                        buttons: [
+                            {
+                                text: "Ok",
+                                click: function (n) {
+                                    n.remove();
+                                    callback();
+                                    this.confirmNotice = null;
+                                }
+                            },
+                            {
+                                text: "Annuller",
+                                click: function (n) {
+                                    n.remove();
+                                    this.confirmNotice = null;
+                                }
+                            }
+                        ]
+                    },
+                    buttons: {
+                        closer: false,
+                        sticker: false
+                    },
+                    history: {
+                        history: false
+                    }
+                });
         };
         return ServerActions;
     })();
@@ -200,7 +218,7 @@ var Help;
                 $scope.$apply();
             });
             $scope.exitChannel = function (channelid) {
-                _this.confirm("Are du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", function () {
+                _this.confirm("Er du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", function () {
                     that.exitChannel(channelid);
                 });
             };

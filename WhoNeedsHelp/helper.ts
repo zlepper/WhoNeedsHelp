@@ -178,6 +178,7 @@ module Help {
 
     export class ServerActions {
         helper: ICentralHubProxy;
+        confirmNotice: PNotify;
 
         send(action: string, parameters: string): JQueryPromise<void> {
             return this.helper.server.send(action, parameters);
@@ -268,33 +269,51 @@ module Help {
                 mouse_reset: false,
                 desktop: {
                     desktop: document.hidden
+                },
+                click(n) {
+                    n.remove();
                 }
-            });
-            notice.elem.click(() => {
-                notice.remove();
             });
         }
         confirm(text: string, title: string, callback: Function) {
-            var notice = new PNotify(<any>{
-                title: title,
-                text: text,
-                icon: "glyphicon glyphicon-question-sign",
-                mouse_reset: false,
-                hide: false,
-                confirm: {
-                    confirm: true
-                },
-                buttons: {
-                    closer: false,
-                    sticker: false
-                },
-                history: {
-                    history: false
-                }
-            });
-            notice.elem.on("pnotify.confirm", () => {
-                callback();
-            }).on("pnotify.cancel", () => false);
+            if (this.confirmNotice == null)
+                this.confirmNotice = new PNotify(<any>{
+                    title: title,
+                    text: text,
+                    icon: "glyphicon glyphicon-question-sign",
+                    mouse_reset: false,
+                    hide: false,
+                    /*confirm: {
+                        confirm: true
+                    },*/
+                    confirm: {
+                        confirm: true,
+                        buttons: [
+                            {
+                                text: "Ok",
+                                click(n) {
+                                    n.remove();
+                                    callback();
+                                    this.confirmNotice = null;
+                                }
+                            },
+                            {
+                                text: "Annuller",
+                                click(n) {
+                                    n.remove();
+                                    this.confirmNotice = null;
+                                }
+                            }
+                        ]
+                    },
+                    buttons: {
+                        closer: false,
+                        sticker: false
+                    },
+                    history: {
+                        history: false
+                    }
+                });
         }
     }
 
@@ -371,7 +390,7 @@ module Help {
             });
 
             $scope.exitChannel = (channelid) => {
-                this.confirm("Are du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", () => {
+                this.confirm("Er du sikker på at du vil lukke kanalen?", "Bekræftelse nødvendig", () => {
                     that.exitChannel(channelid);
                 });
             };
