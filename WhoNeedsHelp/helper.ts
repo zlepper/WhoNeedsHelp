@@ -363,13 +363,15 @@ module Help {
                 templateUrl: "/templates/startModal.html",
                 scope: $scope,
                 keyboard: false,
-                backdrop: "static"
+                backdrop: "static",
+                animation: false
             };
             $scope.changeQuestionModalOptions = {
                 templateUrl: "/templates/editQuestionModal.html",
                 scope: $scope,
                 keyboard: false,
-                backdrop: "static"
+                backdrop: "static",
+                animation: false
             };
             $scope.setActiveChannel = (channelid) => {
                 $scope.ActiveChannel = channelid;
@@ -393,15 +395,16 @@ module Help {
                 }
             };
             $.connection.hub.start().done(() => {
-                var token: LoginToken = $cookieStore.get("token");
-                if (!token) {
-                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
-                } else {
-                    this.loginWithToken(token.id, token.key);
-                }
+                $timeout(() => {
+                    var token: LoginToken = $cookieStore.get("token");
+                    if (!token) {
+                        $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                    } else {
+                        this.loginWithToken(token.id, token.key);
+                    }
 
-                $scope.Loading = false;
-                $scope.$apply();
+                    $scope.Loading = false;
+                });
             });
             this.helper.client.tokenLoginFailed = () => {
                 $timeout(() => {
@@ -435,8 +438,9 @@ module Help {
                 this.editOwnQuestion($scope.ActiveChannel);
             };
             this.helper.client.setQuestionState = (hasQuestion, channelid) => {
-                if ($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
-                $scope.$apply();
+                $timeout(() => {
+                    if ($scope.Channels[channelid] != null) $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                });
             };
             this.helper.client.updateUsername = (name) => {
                 $timeout(() => {
@@ -461,31 +465,34 @@ module Help {
                         chatMessage.User = channel.Users[chatMessage.User.Id];
                     }
                 }
-                $scope.ActiveChannel = channel.Id;
-                $scope.Channels[channel.Id] = channel;
-                $scope.$apply();
+                $timeout(() => {
+                    $scope.ActiveChannel = channel.Id;
+                    $scope.Channels[channel.Id] = channel;
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.exitChannel = (channelId) => {
-                delete $scope.Channels[channelId];
-                if ($scope.ActiveChannel === channelId) {
-                    if ($scope.Channels[$scope.lastActiveChannel] != null) {
-                        $scope.ActiveChannel = $scope.lastActiveChannel;
-                    } else {
-                        if (Object.keys($scope.Channels).length > 0) {
-                            $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                $timeout(() => {
+                    delete $scope.Channels[channelId];
+                    if ($scope.ActiveChannel === channelId) {
+                        if ($scope.Channels[$scope.lastActiveChannel] != null) {
+                            $scope.ActiveChannel = $scope.lastActiveChannel;
                         } else {
-                            $scope.ActiveChannel = 0;
-                            $scope.lastActiveChannel = 0;
+                            if (Object.keys($scope.Channels).length > 0) {
+                                $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                            } else {
+                                $scope.ActiveChannel = 0;
+                                $scope.lastActiveChannel = 0;
+                            }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             };
             this.helper.client.addQuestion = (question, channelid) => {
                 question.User = $scope.Channels[channelid].Users[question.User.Id];
-                $scope.Channels[channelid].Questions[question.Id] = question;
-                $scope.$apply();
+                $timeout(() => {
+                    $scope.Channels[channelid].Questions[question.Id] = question;
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
@@ -495,30 +502,34 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 }
             };
             this.helper.client.removeQuestion = (questionid: number) => {
-                for (var channelid in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(channelid)) {
-                        if ($scope.Channels[channelid].Questions[questionid] != null) {
-                            delete $scope.Channels[channelid].Questions[questionid];
+                $timeout(() => {
+                    for (var channelid in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channelid)) {
+                            if ($scope.Channels[channelid].Questions[questionid] != null) {
+                                delete $scope.Channels[channelid].Questions[questionid];
+                            }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             };
             this.helper.client.sendQuestion = (questionText) => {
-                $scope.editQuestionText.text = questionText;
-                $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                $timeout(() => {
+                    $scope.editQuestionText.text = questionText;
+                    $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                });
             };
             $scope.UpdateQuestion = () => {
                 this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
                 $scope.changeQuestionModal.close();
             };
             this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
-                if ($scope.Channels[channelid] != null) {
-                    if ($scope.Channels[channelid].Questions[questionid] != null) {
-                        $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                $timeout(() => {
+                    if ($scope.Channels[channelid] != null) {
+                        if ($scope.Channels[channelid].Questions[questionid] != null) {
+                            $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                        }
                     }
-                }
-                $scope.$apply();
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             $scope.CloseEditModal = () => {
@@ -526,15 +537,17 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             };
             this.helper.client.appendUser = (user, channelid) => {
                 if ($scope.Channels[channelid] != null) {
-                    $scope.Channels[channelid].Users[user.Id] = user;
-                    $scope.$apply();
+                    $timeout(() => {
+                        $scope.Channels[channelid].Users[user.Id] = user;
+                    });
                 }
             }
             this.helper.client.removeUser = (userid, channelid) => {
                 if ($scope.Channels[channelid] != null) {
                     if ($scope.Channels[channelid].Users[userid] != null) {
-                        delete $scope.Channels[channelid].Users[userid];
-                        $scope.$apply();
+                        $timeout(() => {
+                            delete $scope.Channels[channelid].Users[userid];
+                        });
                     }
                 }
             }
@@ -545,20 +558,21 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 this.removeChatMessage(messageId);
             }
             this.helper.client.removeChatMessage = (messageId: number) => {
-                for (var channel in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(channel)) {
-                        var ch = $scope.Channels[channel];
-                        for (var chatMessage in ch.ChatMessages) {
-                            if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
-                                var id = Number(chatMessage);
-                                if (id === messageId) {
-                                    delete ch.ChatMessages[id];
+                $timeout(() => {
+                    for (var channel in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channel)) {
+                            var ch = $scope.Channels[channel];
+                            for (var chatMessage in ch.ChatMessages) {
+                                if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
+                                    var id = Number(chatMessage);
+                                    if (id === messageId) {
+                                        delete ch.ChatMessages[id];
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             }
             $scope.Chat = () => {
                 var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
@@ -568,9 +582,10 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 $scope.Channels[$scope.ActiveChannel].MessageText = "";
             }
             this.helper.client.sendChatMessage = (message, channelId) => {
-                message.User = $scope.Channels[channelId].Users[message.User.Id];
-                $scope.Channels[channelId].ChatMessages[message.Id] = message;
-                $scope.$apply();
+                $timeout(() => {
+                    message.User = $scope.Channels[channelId].Users[message.User.Id];
+                    $scope.Channels[channelId].ChatMessages[message.Id] = message;
+                });
             }
             this.helper.client.alert = (message, heading, oftype) => {
                 this.alert(oftype, message, heading);
@@ -611,15 +626,16 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     this.logoutUser(token.key);
             }
             this.helper.client.userLoggedOut = () => {
-                $scope.Me.LoggedIn = false;
-                for (var ch in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(ch)) {
-                        delete $scope.Channels[ch];
+                $timeout(() => {
+                    $scope.Me.LoggedIn = false;
+                    for (var ch in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(ch)) {
+                            delete $scope.Channels[ch];
+                        }
                     }
-                }
-                $scope.setActiveChannel(0);
-                $cookieStore.remove("token");
-                $scope.$apply();
+                    $scope.setActiveChannel(0);
+                    $cookieStore.remove("token");
+                });
             }
             $scope.login = () => {
                 if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {

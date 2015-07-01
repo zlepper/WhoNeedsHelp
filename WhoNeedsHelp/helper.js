@@ -188,13 +188,15 @@ var Help;
                 templateUrl: "/templates/startModal.html",
                 scope: $scope,
                 keyboard: false,
-                backdrop: "static"
+                backdrop: "static",
+                animation: false
             };
             $scope.changeQuestionModalOptions = {
                 templateUrl: "/templates/editQuestionModal.html",
                 scope: $scope,
                 keyboard: false,
-                backdrop: "static"
+                backdrop: "static",
+                animation: false
             };
             $scope.setActiveChannel = function (channelid) {
                 $scope.ActiveChannel = channelid;
@@ -218,15 +220,16 @@ var Help;
                 }
             };
             $.connection.hub.start().done(function () {
-                var token = $cookieStore.get("token");
-                if (!token) {
-                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
-                }
-                else {
-                    _this.loginWithToken(token.id, token.key);
-                }
-                $scope.Loading = false;
-                $scope.$apply();
+                $timeout(function () {
+                    var token = $cookieStore.get("token");
+                    if (!token) {
+                        $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                    }
+                    else {
+                        _this.loginWithToken(token.id, token.key);
+                    }
+                    $scope.Loading = false;
+                });
             });
             this.helper.client.tokenLoginFailed = function () {
                 $timeout(function () {
@@ -261,9 +264,10 @@ var Help;
                 _this.editOwnQuestion($scope.ActiveChannel);
             };
             this.helper.client.setQuestionState = function (hasQuestion, channelid) {
-                if ($scope.Channels[channelid] != null)
-                    $scope.Channels[channelid].HaveQuestion = hasQuestion;
-                $scope.$apply();
+                $timeout(function () {
+                    if ($scope.Channels[channelid] != null)
+                        $scope.Channels[channelid].HaveQuestion = hasQuestion;
+                });
             };
             this.helper.client.updateUsername = function (name) {
                 $timeout(function () {
@@ -288,65 +292,72 @@ var Help;
                         chatMessage.User = channel.Users[chatMessage.User.Id];
                     }
                 }
-                $scope.ActiveChannel = channel.Id;
-                $scope.Channels[channel.Id] = channel;
-                $scope.$apply();
+                $timeout(function () {
+                    $scope.ActiveChannel = channel.Id;
+                    $scope.Channels[channel.Id] = channel;
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.exitChannel = function (channelId) {
-                delete $scope.Channels[channelId];
-                if ($scope.ActiveChannel === channelId) {
-                    if ($scope.Channels[$scope.lastActiveChannel] != null) {
-                        $scope.ActiveChannel = $scope.lastActiveChannel;
-                    }
-                    else {
-                        if (Object.keys($scope.Channels).length > 0) {
-                            $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                $timeout(function () {
+                    delete $scope.Channels[channelId];
+                    if ($scope.ActiveChannel === channelId) {
+                        if ($scope.Channels[$scope.lastActiveChannel] != null) {
+                            $scope.ActiveChannel = $scope.lastActiveChannel;
                         }
                         else {
-                            $scope.ActiveChannel = 0;
-                            $scope.lastActiveChannel = 0;
+                            if (Object.keys($scope.Channels).length > 0) {
+                                $scope.ActiveChannel = Number(Object.keys($scope.Channels)[0]);
+                            }
+                            else {
+                                $scope.ActiveChannel = 0;
+                                $scope.lastActiveChannel = 0;
+                            }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             };
             this.helper.client.addQuestion = function (question, channelid) {
                 question.User = $scope.Channels[channelid].Users[question.User.Id];
-                $scope.Channels[channelid].Questions[question.Id] = question;
-                $scope.$apply();
+                $timeout(function () {
+                    $scope.Channels[channelid].Questions[question.Id] = question;
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
-                        _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil spørgsmålet er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
+                        _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil sp\u00F8rgsm\u00E5let er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
                     }
                 }
             };
             this.helper.client.removeQuestion = function (questionid) {
-                for (var channelid in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(channelid)) {
-                        if ($scope.Channels[channelid].Questions[questionid] != null) {
-                            delete $scope.Channels[channelid].Questions[questionid];
+                $timeout(function () {
+                    for (var channelid in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channelid)) {
+                            if ($scope.Channels[channelid].Questions[questionid] != null) {
+                                delete $scope.Channels[channelid].Questions[questionid];
+                            }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             };
             this.helper.client.sendQuestion = function (questionText) {
-                $scope.editQuestionText.text = questionText;
-                $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                $timeout(function () {
+                    $scope.editQuestionText.text = questionText;
+                    $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                });
             };
             $scope.UpdateQuestion = function () {
                 _this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
                 $scope.changeQuestionModal.close();
             };
             this.helper.client.updateQuestion = function (questionText, questionid, channelid) {
-                if ($scope.Channels[channelid] != null) {
-                    if ($scope.Channels[channelid].Questions[questionid] != null) {
-                        $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                $timeout(function () {
+                    if ($scope.Channels[channelid] != null) {
+                        if ($scope.Channels[channelid].Questions[questionid] != null) {
+                            $scope.Channels[channelid].Questions[questionid].Text = questionText;
+                        }
                     }
-                }
-                $scope.$apply();
+                });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             $scope.CloseEditModal = function () {
@@ -354,15 +365,17 @@ var Help;
             };
             this.helper.client.appendUser = function (user, channelid) {
                 if ($scope.Channels[channelid] != null) {
-                    $scope.Channels[channelid].Users[user.Id] = user;
-                    $scope.$apply();
+                    $timeout(function () {
+                        $scope.Channels[channelid].Users[user.Id] = user;
+                    });
                 }
             };
             this.helper.client.removeUser = function (userid, channelid) {
                 if ($scope.Channels[channelid] != null) {
                     if ($scope.Channels[channelid].Users[userid] != null) {
-                        delete $scope.Channels[channelid].Users[userid];
-                        $scope.$apply();
+                        $timeout(function () {
+                            delete $scope.Channels[channelid].Users[userid];
+                        });
                     }
                 }
             };
@@ -373,20 +386,21 @@ var Help;
                 _this.removeChatMessage(messageId);
             };
             this.helper.client.removeChatMessage = function (messageId) {
-                for (var channel in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(channel)) {
-                        var ch = $scope.Channels[channel];
-                        for (var chatMessage in ch.ChatMessages) {
-                            if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
-                                var id = Number(chatMessage);
-                                if (id === messageId) {
-                                    delete ch.ChatMessages[id];
+                $timeout(function () {
+                    for (var channel in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(channel)) {
+                            var ch = $scope.Channels[channel];
+                            for (var chatMessage in ch.ChatMessages) {
+                                if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
+                                    var id = Number(chatMessage);
+                                    if (id === messageId) {
+                                        delete ch.ChatMessages[id];
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                $scope.$apply();
+                });
             };
             $scope.Chat = function () {
                 var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
@@ -396,9 +410,10 @@ var Help;
                 $scope.Channels[$scope.ActiveChannel].MessageText = "";
             };
             this.helper.client.sendChatMessage = function (message, channelId) {
-                message.User = $scope.Channels[channelId].Users[message.User.Id];
-                $scope.Channels[channelId].ChatMessages[message.Id] = message;
-                $scope.$apply();
+                $timeout(function () {
+                    message.User = $scope.Channels[channelId].Users[message.User.Id];
+                    $scope.Channels[channelId].ChatMessages[message.Id] = message;
+                });
             };
             this.helper.client.alert = function (message, heading, oftype) {
                 _this.alert(oftype, message, heading);
@@ -439,15 +454,16 @@ var Help;
                     _this.logoutUser(token.key);
             };
             this.helper.client.userLoggedOut = function () {
-                $scope.Me.LoggedIn = false;
-                for (var ch in $scope.Channels) {
-                    if ($scope.Channels.hasOwnProperty(ch)) {
-                        delete $scope.Channels[ch];
+                $timeout(function () {
+                    $scope.Me.LoggedIn = false;
+                    for (var ch in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(ch)) {
+                            delete $scope.Channels[ch];
+                        }
                     }
-                }
-                $scope.setActiveChannel(0);
-                $cookieStore.remove("token");
-                $scope.$apply();
+                    $scope.setActiveChannel(0);
+                    $cookieStore.remove("token");
+                });
             };
             $scope.login = function () {
                 if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {
