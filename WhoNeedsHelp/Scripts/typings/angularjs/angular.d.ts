@@ -524,11 +524,11 @@ declare module angular {
     }
 
     interface IModelValidators {
-        [index: string]: (...args: any[]) => boolean;
+        [index: string]: (modelValue: any, viewValue: string) => boolean;
     }
 
     interface IAsyncModelValidators {
-        [index: string]: (...args: any[]) => IPromise<boolean>;
+        [index: string]: (modelValue: any, viewValue: string) => IPromise<any>;
     }
 
     interface IModelParser {
@@ -1414,6 +1414,7 @@ declare module angular {
     * https://docs.angularjs.org/api/ng/service/$http#defaults
     */
     interface IHttpProviderDefaults {
+        cache?: boolean;
         xsrfCookieName?: string;
         xsrfHeaderName?: string;
         withCredentials?: boolean;

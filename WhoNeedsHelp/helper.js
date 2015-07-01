@@ -318,7 +318,7 @@ var Help;
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
-                        _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil sp\u00F8rgsm\u00E5let er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
+                        _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil spørgsmålet er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
                     }
                 }
             };
