@@ -269,7 +269,7 @@ module Help {
         }
         alert(typ: string, text: string, title: string) {
             // ReSharper disable once UnusedLocals
-            const notify = new PNotify({
+            var notify = new PNotify({
                 title: title,
                 text: text,
                 type: typ,
@@ -449,13 +449,13 @@ module Help {
                 }, 0);
             }
             this.helper.client.appendChannel = (channel) => {
-                for (let questionId in channel.Questions) {
+                for (var questionId in channel.Questions) {
                     if (channel.Questions.hasOwnProperty(questionId)) {
                         var question = channel.Questions[questionId];
                         question.User = channel.Users[question.User.Id];
                     }
                 }
-                for (let chatMessageId in channel.ChatMessages) {
+                for (var chatMessageId in channel.ChatMessages) {
                     if (channel.ChatMessages.hasOwnProperty(chatMessageId)) {
                         var chatMessage = channel.ChatMessages[chatMessageId];
                         chatMessage.User = channel.Users[chatMessage.User.Id];
@@ -495,7 +495,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 }
             };
             this.helper.client.removeQuestion = (questionid: number) => {
-                for (let channelid in $scope.Channels) {
+                for (var channelid in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(channelid)) {
                         if ($scope.Channels[channelid].Questions[questionid] != null) {
                             delete $scope.Channels[channelid].Questions[questionid];
@@ -545,12 +545,12 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 this.removeChatMessage(messageId);
             }
             this.helper.client.removeChatMessage = (messageId: number) => {
-                for (let channel in $scope.Channels) {
+                for (var channel in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(channel)) {
-                        const ch = $scope.Channels[channel];
-                        for (let chatMessage in ch.ChatMessages) {
+                        var ch = $scope.Channels[channel];
+                        for (var chatMessage in ch.ChatMessages) {
                             if (ch.ChatMessages.hasOwnProperty(chatMessage)) {
-                                const id = Number(chatMessage);
+                                var id = Number(chatMessage);
                                 if (id === messageId) {
                                     delete ch.ChatMessages[id];
                                 }
@@ -612,7 +612,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             }
             this.helper.client.userLoggedOut = () => {
                 $scope.Me.LoggedIn = false;
-                for (let ch in $scope.Channels) {
+                for (var ch in $scope.Channels) {
                     if ($scope.Channels.hasOwnProperty(ch)) {
                         delete $scope.Channels[ch];
                     }
@@ -663,8 +663,8 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             this.helper.client.clearChat = (channelId: number) => {
                 console.log("Called");
                 $timeout(() => {
-                    const chatMessages = $scope.Channels[channelId].ChatMessages;
-                    for (let chatMessageId in chatMessages) {
+                    var chatMessages = $scope.Channels[channelId].ChatMessages;
+                    for (var chatMessageId in chatMessages) {
                         if (chatMessages.hasOwnProperty(chatMessageId)) {
                             delete chatMessages[chatMessageId];
                         }
@@ -673,7 +673,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             }
             this.helper.client.clearChannels = () => {
                 $timeout(() => {
-                    for (let channelId in $scope.Channels) {
+                    for (var channelId in $scope.Channels) {
                         if ($scope.Channels.hasOwnProperty(channelId)) {
                             delete $scope.Channels[channelId];
                         }
