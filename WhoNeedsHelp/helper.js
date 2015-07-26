@@ -7,7 +7,7 @@
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -22,6 +22,7 @@ var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
 function removeFromArray(arr, index) {
     return arr.slice(0, index).concat(arr.slice(index + 1));
 }
+var confirmNotice = null;
 var Help;
 (function (Help) {
     var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
@@ -109,16 +110,13 @@ var Help;
             });
         };
         ServerActions.prototype.confirm = function (text, title, callback) {
-            if (this.confirmNotice == null)
-                this.confirmNotice = new PNotify({
+            if (confirmNotice == null)
+                confirmNotice = new PNotify({
                     title: title,
                     text: text,
                     icon: "glyphicon glyphicon-question-sign",
                     mouse_reset: false,
                     hide: false,
-                    /*confirm: {
-                        confirm: true
-                    },*/
                     confirm: {
                         confirm: true,
                         buttons: [
@@ -127,14 +125,14 @@ var Help;
                                 click: function (n) {
                                     n.remove();
                                     callback();
-                                    this.confirmNotice = null;
+                                    confirmNotice = null;
                                 }
                             },
                             {
                                 text: "Annuller",
                                 click: function (n) {
                                     n.remove();
-                                    this.confirmNotice = null;
+                                    confirmNotice = null;
                                 }
                             }
                         ]

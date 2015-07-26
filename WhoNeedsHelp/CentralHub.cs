@@ -305,39 +305,6 @@ namespace WhoNeedsHelp
             }
         }
 
-        //public void ChangeToChannel(string channelId)
-        //{
-        //    using (HelpContext db = new HelpContext())
-        //    {
-        //        //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-        //        Connection con = db.Connections.Find(Context.ConnectionId);
-        //        if (con == null) return;
-        //        User user = con.User;
-        //        if (user != null)
-        //        {
-        //            if (String.IsNullOrWhiteSpace(channelId)) return;
-        //            int id;
-        //            bool parse = Int32.TryParse(channelId, out id);
-        //            if (!parse) return;
-        //            Channel channel = db.Channels.Find(id);
-        //            if (channel != null)
-        //            {
-        //                user.Channel = channel;
-        //                db.Users.AddOrUpdate(user);
-        //                db.SaveChanges();
-        //                bool areUserQuestioning = user.AreUserQuestioning(channel);
-        //                foreach (Connection connection in user.Connections)
-        //                {
-        //                    Clients.Client(connection.ConnectionId).SetChannel(id, areUserQuestioning);
-        //                }
-        //                ReloadChannelData(user.Id);
-        //            }
-        //        }
-        //        db.SaveChanges();
-        //    }
-
-        //}
-
         public void JoinChannel(int channelId)
         {
             using (HelpContext db = new HelpContext())

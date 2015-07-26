@@ -93,6 +93,8 @@ function removeFromArray(arr: any, index: any) {
     return arr.slice(0, index).concat(arr.slice(index + 1));
 }
 
+var confirmNotice: any = null;
+
 module Help {
     import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
     import ModalService = angular.ui.bootstrap.IModalService;
@@ -286,16 +288,13 @@ module Help {
         }
 
         confirm(text: string, title: string, callback: Function) {
-            if (this.confirmNotice == null)
-                this.confirmNotice = new PNotify(<any>{
+            if (confirmNotice == null)
+                confirmNotice = new PNotify(<any>{
                     title: title,
                     text: text,
                     icon: "glyphicon glyphicon-question-sign",
                     mouse_reset: false,
                     hide: false,
-                    /*confirm: {
-                        confirm: true
-                    },*/
                     confirm: {
                         confirm: true,
                         buttons: [
@@ -304,14 +303,14 @@ module Help {
                                 click(n) {
                                     n.remove();
                                     callback();
-                                    this.confirmNotice = null;
+                                    confirmNotice = null;
                                 }
                             },
                             {
                                 text: "Annuller",
                                 click(n) {
                                     n.remove();
-                                    this.confirmNotice = null;
+                                    confirmNotice = null;
                                 }
                             }
                         ]
