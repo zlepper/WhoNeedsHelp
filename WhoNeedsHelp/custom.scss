@@ -16,6 +16,42 @@
     }
 }
 
+@-moz-keyframes noHeight {
+    0% {
+        -moz-transform: scale3d(0,1,0);
+        -ms-transform: scale3d(0,1,0);
+        -o-transform: scale3d(0,1,0);
+        -webkit-transform: scale3d(0,1,0);
+        transform: scale3d(0,1,0);
+    }
+
+    100% {
+        -moz-transform: scale3d(0,1,0);
+        -ms-transform: scale3d(0,1,0);
+        -o-transform: scale3d(0,1,0);
+        -webkit-transform: scale3d(0,1,0);
+        transform: scale3d(0,1,0);
+    }
+}
+
+@-webkit-keyframes noHeight {
+    0% {
+        -moz-transform: scale3d(0,1,0);
+        -ms-transform: scale3d(0,1,0);
+        -o-transform: scale3d(0,1,0);
+        -webkit-transform: scale3d(0,1,0);
+        transform: scale3d(0,1,0);
+    }
+
+    100% {
+        -moz-transform: scale3d(0,1,0);
+        -ms-transform: scale3d(0,1,0);
+        -o-transform: scale3d(0,1,0);
+        -webkit-transform: scale3d(0,1,0);
+        transform: scale3d(0,1,0);
+    }
+}
+
 @keyframes noHeight {
     0% {
         -moz-transform: scale3d(0,1,0);
