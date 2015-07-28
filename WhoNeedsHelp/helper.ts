@@ -581,15 +581,13 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 $scope.Channels[$scope.ActiveChannel].MessageText = "";
             }
             this.helper.client.sendChatMessage = (message: ChatMessage, channelId) => {
-                setTimeout(() => {
-                    if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
-                        if (message.User.Id !== $scope.Me.Id) {
-                            if (channelId !== $scope.ActiveChannel || !document.hidden) {
-                                this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
-                            }
+                if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
+                    if (message.User.Id !== $scope.Me.Id) {
+                        if (channelId !== $scope.ActiveChannel || document.hidden) {
+                            this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
                         }
                     }
-                }, 0);
+                }
                 $timeout(() => {
                     message.User = $scope.Channels[channelId].Users[message.User.Id];
                     $scope.Channels[channelId].ChatMessages[message.Id] = message;

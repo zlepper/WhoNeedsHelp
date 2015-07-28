@@ -408,15 +408,13 @@ var Help;
                 $scope.Channels[$scope.ActiveChannel].MessageText = "";
             };
             this.helper.client.sendChatMessage = function (message, channelId) {
-                setTimeout(function () {
-                    if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
-                        if (message.User.Id !== $scope.Me.Id) {
-                            if (channelId !== $scope.ActiveChannel || !document.hidden) {
-                                _this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
-                            }
+                if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
+                    if (message.User.Id !== $scope.Me.Id) {
+                        if (channelId !== $scope.ActiveChannel || document.hidden) {
+                            _this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
                         }
                     }
-                }, 0);
+                }
                 $timeout(function () {
                     message.User = $scope.Channels[channelId].Users[message.User.Id];
                     $scope.Channels[channelId].ChatMessages[message.Id] = message;
@@ -634,4 +632,3 @@ var Help;
     })();
     Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
-//# sourceMappingURL=helper.js.map
