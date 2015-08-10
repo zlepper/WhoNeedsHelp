@@ -181,6 +181,13 @@ module Help {
         lastActiveChannel: number;
         changeUsernamePopover: PopoverOptions;
         ClearChat: () => void;
+        StartTimer: (channel: Channel) => void;
+        countDown: (channel: Channel) => void;
+        StopTimer: (channel: Channel) => void;
+        alarm: HTMLAudioElement;
+        HaltTimer: (channel: Channel) => void;
+        EditTimer: () => void;
+        startTime: number;
     }
 
     export class ServerActions {
@@ -328,9 +335,9 @@ module Help {
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", "$modal", "$timeout", "$cookieStore"];
+        static $inject = ["$scope", "$modal", "$timeout", "$cookieStore", "$interval"];
 
-        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any, public $cookieStore: any) {
+        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any, public $cookieStore: any, public $interval: any) {
             super();
             $scope.Loading = true;
             $scope.StartingModal = new LoginOptions();
@@ -339,6 +346,9 @@ module Help {
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
             $scope.lastActiveChannel = 0;
+            $scope.startTime = 300;
+            $scope.alarm = new Audio("alarm.mp3");
+
             this.helper = $.connection.centralHub;
             var that = this;
 
@@ -372,6 +382,65 @@ module Help {
                 backdrop: "static",
                 animation: false
             };
+
+            if ($scope.ActiveChannel)
+                $scope.Channels[$scope.ActiveChannel].timeLeft = 0;
+
+            $scope.countDown = (channel: Channel) => {
+                if (channel) {
+                    channel.timeLeft = channel.timeLeft - 1;
+                    if (channel.timeLeft <= 0) {
+                        channel.outOfTime = true;
+                        $scope.alarm.play();
+                        $scope.HaltTimer(channel);
+                    }
+                } else {
+                    $scope.countDown($scope.Channels[$scope.ActiveChannel]);
+                }
+            }
+
+            $scope.StartTimer = (channel: Channel) => {
+                if (channel) {
+                    channel.timing = true;
+                    channel.counting = true;
+                    channel.timeLeft = $scope.startTime;
+                    channel.outOfTime = false;
+                    channel.intervalCont = $interval($scope.countDown, 1000, 0, true, channel);
+                } else {
+                    $scope.StartTimer($scope.Channels[$scope.ActiveChannel]);
+                }
+            }
+
+            $scope.StopTimer = (channel: Channel) => {
+                if (channel) {
+                    $scope.HaltTimer(channel);
+                    channel.timing = false;
+                    channel.outOfTime = false;
+                } else {
+                    $scope.StopTimer($scope.Channels[$scope.ActiveChannel]);
+                }
+            }
+
+            $scope.HaltTimer = (channel: Channel) => {
+                if (channel) {
+                    $interval.cancel(channel.intervalCont);
+                    channel.counting = false;
+                } else {
+                    $scope.HaltTimer($scope.Channels[$scope.ActiveChannel]);
+                }
+            }
+            $scope.EditTimer = () => {
+                var n = prompt("Hvad skal den nye tid være? \n Tal i sekunder");
+                var m = Number(n);
+                if (m === NaN) {
+                    return this.alert("error", "Ikke et tal!", "Fejl");
+                }
+                if (m <= 0) {
+                    return this.alert("error", "Tiden kan ikke være mindre end 1!", "Fejl");
+                }
+                $scope.startTime = m;
+            }
+
             $scope.setActiveChannel = (channelid) => {
                 $scope.ActiveChannel = channelid;
             };
@@ -488,6 +557,11 @@ module Help {
                 });
             };
             this.helper.client.addQuestion = (question, channelid) => {
+                if ($scope.Channels[channelid].timing) {
+                    if (Object.keys($scope.Channels[channelid].Questions).length === 0) {
+                        $scope.StartTimer($scope.Channels[channelid]);
+                    }
+                }
                 question.User = $scope.Channels[channelid].Users[question.User.Id];
                 $timeout(() => {
                     $scope.Channels[channelid].Questions[question.Id] = question;
@@ -506,9 +580,17 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                         if ($scope.Channels.hasOwnProperty(channelid)) {
                             if ($scope.Channels[channelid].Questions[questionid] != null) {
                                 delete $scope.Channels[channelid].Questions[questionid];
+                                if ($scope.Channels[channelid].timing) {
+                                    if (Object.keys($scope.Channels[channelid].Questions).length === 0)
+                                        $scope.HaltTimer($scope.Channels[channelid]);
+                                    else {
+                                        $scope.StartTimer($scope.Channels[channelid]);
+                                    }
+                                }
                             }
                         }
                     }
+
                 });
             };
             this.helper.client.sendQuestion = (questionText) => {
@@ -797,6 +879,11 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
         IsAdmin: boolean;
         Text: string;
         MessageText: string;
+        counting = false;
+        outOfTime = false;
+        timing = false;
+        timeLeft = 300;
+        intervalCont: any;
 
         constructor(id: number, channelName: string) {
             this.Id = id;

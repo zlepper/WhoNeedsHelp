@@ -8,8 +8,8 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/bootstrap-theme.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="Content/animate.min.css" />
-    <link rel="stylesheet" href="custom.css"/>
-    <link rel="stylesheet" href="Content/perfect-scrollbar.min.css"/>
+    <link rel="stylesheet" href="custom.css" />
+    <link rel="stylesheet" href="Content/perfect-scrollbar.min.css" />
     <script src="Scripts/analytics.js"></script>
     <!--Script references. -->
     <!--Reference the jQuery library. -->
@@ -34,6 +34,7 @@
     <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="helper.js"></script>
+    <script src="js/countdown.js"></script>
     <script type="text/javascript" src="loading.js"></script>
     <link href="loading.css" type="text/css" rel="stylesheet" />
     <script>
@@ -155,13 +156,21 @@
                 <div class="col-md-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Hj&aelig;lpeliste</h3>
+                            <h3 class="panel-title">
+                                Hj&aelig;lpeliste
+                                <span class="pull-right" ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
+                                    <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
+                                    <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].timeLeft|countdown}}</button>
+                                    <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
+                                    <button class="astext" ng-click="EditTimer()"><span class="glyphicon glyphicon-pencil"></span></button>
+                                </span>
+                            </h3>
                         </div>
                         <div class="panel-body" id="HelpList">
                             <div class="wrapper">
                                 <inner class="box">
                                     <!--Help panels will appear here-->
-                                    <div class="panel panel-primary" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
+                                    <div class="panel" ng-class="{'panel-danger': Channels[ActiveChannel].outOfTime && $first, 'panel-primary': !Channels[ActiveChannel].outOfTime || !$first}" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
                                         <div class="panel-heading">
                                             <button aria-label="Fjern spørgsmål" class="close"
                                                     type="button" ng-click="RemoveQuestion(question.Id)"
@@ -178,7 +187,6 @@
                             </div>
                         </div>
                         <div class="panel-footer">
-
                             <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
                                 <div class="form-group">
                                     <label class="sr-only" for="question">Spørgsmåls Tekst</label>
