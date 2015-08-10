@@ -352,7 +352,7 @@ module Help {
             this.helper = $.connection.centralHub;
             var that = this;
 
-            $scope.$watch("ActiveChannel", (newValue, oldValue) => {
+            $scope.$watch("ActiveChannel", (newValue: number, oldValue: number) => {
                 $scope.lastActiveChannel = oldValue;
             });
 
