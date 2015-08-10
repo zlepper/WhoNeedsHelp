@@ -405,6 +405,9 @@ module Help {
                     channel.counting = true;
                     channel.timeLeft = $scope.startTime;
                     channel.outOfTime = false;
+                    if (angular.isDefined(channel.intervalCont)) {
+                        $interval.cancel(channel.intervalCont);
+                    }
                     channel.intervalCont = $interval($scope.countDown, 1000, 0, true, channel);
                 } else {
                     $scope.StartTimer($scope.Channels[$scope.ActiveChannel]);
