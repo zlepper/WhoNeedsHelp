@@ -7,7 +7,7 @@
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -215,6 +215,9 @@ var Help;
             $scope.countDown = function (channel) {
                 if (channel) {
                     channel.TimeLeft = channel.TimeLeft - 1;
+                    if (channel.TimeLeft % 10 == 0) {
+                        _this.sendCountdownTime(channel.TimeLeft, channel.Id);
+                    }
                     if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
                         $scope.alarm.play();
