@@ -29,6 +29,7 @@ namespace WhoNeedsHelp.server
         public virtual ICollection<ChatMessage> ChatMessages { get; set; }
 
         public string ChannelName { get; set; }
+        public int TimeLeft { get; set; }
 
         public Channel()
         {

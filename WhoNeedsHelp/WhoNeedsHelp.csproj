@@ -202,6 +202,10 @@
     <Compile Include="Migrations\201506131700157_LoginToken.Designer.cs">
       <DependentUpon>201506131700157_LoginToken.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508110508328_addTimeLeft.cs" />
+    <Compile Include="Migrations\201508110508328_addTimeLeft.Designer.cs">
+      <DependentUpon>201508110508328_addTimeLeft.cs</DependentUpon>
+    </Compile>
     <Compile Include="server\Connection.cs" />
     <Compile Include="Migrations\201503051130379_initinal.cs" />
     <Compile Include="Migrations\201503051130379_initinal.Designer.cs">
@@ -322,6 +326,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506131700157_LoginToken.resx">
       <DependentUpon>201506131700157_LoginToken.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508110508328_addTimeLeft.resx">
+      <DependentUpon>201508110508328_addTimeLeft.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

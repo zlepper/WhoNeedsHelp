@@ -92,6 +92,9 @@ var Help;
         ServerActions.prototype.loginWithToken = function (id, key) {
             return this.helper.server.loginWithToken(id, key);
         };
+        ServerActions.prototype.sendCountdownTime = function (time, channelid) {
+            return this.helper.server.sendCountdownTime(time, channelid);
+        };
         ServerActions.prototype.alert = function (typ, text, title) {
             // ReSharper disable once UnusedLocals
             var notify = new PNotify({
@@ -103,10 +106,10 @@ var Help;
                 mouse_reset: false,
                 desktop: {
                     desktop: document.hidden
-                },
-                click: function (n) {
-                    n.remove();
                 }
+            });
+            notify.elem.click(function () {
+                notify.remove();
             });
         };
         ServerActions.prototype.confirm = function (text, title, callback) {
@@ -200,11 +203,19 @@ var Help;
                 animation: false
             };
             if ($scope.ActiveChannel)
-                $scope.Channels[$scope.ActiveChannel].timeLeft = 0;
+                $scope.Channels[$scope.ActiveChannel].TimeLeft = 0;
+            window.onbeforeunload = function () {
+                for (var key in $scope.Channels) {
+                    var channel = $scope.Channels[key];
+                    if (channel.timing) {
+                        _this.sendCountdownTime(channel.TimeLeft, key);
+                    }
+                }
+            };
             $scope.countDown = function (channel) {
                 if (channel) {
-                    channel.timeLeft = channel.timeLeft - 1;
-                    if (channel.timeLeft <= 0) {
+                    channel.TimeLeft = channel.TimeLeft - 1;
+                    if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
                         $scope.alarm.play();
                         $scope.HaltTimer(channel);
@@ -218,7 +229,7 @@ var Help;
                 if (channel) {
                     channel.timing = true;
                     channel.counting = true;
-                    channel.timeLeft = $scope.startTime;
+                    channel.TimeLeft = $scope.startTime;
                     channel.outOfTime = false;
                     if (angular.isDefined(channel.intervalCont)) {
                         $interval.cancel(channel.intervalCont);
@@ -255,7 +266,7 @@ var Help;
                     return _this.alert("error", "Ikke et tal!", "Fejl");
                 }
                 if (m <= 0) {
-                    return _this.alert("error", "Tiden kan ikke være mindre end 1!", "Fejl");
+                    return _this.alert("error", "Tiden kan ikke være mindre end 1 sekund!", "Fejl");
                 }
                 $scope.startTime = m;
             };
@@ -356,6 +367,11 @@ var Help;
                 $timeout(function () {
                     $scope.ActiveChannel = channel.Id;
                     $scope.Channels[channel.Id] = channel;
+                    if (channel.TimeLeft) {
+                        $scope.startTime = channel.TimeLeft;
+                        $scope.StartTimer(channel);
+                        $scope.startTime = 300;
+                    }
                 });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
@@ -679,7 +695,7 @@ var Help;
             this.counting = false;
             this.outOfTime = false;
             this.timing = false;
-            this.timeLeft = 300;
+            this.TimeLeft = 300;
             this.Id = id;
             this.ChannelName = channelName;
         }
@@ -711,4 +727,3 @@ var Help;
     })();
     Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
-//# sourceMappingURL=helper.js.map

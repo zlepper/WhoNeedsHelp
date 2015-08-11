@@ -82,6 +82,7 @@ interface ICentralServer {
     removeOwnQuestion(channelid: number): JQueryPromise<void>;
     editOwnQuestion(channelId: number): JQueryPromise<void>;
     loginWithToken(id: number, key: string): JQueryPromise<void>;
+    sendCountdownTime(time: number, channelid: number): JQueryPromise<void>;
 }
 
 function isNullOrWhitespace(input: any) {
@@ -276,6 +277,9 @@ module Help {
         loginWithToken(id: number, key: string) {
             return this.helper.server.loginWithToken(id, key);
         }
+        sendCountdownTime(time: number, channelid: number) {
+            return this.helper.server.sendCountdownTime(time, channelid);
+        }
         alert(typ: string, text: string, title: string) {
             // ReSharper disable once UnusedLocals
             var notify = new PNotify({
@@ -287,10 +291,10 @@ module Help {
                 mouse_reset: false,
                 desktop: {
                     desktop: document.hidden
-                },
-                click(n) {
-                    n.remove();
                 }
+            });
+            notify.elem.click(() => {
+                notify.remove();
             });
         }
 
@@ -384,12 +388,22 @@ module Help {
             };
 
             if ($scope.ActiveChannel)
-                $scope.Channels[$scope.ActiveChannel].timeLeft = 0;
+                $scope.Channels[$scope.ActiveChannel].TimeLeft = 0;
+
+            window.onbeforeunload = () => {
+                for (var key in $scope.Channels) {
+                    var channel = $scope.Channels[key];
+                    if (channel.timing) {
+                        this.sendCountdownTime(channel.TimeLeft, key);
+                    }
+                }
+                
+            }
 
             $scope.countDown = (channel: Channel) => {
                 if (channel) {
-                    channel.timeLeft = channel.timeLeft - 1;
-                    if (channel.timeLeft <= 0) {
+                    channel.TimeLeft = channel.TimeLeft - 1;
+                    if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
                         $scope.alarm.play();
                         $scope.HaltTimer(channel);
@@ -403,7 +417,7 @@ module Help {
                 if (channel) {
                     channel.timing = true;
                     channel.counting = true;
-                    channel.timeLeft = $scope.startTime;
+                    channel.TimeLeft = $scope.startTime;
                     channel.outOfTime = false;
                     if (angular.isDefined(channel.intervalCont)) {
                         $interval.cancel(channel.intervalCont);
@@ -439,7 +453,7 @@ module Help {
                     return this.alert("error", "Ikke et tal!", "Fejl");
                 }
                 if (m <= 0) {
-                    return this.alert("error", "Tiden kan ikke være mindre end 1!", "Fejl");
+                    return this.alert("error", "Tiden kan ikke være mindre end 1 sekund!", "Fejl");
                 }
                 $scope.startTime = m;
             }
@@ -539,6 +553,11 @@ module Help {
                 $timeout(() => {
                     $scope.ActiveChannel = channel.Id;
                     $scope.Channels[channel.Id] = channel;
+                    if (channel.TimeLeft) {
+                        $scope.startTime = channel.TimeLeft;
+                        $scope.StartTimer(channel);
+                        $scope.startTime = 300;
+                    }
                 });
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
@@ -885,7 +904,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
         counting = false;
         outOfTime = false;
         timing = false;
-        timeLeft = 300;
+        TimeLeft = 300;
         intervalCont: any;
 
         constructor(id: number, channelName: string) {

@@ -839,5 +839,23 @@ namespace WhoNeedsHelp
                 Clients.Caller.SendUserId(newUser.Id);
             }
         }
+
+        public void SendCountdownTime(int timeLeft, int channelId)
+        {
+            using (HelpContext db = new HelpContext())
+            {
+                Connection con = db.Connections.Find(Context.ConnectionId);
+                if (con == null) return;
+                User user = con.User;
+                if (user == null) return;
+
+                Channel channel = db.Channels.Find(channelId);
+                if (channel.IsUserAdministrator(user))
+                {
+                    channel.TimeLeft = timeLeft;
+                }
+                db.SaveChanges();
+            }
+        }
     }
 }

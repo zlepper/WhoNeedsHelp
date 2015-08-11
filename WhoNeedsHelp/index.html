@@ -160,7 +160,7 @@
                                 Hj&aelig;lpeliste
                                 <span class="pull-right" ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
                                     <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
-                                    <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].timeLeft|countdown}}</button>
+                                    <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>
                                     <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
                                     <button class="astext" ng-click="EditTimer()"><span class="glyphicon glyphicon-pencil"></span></button>
                                 </span>

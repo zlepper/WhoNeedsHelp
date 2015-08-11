@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using WhoNeedsHelp.server;
 
 namespace WhoNeedsHelp.Simples
@@ -12,6 +13,7 @@ namespace WhoNeedsHelp.Simples
         public Dictionary<int, SimpleChatMessage> ChatMessages { get; set; }
         public Dictionary<int, SimpleUser> Users { get; set; }
         public bool IsAdmin { get; set; }
+        public int TimeLeft { get; set; }
 
         public SimpleChannel(int id, bool isAdmin = false)
         {
@@ -36,6 +38,7 @@ namespace WhoNeedsHelp.Simples
                 {
                     Users.Add(u.Id, u.ToSimpleUser());
                 }
+                TimeLeft = c.TimeLeft;
             }
         }
     }
