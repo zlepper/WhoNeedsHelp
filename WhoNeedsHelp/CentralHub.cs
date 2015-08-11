@@ -73,7 +73,7 @@ namespace WhoNeedsHelp
 
         public void Chat(string message, int channelId)
         {
-            if (String.IsNullOrWhiteSpace(message)) return;
+            if (string.IsNullOrWhiteSpace(message)) return;
             using (HelpContext db = new HelpContext())
             {
                 User user = db.Connections.Find(Context.ConnectionId).User;
@@ -188,7 +188,7 @@ namespace WhoNeedsHelp
                 if (q == null) return;
                 foreach (Connection connection in channel.Users.SelectMany(use => use.Connections))
                 {
-                    Clients.Client(connection.ConnectionId).UpdateQuestion(String.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id, channelId);
+                    Clients.Client(connection.ConnectionId).UpdateQuestion(string.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id, channelId);
                 }
                 db.SaveChanges();
             }
@@ -470,7 +470,7 @@ namespace WhoNeedsHelp
 
         public void RequestHelp(string question, int channelid)
         {
-            if (String.IsNullOrWhiteSpace(question)) question = "";
+            if (string.IsNullOrWhiteSpace(question)) question = "";
             using (HelpContext db = new HelpContext())
             {
                 Connection con = db.Connections.Find(Context.ConnectionId);
@@ -572,7 +572,7 @@ namespace WhoNeedsHelp
                 if (con == null) return base.OnDisconnected(stopCalled);
                 User user = con.User;
                 if (user == null) return base.OnDisconnected(stopCalled);
-                if (String.IsNullOrWhiteSpace(user.EmailAddress))
+                if (string.IsNullOrWhiteSpace(user.EmailAddress))
                 {
                     foreach (Channel c in user.ChannelsIn)
                     {
@@ -623,7 +623,7 @@ namespace WhoNeedsHelp
         public void CreateNewUser(string username, string email, string pw, bool stayLoggedIn)
         {
             Debug.WriteLine("Here");
-            if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(pw))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(pw))
             {
                 Clients.Caller.Alert("En af værdier er ikke blevet sat.", "Fejl under oprettelse af bruger", "error");
                 return;
@@ -640,7 +640,7 @@ namespace WhoNeedsHelp
                 if (con == null) return;
                 user = con.User;
                 if (user == null) return;
-                if (!String.IsNullOrWhiteSpace(user.Pw) || !String.IsNullOrWhiteSpace(user.EmailAddress))
+                if (!string.IsNullOrWhiteSpace(user.Pw) || !string.IsNullOrWhiteSpace(user.EmailAddress))
                 {
                     Clients.Caller.Alert("Du er allerede logget ind.", "Fejl under oprettelse af bruger", "error");
                     return;
@@ -658,7 +658,7 @@ namespace WhoNeedsHelp
                 }
 
 
-
+                user.LastLogin = DateTime.Now;
                 db.SaveChanges();
                 Clients.Caller.UserCreationSuccess();
             }
@@ -694,13 +694,14 @@ namespace WhoNeedsHelp
                     db.LoginTokens.RemoveRange(user.LoginTokens);
                     Clients.Caller.TokenLoginFailed();
                 }
+                user.LastLogin = DateTime.Now;
                 db.SaveChanges();
             }
         }
 
         public void LoginUser(string email, string password, bool stayLoggedIn)
         {
-            if (String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 Clients.Caller.Alert("Ikke alt info er indtastet", "Fejl i indtasting", "error");
                 return;
@@ -711,7 +712,7 @@ namespace WhoNeedsHelp
                 Connection con = db.Connections.Find(Context.ConnectionId);
                 if (con == null) return;
                 User currentUser = con.User;
-                if (currentUser == null || !String.IsNullOrWhiteSpace(currentUser.EmailAddress) || !String.IsNullOrWhiteSpace(currentUser.Pw))
+                if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
                 {
                     Clients.Caller.Alert("Du er allerede logget ind", "Allerede logget ind", "error");
                     return;
@@ -769,9 +770,10 @@ namespace WhoNeedsHelp
 
                         user.GenerateLoginToken(key);
                     }
+                    user.LastLogin = DateTime.Now;
                     db.SaveChanges();
                     Clients.Caller.LoginSuccess();
-                    if (String.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
+                    if (string.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
                     {
                         Clients.Caller.UpdateUsername(user.Name);
                     }

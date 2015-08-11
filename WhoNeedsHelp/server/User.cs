@@ -38,10 +38,13 @@ namespace WhoNeedsHelp.server
         public int FailedLoginAttempts { get; set; }
         public DateTime LastFailedAttempt { get; set; }
 
+        public DateTime LastLogin { get; set; }
+
         public User()
         {
             Questions = new List<Question>();
             Connections = new List<Connection>();
+            LastLogin = DateTime.Now;
         }
 
         public Question RequestHelp(Channel ch, string question = null)
