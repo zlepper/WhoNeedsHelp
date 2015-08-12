@@ -54,8 +54,8 @@ namespace WhoNeedsHelp.Server.Mail
                     Subject = "Nulstilling af kodeord",
                     Html =
                         "<p>Du har anmodet om at få nulstillet dit kodeord.</p><p>Indtast denne nøgle for at nulstille dit kodeord. </p>" +
-                        $"<pre>{resetKey}</pre>" +
-                        $"<p>Du har til {user.ResetExpiresAt.ToUniversalTime()} UTC til at nulstille dit kodeord.</p>" +
+                        "<pre>" + resetKey + "</pre>" +
+                        "<p>Du har til " + user.ResetExpiresAt.ToUniversalTime() + " UTC til at nulstille dit kodeord.</p>" +
                         "<p>Har du ikke anmodet om at få dit kodeord nulstillet kan du se bort fra denne mail."
                 };
 
