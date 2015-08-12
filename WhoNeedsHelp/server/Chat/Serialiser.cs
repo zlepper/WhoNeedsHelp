@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-
-namespace WhoNeedsHelp.server
+﻿namespace WhoNeedsHelp.Server.Chat
 {
     /*public static class Serialiser
     {

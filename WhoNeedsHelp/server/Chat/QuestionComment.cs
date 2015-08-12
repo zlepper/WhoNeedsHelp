@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     public class QuestionComment
     {

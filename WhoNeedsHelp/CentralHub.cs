@@ -6,7 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
-using WhoNeedsHelp.server;
+using WhoNeedsHelp.Server.Chat;
+using WhoNeedsHelp.Server.Mail;
 using WhoNeedsHelp.Simples;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -684,6 +685,7 @@ namespace WhoNeedsHelp
                     Clients.Caller.SendReloginData(newKey.ToString(), user.Id);
                     user.GenerateLoginToken(newKey);
                     db.LoginTokens.Remove(lt);
+                    user.LastLogin = DateTime.Now;
                 }
                 else
                 {
@@ -694,7 +696,6 @@ namespace WhoNeedsHelp
                     db.LoginTokens.RemoveRange(user.LoginTokens);
                     Clients.Caller.TokenLoginFailed();
                 }
-                user.LastLogin = DateTime.Now;
                 db.SaveChanges();
             }
         }
@@ -857,6 +858,81 @@ namespace WhoNeedsHelp
                     channel.TimeLeft = timeLeft;
                 }
                 db.SaveChanges();
+            }
+        }
+
+        public void RequestPasswordReset(string email)
+        {
+            UserMail um = new UserMail();
+            Clients.Caller.PasswordResetRequestResult(um.SendPasswordRecovery(email));
+        }
+
+        public void ResetPassword(string key, string password, string email)
+        {
+            key = key.Trim();
+            using (HelpContext db = new HelpContext())
+            {
+                var user = db.Users.SingleOrDefault(u => u.ResetKey.Equals(key));
+                if (user == null)
+                {
+                    Clients.Caller.PasswordResetResult(false);
+                    return;
+                }
+                if (user.CanPasswordBeReset(key))
+                {
+                    user.Pw = PasswordHash.CreateHash(password);
+                    Clients.Caller.PasswordResetResult(true);
+                    user.ResetExpiresAt = DateTime.Now;
+                    user.ResetKey = null;
+                    db.SaveChanges();
+                    LoginUser(email, password, false);
+                }
+                else
+                {
+                    Clients.Caller.PasswordResetResult(false);
+                }
+            }
+        }
+
+        public void ChangePassword(string oldpass, string newpass)
+        {
+            using (HelpContext db = new HelpContext())
+            {
+                var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+                if (con == null) return;
+                var user = con.User;
+                if (user == null) return;
+                if (string.IsNullOrWhiteSpace(user.EmailAddress))
+                {
+                    Clients.Caller.UserLoggedOut();
+                    return;
+                }
+                if (PasswordHash.ValidatePassword(oldpass, user.Pw))
+                {
+                    user.Pw = PasswordHash.CreateHash(newpass);
+                    db.SaveChanges();
+                    Clients.Caller.PasswordChanged(true);
+                    return;
+                }
+                Clients.Caller.PasswordChanged(false);
+
+            }
+        }
+
+        public void LogoutAll()
+        {
+            using (HelpContext db = new HelpContext())
+            {
+                var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+                if (con == null) return;
+                var user = con.User;
+                if (user == null) return;
+                foreach (Connection connection in user.Connections.Where(c => !c.ConnectionId.Equals(Context.ConnectionId)))
+                {
+                    Clients.Client(connection.ConnectionId).UserLoggedOut();
+                }
+                db.LoginTokens.RemoveRange(user.LoginTokens);
+                Clients.Caller.AllUsersLoggedOut();
             }
         }
     }

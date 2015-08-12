@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WhoNeedsHelp.Simples;
 
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     public class User
     {
@@ -39,12 +39,17 @@ namespace WhoNeedsHelp.server
         public DateTime LastFailedAttempt { get; set; }
 
         public DateTime LastLogin { get; set; }
+        public DateTime CreatedAt { get; set; }
+        
+        public DateTime ResetExpiresAt { get; set; }
+        public string ResetKey { get; set; }
 
         public User()
         {
             Questions = new List<Question>();
             Connections = new List<Connection>();
             LastLogin = DateTime.Now;
+            CreatedAt = DateTime.Now;
         }
 
         public Question RequestHelp(Channel ch, string question = null)
@@ -117,6 +122,19 @@ namespace WhoNeedsHelp.server
         {
             LoginToken loginToken = LoginTokens.SingleOrDefault(token => PasswordHash.ValidatePassword(key, token.Key));
             return loginToken;
+        }
+
+        public string GenerateResetKey()
+        {
+            ResetExpiresAt = DateTime.Now.AddHours(2);
+            string key = Guid.NewGuid().ToString();
+            ResetKey = PasswordHash.CreateHash(key);
+            return key;
+        }
+
+        public bool CanPasswordBeReset(string key)
+        {
+            return ResetExpiresAt > DateTime.Now && PasswordHash.ValidatePassword(key, ResetKey);
         }
     }
 }

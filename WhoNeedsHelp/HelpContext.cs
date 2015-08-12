@@ -3,8 +3,8 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Linq;
 using MySql.Data.Entity;
-using WhoNeedsHelp.server;
 using MySql.Data;
+using WhoNeedsHelp.Server.Chat;
 
 namespace WhoNeedsHelp
 {

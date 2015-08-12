@@ -1,6 +1,6 @@
 using WhoNeedsHelp.Simples;
 
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     public interface IClient
     {
@@ -8,7 +8,6 @@ namespace WhoNeedsHelp.server
         void AddQuestion(SimpleQuestion question, int channelid);
         void RemoveQuestion(int questionId);
         void ExitChannel(int channelId);
-        void SetChannel(int channelId, bool areUserQuestioning);
         void SendQuestion(string question);
         void UpdateQuestion(string questionText, int questionId, int channelId);
         void SendChatMessage(SimpleChatMessage message, int channelId);
@@ -17,7 +16,6 @@ namespace WhoNeedsHelp.server
         void IpDiscover(string[] channelIds, string[] channelNames);
         void ClearChat(int channelId);
         void LoginSuccess();
-        void ShowChannels(string[] channelId, string[] channelName);
         void UserCreationSuccess();
         void UserLoggedOut();
         void UpdateUsername(string name);
@@ -31,5 +29,9 @@ namespace WhoNeedsHelp.server
         void ClearChannels();
         void SendReloginData(string loginKey, int userId);
         void TokenLoginFailed();
+        void PasswordResetRequestResult(bool success);
+        void PasswordResetResult(bool success);
+        void PasswordChanged(bool success);
+        void AllUsersLoggedOut();
     }
 }

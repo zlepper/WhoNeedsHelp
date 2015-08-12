@@ -32,7 +32,6 @@ interface ICentralClient {
     reloadPage: () => void;
     setQuestionState: (hasQuestion: boolean, channelid: number) => void;
     sendChatMessage: (message: Help.ChatMessage, channelId: number) => void;
-    sendChatMessages: (text: string[], author: string[], messageId: number[], sender: boolean[], appendToLast: boolean[], canEdit: boolean[]) => void;
     checkVersion: (version: number) => void;
     removeChatMessage: (messageId: number) => void;
     ipDiscover: (channelIds: number[], channelNames: string[]) => void;
@@ -58,6 +57,10 @@ interface ICentralClient {
     clearChannels: () => void;
     sendReloginData: (key: string, id: number) => void;
     tokenLoginFailed: () => void;
+    passwordResetRequestResult: (success: boolean) => void;
+    passwordResetResult: (success: boolean) => void;
+    passwordChanged: (success: boolean) => void;
+    allUsersLoggedOut: () => void;
 }
 
 interface ICentralServer {
@@ -83,6 +86,10 @@ interface ICentralServer {
     editOwnQuestion(channelId: number): JQueryPromise<void>;
     loginWithToken(id: number, key: string): JQueryPromise<void>;
     sendCountdownTime(time: number, channelid: number): JQueryPromise<void>;
+    requestPasswordReset(email: string): JQueryPromise<void>;
+    resetPassword(key: string, pass: string, email: string): JQueryPromise<void>;
+    changePassword(oldpass: string, newpass: string): JQueryPromise<void>;
+    logoutAll(): JQueryPromise<void>;
 }
 
 function isNullOrWhitespace(input: any) {
@@ -189,6 +196,14 @@ module Help {
         HaltTimer: (channel: Channel) => void;
         EditTimer: () => void;
         startTime: number;
+        pwReset: any;
+        startPasswordReset: () => void;
+        stopPasswordReset: () => void;
+        RequestPasswordReset: () => void;
+        ResetPassword: () => void;
+        changePasswordPopover: PopoverOptions;
+        ChangePassword: () => void;
+        LogoutAll: () => void;
     }
 
     export class ServerActions {
@@ -280,6 +295,18 @@ module Help {
         sendCountdownTime(time: number, channelid: number) {
             return this.helper.server.sendCountdownTime(time, channelid);
         }
+        requestPasswordReset(email: string) {
+            return this.helper.server.requestPasswordReset(email);
+        }
+        resetPassword(key: string, pass: string, email: string) {
+            return this.helper.server.resetPassword(key, pass, email);
+        }
+        changePassword(oldpass: string, newpass: string) {
+            return this.helper.server.changePassword(oldpass, newpass);
+        }
+        logoutAll() {
+            return this.helper.server.logoutAll();
+        }
         alert(typ: string, text: string, title: string) {
             // ReSharper disable once UnusedLocals
             var notify = new PNotify({
@@ -352,6 +379,9 @@ module Help {
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             $scope.alarm = new Audio("alarm.mp3");
+            $scope.pwReset = {
+                step: 0
+            }
 
             this.helper = $.connection.centralHub;
             var that = this;
@@ -371,6 +401,10 @@ module Help {
             $scope.loginUserPopover = {
                 templateUrl: "/templates/loginPopover.html",
                 title: "Login"
+            }
+            $scope.changePasswordPopover = {
+                templateUrl: "/templates/changePasswordPopover.html",
+                title: "Skift kodeord"
             }
             $scope.LoginModalOptions = {
                 templateUrl: "/templates/startModal.html",
@@ -397,7 +431,7 @@ module Help {
                         this.sendCountdownTime(channel.TimeLeft, key);
                     }
                 }
-                
+
             }
 
             $scope.countDown = (channel: Channel) => {
@@ -433,6 +467,7 @@ module Help {
                     $scope.HaltTimer(channel);
                     channel.timing = false;
                     channel.outOfTime = false;
+                    this.sendCountdownTime(0, channel.Id);
                 } else {
                     $scope.StopTimer($scope.Channels[$scope.ActiveChannel]);
                 }
@@ -812,6 +847,80 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     $scope.Me.LoggedIn = true;
                 });
             }
+
+
+            $scope.startPasswordReset = () => {
+                $scope.pwReset.step = 1;
+            }
+            $scope.stopPasswordReset = () => {
+                $scope.pwReset.step = 0;
+            }
+
+            $scope.RequestPasswordReset = () => {
+                this.requestPasswordReset($scope.pwReset.email);
+            }
+            this.helper.client.passwordResetRequestResult = (success: boolean) => {
+                $timeout(() => {
+                    if (success) {
+                        $scope.pwReset.invalidEmail = false;
+                        $scope.pwReset.mailSent = true;
+                    } else {
+                        $scope.pwReset.invalidEmail = true;
+                    }
+                });
+            }
+
+            $scope.ResetPassword = () => {
+                if (!$scope.pwReset.key.trim()) {
+                    return;
+                } 
+                if ($scope.pwReset.pass1 !== $scope.pwReset.pass2) {
+                    return;
+                } 
+                if ($scope.pwReset.pass1 && $scope.pwReset.pass1.length) {
+                    this.resetPassword($scope.pwReset.key, $scope.pwReset.pass1, $scope.pwReset.email);
+                }
+            }
+            this.helper.client.passwordResetResult = (success: boolean) => {
+                if (success) {
+                    this.alert("success", "Dit kodeord er blevet nulstillet.", "Nulstiling lykkedes");
+                    $scope.pwReset = {};
+                } else {
+                    $timeout(() => {
+                        $scope.pwReset.resetFailed = true;
+                    });
+                }
+            }
+
+            $scope.ChangePassword = () => {
+                if ($scope.pwReset.old) {
+                    $scope.pwReset.oldEmpty = false;
+                    if ($scope.pwReset.pass1 === $scope.pwReset.pass2) {
+                        this.changePassword($scope.pwReset.old, $scope.pwReset.pass1);
+                    }
+                } else {
+                    $scope.pwReset.oldEmpty = true;
+                }
+            }
+
+            this.helper.client.passwordChanged = (success: boolean) => {
+                if (success) {
+                    this.alert("success", "Dit password are blevet ændret.", "");
+                } else {
+                    this.alert("error", "Kunne ikke skifte kodeord.", "");
+                }
+            }
+
+            $scope.LogoutAll = () => {
+                this.confirm("Are du sikker på at du vil logge din bruger ud alle stedet?", "Bekræftelse nødvendig.", () => {
+                    this.logoutAll();
+                });
+            }
+
+            this.helper.client.allUsersLoggedOut = () => {
+                this.alert("success", "Din bruger er blevet logget ud alle andre steder.", "Log ud lykkedes");
+            }
+
         }
 
     }

@@ -27,10 +27,9 @@
  */
 
 using System;
-using System.Text;
 using System.Security.Cryptography;
 
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     /// <summary>
     /// Salted password hashing with PBKDF2-SHA1.

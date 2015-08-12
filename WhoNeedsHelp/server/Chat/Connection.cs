@@ -1,5 +1,5 @@
 ﻿// ReSharper disable DoNotCallOverridableMethodsInConstructor
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     public class Connection
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WhoNeedsHelp.Simples;
 
-namespace WhoNeedsHelp.server
+namespace WhoNeedsHelp.Server.Chat
 {
     public class Channel
     {

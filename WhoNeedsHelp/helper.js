@@ -95,6 +95,18 @@ var Help;
         ServerActions.prototype.sendCountdownTime = function (time, channelid) {
             return this.helper.server.sendCountdownTime(time, channelid);
         };
+        ServerActions.prototype.requestPasswordReset = function (email) {
+            return this.helper.server.requestPasswordReset(email);
+        };
+        ServerActions.prototype.resetPassword = function (key, pass, email) {
+            return this.helper.server.resetPassword(key, pass, email);
+        };
+        ServerActions.prototype.changePassword = function (oldpass, newpass) {
+            return this.helper.server.changePassword(oldpass, newpass);
+        };
+        ServerActions.prototype.logoutAll = function () {
+            return this.helper.server.logoutAll();
+        };
         ServerActions.prototype.alert = function (typ, text, title) {
             // ReSharper disable once UnusedLocals
             var notify = new PNotify({
@@ -171,6 +183,9 @@ var Help;
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             $scope.alarm = new Audio("alarm.mp3");
+            $scope.pwReset = {
+                step: 0
+            };
             this.helper = $.connection.centralHub;
             var that = this;
             $scope.$watch("ActiveChannel", function (newValue, oldValue) {
@@ -187,6 +202,10 @@ var Help;
             $scope.loginUserPopover = {
                 templateUrl: "/templates/loginPopover.html",
                 title: "Login"
+            };
+            $scope.changePasswordPopover = {
+                templateUrl: "/templates/changePasswordPopover.html",
+                title: "Skift kodeord"
             };
             $scope.LoginModalOptions = {
                 templateUrl: "/templates/startModal.html",
@@ -245,6 +264,7 @@ var Help;
                     $scope.HaltTimer(channel);
                     channel.timing = false;
                     channel.outOfTime = false;
+                    _this.sendCountdownTime(0, channel.Id);
                 }
                 else {
                     $scope.StopTimer($scope.Channels[$scope.ActiveChannel]);
@@ -626,6 +646,75 @@ var Help;
                     $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
                     $scope.Me.LoggedIn = true;
                 });
+            };
+            $scope.startPasswordReset = function () {
+                $scope.pwReset.step = 1;
+            };
+            $scope.stopPasswordReset = function () {
+                $scope.pwReset.step = 0;
+            };
+            $scope.RequestPasswordReset = function () {
+                _this.requestPasswordReset($scope.pwReset.email);
+            };
+            this.helper.client.passwordResetRequestResult = function (success) {
+                $timeout(function () {
+                    if (success) {
+                        $scope.pwReset.invalidEmail = false;
+                        $scope.pwReset.mailSent = true;
+                    }
+                    else {
+                        $scope.pwReset.invalidEmail = true;
+                    }
+                });
+            };
+            $scope.ResetPassword = function () {
+                if (!$scope.pwReset.key.trim()) {
+                    return;
+                }
+                if ($scope.pwReset.pass1 !== $scope.pwReset.pass2) {
+                    return;
+                }
+                if ($scope.pwReset.pass1 && $scope.pwReset.pass1.length) {
+                    _this.resetPassword($scope.pwReset.key, $scope.pwReset.pass1, $scope.pwReset.email);
+                }
+            };
+            this.helper.client.passwordResetResult = function (success) {
+                if (success) {
+                    _this.alert("success", "Dit kodeord er blevet nulstillet.", "Nulstiling lykkedes");
+                    $scope.pwReset = {};
+                }
+                else {
+                    $timeout(function () {
+                        $scope.pwReset.resetFailed = true;
+                    });
+                }
+            };
+            $scope.ChangePassword = function () {
+                if ($scope.pwReset.old) {
+                    $scope.pwReset.oldEmpty = false;
+                    if ($scope.pwReset.pass1 === $scope.pwReset.pass2) {
+                        _this.changePassword($scope.pwReset.old, $scope.pwReset.pass1);
+                    }
+                }
+                else {
+                    $scope.pwReset.oldEmpty = true;
+                }
+            };
+            this.helper.client.passwordChanged = function (success) {
+                if (success) {
+                    _this.alert("success", "Dit password are blevet ændret.", "");
+                }
+                else {
+                    _this.alert("error", "Kunne ikke skifte kodeord.", "");
+                }
+            };
+            $scope.LogoutAll = function () {
+                _this.confirm("Are du sikker på at du vil logge din bruger ud alle stedet?", "Bekræftelse nødvendig.", function () {
+                    _this.logoutAll();
+                });
+            };
+            this.helper.client.allUsersLoggedOut = function () {
+                _this.alert("success", "Din bruger er blevet logget ud alle andre steder.", "Log ud lykkedes");
             };
         }
         HelpCtrl.$inject = ["$scope", "$modal", "$timeout", "$cookieStore", "$interval"];

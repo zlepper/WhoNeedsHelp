@@ -105,6 +105,15 @@
                                 </li>
                                 <!--Should only be shown when the user is logged in-->
                                 <li ng-show="Me.LoggedIn">
+                                    <button class="btn btn-default navbar-btn"
+                                            popover-trigger="click"
+                                            popover-append-to-body="true"
+                                            popover-template="changePasswordPopover.templateUrl"
+                                            popover-placement="bottom">
+                                        Skift kodeord
+                                    </button>
+                                </li>
+                                <li ng-show="Me.LoggedIn">
                                     <button class="btn btn-default navbar-btn" ng-click="logout()">Log ud</button>
                                 </li>
                             </ul>
@@ -158,6 +167,10 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">
                                 Hj&aelig;lpeliste
+                                <span class="pull-right" ng-if="ActiveChannel && (!(Channels[ActiveChannel].Questions | keylength)) && Channels[ActiveChannel].IsAdmin">
+                                    <button class="astext" title="Klik for at deaktivere" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = false">Timer aktiv</button>
+                                    <button class="astext" title="Klik for at aktivere" ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = true">Timer ikke aktiv</button>
+                                </span>
                                 <span class="pull-right" ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
                                     <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
                                     <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>

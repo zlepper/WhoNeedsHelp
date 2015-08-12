@@ -91,6 +91,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="SendGrid.SmtpApi, Version=1.3.1.0, Culture=neutral, PublicKeyToken=2ae73662c35d80e4, processorArchitecture=MSIL">
+      <HintPath>..\packages\SendGrid.SmtpApi.1.3.1\lib\net40\SendGrid.SmtpApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SendGridMail, Version=6.1.0.0, Culture=neutral, PublicKeyToken=2ae73662c35d80e4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sendgrid.6.1.0\lib\SendGridMail.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -143,6 +151,7 @@
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="templates\changePasswordPopover.html" />
     <Content Include="templates\changeUsernamePopover.html" />
     <Content Include="templates\createUserPopover.html" />
     <Content Include="templates\editQuestionModal.html" />
@@ -210,7 +219,11 @@
     <Compile Include="Migrations\201508110604369_addLoginTime.Designer.cs">
       <DependentUpon>201508110604369_addLoginTime.cs</DependentUpon>
     </Compile>
-    <Compile Include="server\Connection.cs" />
+    <Compile Include="Migrations\201508121906085_AddResetData.cs" />
+    <Compile Include="Migrations\201508121906085_AddResetData.Designer.cs">
+      <DependentUpon>201508121906085_AddResetData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Server\Chat\Connection.cs" />
     <Compile Include="Migrations\201503051130379_initinal.cs" />
     <Compile Include="Migrations\201503051130379_initinal.Designer.cs">
       <DependentUpon>201503051130379_initinal.cs</DependentUpon>
@@ -243,21 +256,22 @@
     <Compile Include="MySqlConfiguration.cs" />
     <Compile Include="MySqlHistoryContext.cs" />
     <Compile Include="MySqlInitializer.cs" />
-    <Compile Include="server\Channel.cs" />
-    <Compile Include="server\ChatMessage.cs" />
-    <Compile Include="server\hasher.cs" />
-    <Compile Include="server\IClient.cs" />
+    <Compile Include="Server\Chat\Channel.cs" />
+    <Compile Include="Server\Chat\ChatMessage.cs" />
+    <Compile Include="Server\Chat\hasher.cs" />
+    <Compile Include="Server\Chat\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="server\LoginToken.cs" />
-    <Compile Include="server\Question.cs" />
-    <Compile Include="server\QuestionComment.cs" />
-    <Compile Include="server\Serialiser.cs" />
+    <Compile Include="Server\Chat\LoginToken.cs" />
+    <Compile Include="Server\Chat\Question.cs" />
+    <Compile Include="Server\Chat\QuestionComment.cs" />
+    <Compile Include="Server\Chat\Serialiser.cs" />
+    <Compile Include="Server\Mail\UserMail.cs" />
     <Compile Include="Simples\SimpleChannel.cs" />
     <Compile Include="Simples\SimpleChatMessage.cs" />
     <Compile Include="Simples\SimpleQuestion.cs" />
     <Compile Include="Simples\SimpleUser.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="server\User.cs" />
+    <Compile Include="Server\Chat\User.cs" />
     <Compile Include="HelpContext.cs" />
     <Compile Include="UniqueKeyAttribute.cs" />
   </ItemGroup>
@@ -336,6 +350,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508110604369_addLoginTime.resx">
       <DependentUpon>201508110604369_addLoginTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121906085_AddResetData.resx">
+      <DependentUpon>201508121906085_AddResetData.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
