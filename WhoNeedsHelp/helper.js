@@ -234,6 +234,9 @@ var Help;
             $scope.countDown = function (channel) {
                 if (channel) {
                     channel.TimeLeft = channel.TimeLeft - 1;
+                    if (channel.TimeLeft % 10 == 0) {
+                        _this.sendCountdownTime(channel.TimeLeft, channel.Id);
+                    }
                     if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
                         $scope.alarm.play();
@@ -816,4 +819,3 @@ var Help;
     })();
     Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
-//# sourceMappingURL=helper.js.map

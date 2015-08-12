@@ -437,6 +437,9 @@ module Help {
             $scope.countDown = (channel: Channel) => {
                 if (channel) {
                     channel.TimeLeft = channel.TimeLeft - 1;
+                    if (channel.TimeLeft % 10 == 0) {
+                        this.sendCountdownTime(channel.TimeLeft, channel.Id);
+                    }
                     if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
                         $scope.alarm.play();
