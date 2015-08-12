@@ -48,15 +48,15 @@
         <form onsubmit=" return false; " ng-submit="ResetPassword()">
             <div class="form-group" ng-class="{'has-success': pwReset.key && pwReset.key.trim()}">
                 <label for="pwResetKeyInput">Nøgle</label>
-                <input type="text" class="form-control" id="pwResetKeyInput" ng-model="pwReset.key" required="required"/>
+                <input type="text" class="form-control" id="pwResetKeyInput" ng-model="pwReset.key" required="required" autocomplete="off"/>
             </div>
             <div class="form-group" ng-class="{'has-error': pwReset.pass1 != pwReset.pass2, 'has-success': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}">
                 <label for="pwResetPass1">Nyt kodeord</label>
-                <input type="password" class="form-control" id="pwResetPass1" ng-model="pwReset.pass1" required="required"/>
+                <input type="password" class="form-control" id="pwResetPass1" ng-model="pwReset.pass1" required="required" autocomplete="off"/>
             </div>
             <div class="form-group" ng-class="{'has-error': pwReset.pass1 != pwReset.pass2, 'has-success': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}">
                 <label for="pwResetPass2">Gentag kodeord</label>
-                <input type="password" class="form-control" id="pwResetPass2" ng-model="pwReset.pass2" required="required"/>
+                <input type="password" class="form-control" id="pwResetPass2" ng-model="pwReset.pass2" required="required" autocomplete="off"/>
             </div>
             <input type="submit" class="btn btn-primary" value="Nulstil"/>
         </form>
