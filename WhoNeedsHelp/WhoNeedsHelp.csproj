@@ -295,7 +295,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="helper.ts.old" />
     <TypeScriptCompile Include="helper.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />

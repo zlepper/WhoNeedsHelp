@@ -39,9 +39,10 @@
                 <label for="pwResetEmailInput">Email</label>
                 <input type="text" class="form-control" id="pwResetEmailInput" ng-model="pwReset.email" required="required"/>
             </div>
-            <input type="submit" class="btn btn-primary" value="Nulstil"/>
+            <input type="submit" class="btn btn-primary" value="Bestil Nulstilling"/>
         </form>
         <alert type="danger" ng-show="pwReset.invalidEmail" close="pwReset.invalidEmail = false">Der findes ingen bruger med denne emailaddresse.</alert>
+        <alert type="info" ng-show="pwReset.missingEmail" close="pwReset.missingEmail = false">Af sikkerhedsårsager skal du indtaste din email igen. Efterfølgende kan du bare klikke "Nulstil".</alert>
         <!-- Part 2 of the password reset process Enter key from email and new password -->
         <alert type="success" ng-if="pwReset.mailSent" close="pwReset.mailSent = false">Der er blevet sendt en email til {{::pwReset.email}} med en nøgle til nulstilling.<br/>Du har 2 timer til at nulstille kodeordet.</alert>
         <form onsubmit=" return false; " ng-submit="ResetPassword()">

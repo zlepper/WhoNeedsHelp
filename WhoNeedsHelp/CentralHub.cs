@@ -872,7 +872,7 @@ namespace WhoNeedsHelp
             key = key.Trim();
             using (HelpContext db = new HelpContext())
             {
-                var user = db.Users.SingleOrDefault(u => u.ResetKey.Equals(key));
+                var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
                 if (user == null)
                 {
                     Clients.Caller.PasswordResetResult(false);

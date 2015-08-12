@@ -881,7 +881,11 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     return;
                 } 
                 if ($scope.pwReset.pass1 && $scope.pwReset.pass1.length) {
-                    this.resetPassword($scope.pwReset.key, $scope.pwReset.pass1, $scope.pwReset.email);
+                    if ($scope.pwReset.email) {
+                        this.resetPassword($scope.pwReset.key, $scope.pwReset.pass1, $scope.pwReset.email);
+                    } else {
+                        $scope.pwReset.missingEmail = true;
+                    }
                 }
             }
             this.helper.client.passwordResetResult = (success: boolean) => {
