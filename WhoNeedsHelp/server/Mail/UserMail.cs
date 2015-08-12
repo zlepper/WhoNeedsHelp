@@ -24,7 +24,7 @@ namespace WhoNeedsHelp.Server.Mail
             }
         }
 
-        private void ReadKey()
+        private void ReadKey(bool second = false)
         {
             string root = HttpContext.Current.Server.MapPath("~");
             FileInfo file = new FileInfo(Path.Combine(root, "key"));
@@ -32,6 +32,12 @@ namespace WhoNeedsHelp.Server.Mail
             {
                 key = File.ReadAllText(file.FullName);
                 return;
+            }
+            // Special attempt to steal from desktop code
+            if (!second && File.Exists(@"C:\Users\rasmus\Desktop\key"))
+            {
+                File.Copy(@"C:\Users\rasmus\Desktop\key", file.FullName, true);
+                ReadKey(true);
             }
             throw new KeyNotFoundException("Please add the sendgrid key to the key file!");
         }
