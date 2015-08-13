@@ -38,7 +38,8 @@ namespace WhoNeedsHelp.Simples
                 {
                     Users.Add(u.Id, u.ToSimpleUser());
                 }
-                TimeLeft = c.TimeLeft;
+                if (IsAdmin)
+                    TimeLeft = c.TimeLeft;
             }
         }
     }
