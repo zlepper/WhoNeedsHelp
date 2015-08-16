@@ -7,91 +7,6 @@
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
-
-interface SignalR {
-    centralHub: ICentralHubProxy;
-}
-
-interface ICentralHubProxy {
-    client: ICentralClient;
-    server: ICentralServer;
-}
-
-interface ICentralClient {
-    appendChannel: (channel: Help.Channel) => void;
-    addQuestions: (questions: Help.Question[]) => void;
-    addQuestion: (question: Help.Question, channelid: number) => void;
-    userAreQuesting: () => void;
-    removeQuestion: (questionId: number) => void;
-    errorChannelAlreadyMade: () => void;
-    log: (text: string) => void;
-    exitChannel: (channelId: number) => void;
-    setChannel: (channel: number, areUserQuestioning: boolean) => void;
-    sendQuestion: (question: string) => void;
-    updateQuestion: (question: string, questionId: number, channelId: number) => void;
-    reloadPage: () => void;
-    setQuestionState: (hasQuestion: boolean, channelid: number) => void;
-    sendChatMessage: (message: Help.ChatMessage, channelId: number) => void;
-    checkVersion: (version: number) => void;
-    removeChatMessage: (messageId: number) => void;
-    ipDiscover: (channelIds: number[], channelNames: string[]) => void;
-    clearChat: (channelId: number) => void;
-    loginSuccess: () => void;
-    loginFailed: () => void;
-    showChannels: (channelIds: number[], channelNames: string[]) => void;
-    userCreationFailed: (errorMessage: string) => void;
-    userCreationSuccess: () => void;
-    userLoggedOut: () => void;
-    appendChannel2: (channelname: string, channelid: number) => void;
-    updateUsername: (name: string) => void;
-    updateQuestionAuthorName: (name: string, id: number) => void;
-    updateChatMessageAuthorName: (name: string, ids: number[]) => void;
-    errorChat: (errorMessage: string) => void;
-    appendUsers(usernames: string[], userids: number[], isAdmin: boolean[]);
-    appendUser(user: Help.User, channelid: number);
-    removeUser(id: number, channelId: number);
-    alert: (message: string, title: string, t: string) => void;
-    sendUserId: (id: number) => void;
-    updateOtherUsername: (name: string, userid: number, channelid: number) => void;
-    setAdminState: (channelId: number, isAdmin: boolean) => void;
-    clearChannels: () => void;
-    sendReloginData: (key: string, id: number) => void;
-    tokenLoginFailed: () => void;
-    passwordResetRequestResult: (success: boolean) => void;
-    passwordResetResult: (success: boolean) => void;
-    passwordChanged: (success: boolean) => void;
-    allUsersLoggedOut: () => void;
-}
-
-interface ICentralServer {
-    send(action: string, parameters: string): JQueryPromise<void>;
-    getData(action: number): JQueryPromise<void>;
-    setUsername(name: string): JQueryPromise<void>;
-    createNewChannel(channelName: string): JQueryPromise<void>;
-    loadNearbyChannels(): JQueryPromise<void>;
-    exitChannel(channelId: number): JQueryPromise<void>;
-    joinChannel(channelId: number): JQueryPromise<void>;
-    removeQuestion(channelId: number): JQueryPromise<void>;
-    removeChatMessage(messageId: number): JQueryPromise<void>;
-    requestHelp(question: string, channelid: number): JQueryPromise<void>;
-    changeQuestion(question: string, channelid: number): JQueryPromise<void>;
-    chat(message: string, channelid: number): JQueryPromise<void>;
-    clearChat(channelId: number): JQueryPromise<void>;
-    createNewUser(username: string, email: string, password: string, stay: boolean): JQueryPromise<void>;
-    requestActiveChannel(): JQueryPromise<void>;
-    loginUser(mail: string, pass: string, stay: boolean): JQueryPromise<void>;
-    logoutUser(key: string): JQueryPromise<void>;
-    removeUserFromChannel(userid: number, channelid: number): JQueryPromise<void>;
-    removeOwnQuestion(channelid: number): JQueryPromise<void>;
-    editOwnQuestion(channelId: number): JQueryPromise<void>;
-    loginWithToken(id: number, key: string): JQueryPromise<void>;
-    sendCountdownTime(time: number, channelid: number): JQueryPromise<void>;
-    requestPasswordReset(email: string): JQueryPromise<void>;
-    resetPassword(key: string, pass: string, email: string): JQueryPromise<void>;
-    changePassword(oldpass: string, newpass: string): JQueryPromise<void>;
-    logoutAll(): JQueryPromise<void>;
-}
-
 function isNullOrWhitespace(input: any) {
     if (typeof input === "undefined" || input == null) return true;
     return input.replace(/\s/g, "").length < 1;
@@ -104,265 +19,8 @@ function removeFromArray(arr: any, index: any) {
 var confirmNotice: any = null;
 
 module Help {
-    import ModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
     import ModalService = angular.ui.bootstrap.IModalService;
-    import ModalSettings = angular.ui.bootstrap.IModalSettings;
     var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
-
-    export interface IHelpScope extends ng.IScope {
-        /**
-         * The local user.
-         */
-        Me: Me;
-        /**
-         * The channels the local user are in.
-         */
-        Channels: { [id: number]: Channel };
-        /**
-         * Indicates if the signalr connection is ready.
-         */
-        Loading: boolean;
-        /**
-         * Indicates if the user has choosen a username yet.
-         */
-        Ready: boolean;
-
-        /**
-         * The info from the first modal
-         */
-        StartingModal: LoginOptions;
-        /**
-         * Call to have the user login from the modal
-         * @returns {} 
-         */
-        LoginFromModal: () => void;
-        /**
-         * The instance of the first modal
-         */
-        LoginModal: ModalServiceInstance;
-        /**
-         * The configuration options for the first modal
-         */
-        LoginModalOptions: ModalSettings;
-        /**
-         * Starts the application with the selected username
-         * @returns {} 
-         */
-        Start: () => void;
-
-        /**
-         * The currently active channel id
-         */
-        ActiveChannel: number;
-
-        /**
-         * The result of IP-discover
-         */
-        DiscoveredIps: Channel[];
-        /**
-         * Finds a user with a specific ID
-         * @param id The id of the user to find
-         * @returns {} 
-         */
-        GetUser: (id: number) => User;
-        CreateNewChannel: (channelName: string) => void;
-        setActiveChannel: (channelid: number) => void;
-        exitChannel: (channelid: number) => void;
-        RequestHelp: () => void;
-        RemoveQuestion: (questionid: number) => void;
-        RemoveOwnQuestion: () => void;
-        EditOwnQuestion: () => void;
-        changeQuestionModalOptions: ModalSettings;
-        changeQuestionModal: ModalServiceInstance;
-        UpdateQuestion: () => void;
-        CloseEditModal: () => void;
-        editQuestionText: { text: string };
-        RemoveUser: (userid: number) => void;
-        newChannelName: string;
-        RemoveChatMessage: (messageId: number) => void;
-        Chat: () => void;
-        createUserPopover: PopoverOptions;
-        createUser: () => void;
-        logout: () => void;
-        loginUserPopover: PopoverOptions;
-        login: () => void;
-        lastActiveChannel: number;
-        changeUsernamePopover: PopoverOptions;
-        ClearChat: () => void;
-        StartTimer: (channel: Channel) => void;
-        countDown: (channel: Channel) => void;
-        StopTimer: (channel: Channel) => void;
-        alarm: HTMLAudioElement;
-        HaltTimer: (channel: Channel) => void;
-        EditTimer: () => void;
-        startTime: number;
-        pwReset: any;
-        startPasswordReset: () => void;
-        stopPasswordReset: () => void;
-        RequestPasswordReset: () => void;
-        ResetPassword: () => void;
-        changePasswordPopover: PopoverOptions;
-        ChangePassword: () => void;
-        LogoutAll: () => void;
-    }
-
-    export class ServerActions {
-        helper: ICentralHubProxy;
-        confirmNotice: PNotify;
-
-        send(action: string, parameters: string): JQueryPromise<void> {
-            return this.helper.server.send(action, parameters);
-        }
-
-        getData(action: number): JQueryPromise<void> {
-            return this.helper.server.getData(action);
-        }
-
-        setUsername(name: string): JQueryPromise<void> {
-            return this.helper.server.setUsername(name);
-        }
-
-        createNewChannel(channelName: string): JQueryPromise<void> {
-            return this.helper.server.createNewChannel(channelName);
-        }
-
-        loadHearbyChannels(): JQueryPromise<void> {
-            return this.helper.server.loadNearbyChannels();
-        }
-
-        exitChannel(channelId): JQueryPromise<void> {
-            return this.helper.server.exitChannel(channelId);
-        }
-
-        joinChannel(channelId: number): JQueryPromise<void> {
-            return this.helper.server.joinChannel(channelId);
-        }
-
-        removeQuestion(channelId: number): JQueryPromise<void> {
-            return this.helper.server.removeQuestion(channelId);
-        }
-
-        removeChatMessage(messageId: number): JQueryPromise<void> {
-            return this.helper.server.removeChatMessage(messageId);
-        }
-
-        chat(message: string, channelid: number): JQueryPromise<void> {
-            return this.helper.server.chat(message, channelid);
-        }
-
-        clearChat(channelId: number): JQueryPromise<void> {
-            return this.helper.server.clearChat(channelId);
-        }
-
-        createNewUser(username: string, email: string, password: string, stay: boolean): JQueryPromise<void> {
-            return this.helper.server.createNewUser(username, email, password, stay);
-        }
-
-        requestActiveChannel(): JQueryPromise<void> {
-            return this.helper.server.requestActiveChannel();
-        }
-
-        requestHelp(question: string, channelid: number): JQueryPromise<void> {
-            return this.helper.server.requestHelp(question, channelid);
-        }
-
-        loginUser(mail: string, pass: string, stay: boolean): JQueryPromise<void> {
-            return this.helper.server.loginUser(mail, pass, stay);
-        }
-
-        logoutUser(key: string): JQueryPromise<void> {
-            return this.helper.server.logoutUser(key);
-        }
-
-        removeUserFromChannel(id: number, channelid: number): JQueryPromise<void> {
-            return this.helper.server.removeUserFromChannel(id, channelid);
-        }
-
-        removeOwnQuestion(channelid: number): JQueryPromise<void> {
-            return this.helper.server.removeOwnQuestion(channelid);
-        }
-
-        editOwnQuestion(channelId: number): JQueryPromise<void> {
-            return this.helper.server.editOwnQuestion(channelId);
-        }
-
-        changeQuestion(questionText: string, channelId: number): JQueryPromise<void> {
-            return this.helper.server.changeQuestion(questionText, channelId);
-        }
-        loginWithToken(id: number, key: string) {
-            return this.helper.server.loginWithToken(id, key);
-        }
-        sendCountdownTime(time: number, channelid: number) {
-            return this.helper.server.sendCountdownTime(time, channelid);
-        }
-        requestPasswordReset(email: string) {
-            return this.helper.server.requestPasswordReset(email);
-        }
-        resetPassword(key: string, pass: string, email: string) {
-            return this.helper.server.resetPassword(key, pass, email);
-        }
-        changePassword(oldpass: string, newpass: string) {
-            return this.helper.server.changePassword(oldpass, newpass);
-        }
-        logoutAll() {
-            return this.helper.server.logoutAll();
-        }
-        alert(typ: string, text: string, title: string) {
-            // ReSharper disable once UnusedLocals
-            var notify = new PNotify({
-                title: title,
-                text: text,
-                type: typ,
-                animation: "show",
-                styling: "fontawesome",
-                mouse_reset: false,
-                desktop: {
-                    desktop: document.hidden
-                }
-            });
-            notify.elem.click(() => {
-                notify.remove();
-            });
-        }
-
-        confirm(text: string, title: string, callback: Function) {
-            if (confirmNotice == null)
-                confirmNotice = new PNotify(<any>{
-                    title: title,
-                    text: text,
-                    icon: "glyphicon glyphicon-question-sign",
-                    mouse_reset: false,
-                    hide: false,
-                    confirm: {
-                        confirm: true,
-                        buttons: [
-                            {
-                                text: "Ok",
-                                click(n) {
-                                    n.remove();
-                                    callback();
-                                    confirmNotice = null;
-                                }
-                            },
-                            {
-                                text: "Annuller",
-                                click(n) {
-                                    n.remove();
-                                    confirmNotice = null;
-                                }
-                            }
-                        ]
-                    },
-                    buttons: {
-                        closer: false,
-                        sticker: false
-                    },
-                    history: {
-                        history: false
-                    }
-                });
-        }
-    }
 
     export class HelpCtrl extends ServerActions {
 
@@ -382,6 +40,26 @@ module Help {
             $scope.pwReset = {
                 step: 0
             }
+
+            // Syncronise the current data with the server every 30 second
+            $interval(() => {
+                if(Object.keys($scope.Channels)) {
+                    var chs = {};
+                    for (var key in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(key)) {
+                            var channel = $scope.Channels[key];
+                            chs[key] = [];
+                            for (var qKey in channel.Questions) {
+                                if (channel.Questions.hasOwnProperty(qKey)) {
+                                    var question = channel.Questions[qKey];
+                                    chs[key].push(question.Id);
+                                }
+                            }
+                        }
+                    }
+                    this.syncChannels(chs);
+                }
+            }, 30000);
 
             this.helper = $.connection.centralHub;
             var that = this;

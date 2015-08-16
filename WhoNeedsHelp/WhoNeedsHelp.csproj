@@ -266,6 +266,7 @@
     <Compile Include="Server\Chat\QuestionComment.cs" />
     <Compile Include="Server\Chat\Serialiser.cs" />
     <Compile Include="Server\Mail\UserMail.cs" />
+    <Compile Include="Simples\ChannelSync.cs" />
     <Compile Include="Simples\SimpleChannel.cs" />
     <Compile Include="Simples\SimpleChatMessage.cs" />
     <Compile Include="Simples\SimpleQuestion.cs" />
@@ -296,6 +297,10 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="helper.ts" />
+    <TypeScriptCompile Include="ICentralClient.ts" />
+    <TypeScriptCompile Include="ICentralHubProxy.ts" />
+    <TypeScriptCompile Include="ICentralServer.ts" />
+    <TypeScriptCompile Include="IHelpScope.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -310,6 +315,8 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
+    <TypeScriptCompile Include="ServerActions.ts" />
+    <TypeScriptCompile Include="SignalR.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Client\" />

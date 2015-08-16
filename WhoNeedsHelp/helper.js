@@ -1,3 +1,9 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 /// <reference path="Scripts/typings/jquery/jquery.d.ts" />
 /// <reference path="Scripts/typings/signalr/signalr.d.ts" />
 /// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
@@ -7,12 +13,6 @@
 /// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 /// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 function isNullOrWhitespace(input) {
     if (typeof input === "undefined" || input == null)
         return true;
@@ -26,144 +26,6 @@ var confirmNotice = null;
 var Help;
 (function (Help) {
     var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
-    var ServerActions = (function () {
-        function ServerActions() {
-        }
-        ServerActions.prototype.send = function (action, parameters) {
-            return this.helper.server.send(action, parameters);
-        };
-        ServerActions.prototype.getData = function (action) {
-            return this.helper.server.getData(action);
-        };
-        ServerActions.prototype.setUsername = function (name) {
-            return this.helper.server.setUsername(name);
-        };
-        ServerActions.prototype.createNewChannel = function (channelName) {
-            return this.helper.server.createNewChannel(channelName);
-        };
-        ServerActions.prototype.loadHearbyChannels = function () {
-            return this.helper.server.loadNearbyChannels();
-        };
-        ServerActions.prototype.exitChannel = function (channelId) {
-            return this.helper.server.exitChannel(channelId);
-        };
-        ServerActions.prototype.joinChannel = function (channelId) {
-            return this.helper.server.joinChannel(channelId);
-        };
-        ServerActions.prototype.removeQuestion = function (channelId) {
-            return this.helper.server.removeQuestion(channelId);
-        };
-        ServerActions.prototype.removeChatMessage = function (messageId) {
-            return this.helper.server.removeChatMessage(messageId);
-        };
-        ServerActions.prototype.chat = function (message, channelid) {
-            return this.helper.server.chat(message, channelid);
-        };
-        ServerActions.prototype.clearChat = function (channelId) {
-            return this.helper.server.clearChat(channelId);
-        };
-        ServerActions.prototype.createNewUser = function (username, email, password, stay) {
-            return this.helper.server.createNewUser(username, email, password, stay);
-        };
-        ServerActions.prototype.requestActiveChannel = function () {
-            return this.helper.server.requestActiveChannel();
-        };
-        ServerActions.prototype.requestHelp = function (question, channelid) {
-            return this.helper.server.requestHelp(question, channelid);
-        };
-        ServerActions.prototype.loginUser = function (mail, pass, stay) {
-            return this.helper.server.loginUser(mail, pass, stay);
-        };
-        ServerActions.prototype.logoutUser = function (key) {
-            return this.helper.server.logoutUser(key);
-        };
-        ServerActions.prototype.removeUserFromChannel = function (id, channelid) {
-            return this.helper.server.removeUserFromChannel(id, channelid);
-        };
-        ServerActions.prototype.removeOwnQuestion = function (channelid) {
-            return this.helper.server.removeOwnQuestion(channelid);
-        };
-        ServerActions.prototype.editOwnQuestion = function (channelId) {
-            return this.helper.server.editOwnQuestion(channelId);
-        };
-        ServerActions.prototype.changeQuestion = function (questionText, channelId) {
-            return this.helper.server.changeQuestion(questionText, channelId);
-        };
-        ServerActions.prototype.loginWithToken = function (id, key) {
-            return this.helper.server.loginWithToken(id, key);
-        };
-        ServerActions.prototype.sendCountdownTime = function (time, channelid) {
-            return this.helper.server.sendCountdownTime(time, channelid);
-        };
-        ServerActions.prototype.requestPasswordReset = function (email) {
-            return this.helper.server.requestPasswordReset(email);
-        };
-        ServerActions.prototype.resetPassword = function (key, pass, email) {
-            return this.helper.server.resetPassword(key, pass, email);
-        };
-        ServerActions.prototype.changePassword = function (oldpass, newpass) {
-            return this.helper.server.changePassword(oldpass, newpass);
-        };
-        ServerActions.prototype.logoutAll = function () {
-            return this.helper.server.logoutAll();
-        };
-        ServerActions.prototype.alert = function (typ, text, title) {
-            // ReSharper disable once UnusedLocals
-            var notify = new PNotify({
-                title: title,
-                text: text,
-                type: typ,
-                animation: "show",
-                styling: "fontawesome",
-                mouse_reset: false,
-                desktop: {
-                    desktop: document.hidden
-                }
-            });
-            notify.elem.click(function () {
-                notify.remove();
-            });
-        };
-        ServerActions.prototype.confirm = function (text, title, callback) {
-            if (confirmNotice == null)
-                confirmNotice = new PNotify({
-                    title: title,
-                    text: text,
-                    icon: "glyphicon glyphicon-question-sign",
-                    mouse_reset: false,
-                    hide: false,
-                    confirm: {
-                        confirm: true,
-                        buttons: [
-                            {
-                                text: "Ok",
-                                click: function (n) {
-                                    n.remove();
-                                    callback();
-                                    confirmNotice = null;
-                                }
-                            },
-                            {
-                                text: "Annuller",
-                                click: function (n) {
-                                    n.remove();
-                                    confirmNotice = null;
-                                }
-                            }
-                        ]
-                    },
-                    buttons: {
-                        closer: false,
-                        sticker: false
-                    },
-                    history: {
-                        history: false
-                    }
-                });
-        };
-        return ServerActions;
-    })();
-    Help.ServerActions = ServerActions;
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
         function HelpCtrl($scope, $Modal, $timeout, $cookieStore, $interval) {
@@ -186,6 +48,25 @@ var Help;
             $scope.pwReset = {
                 step: 0
             };
+            // Syncronise the current data with the server every 30 second
+            $interval(function () {
+                if (Object.keys($scope.Channels)) {
+                    var chs = {};
+                    for (var key in $scope.Channels) {
+                        if ($scope.Channels.hasOwnProperty(key)) {
+                            var channel = $scope.Channels[key];
+                            chs[key] = [];
+                            for (var qKey in channel.Questions) {
+                                if (channel.Questions.hasOwnProperty(qKey)) {
+                                    var question = channel.Questions[qKey];
+                                    chs[key].push(question.Id);
+                                }
+                            }
+                        }
+                    }
+                    _this.syncChannels(chs);
+                }
+            }, 30000);
             this.helper = $.connection.centralHub;
             var that = this;
             $scope.$watch("ActiveChannel", function (newValue, oldValue) {
@@ -727,7 +608,7 @@ var Help;
         }
         HelpCtrl.$inject = ["$scope", "$modal", "$timeout", "$cookieStore", "$interval"];
         return HelpCtrl;
-    })(ServerActions);
+    })(Help.ServerActions);
     Help.HelpCtrl = HelpCtrl;
     app.controller("HelpCtrl", HelpCtrl);
     app.filter("keylength", function () { return function (input) {
@@ -824,4 +705,3 @@ var Help;
     })();
     Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
-//# sourceMappingURL=helper.js.map

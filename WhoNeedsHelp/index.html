@@ -33,6 +33,12 @@
     <script src="Scripts/angular-ui/ui-bootstrap.min.js"></script>
     <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="ServerActions.js"></script>
+    <script type="text/javascript" src="IHelpScope.js"></script>
+    <script type="text/javascript" src="SignalR.js"></script>
+    <script type="text/javascript" src="ICentralHubProxy.js"></script>
+    <script type="text/javascript" src="ICentralClient.js"></script>
+    <script type="text/javascript" src="ICentralServer.js"></script>
     <script type="text/javascript" src="helper.js"></script>
     <script src="js/countdown.js"></script>
     <script type="text/javascript" src="loading.js"></script>
@@ -183,7 +189,7 @@
                             <div class="wrapper">
                                 <inner class="box">
                                     <!--Help panels will appear here-->
-                                    <div class="panel" ng-class="{'panel-danger': Channels[ActiveChannel].outOfTime && $first, 'panel-primary': !Channels[ActiveChannel].outOfTime || !$first}" ng-repeat="(id, question) in Channels[ActiveChannel].Questions">
+                                    <div class="panel" ng-class="{'panel-danger': Channels[ActiveChannel].outOfTime && $first, 'panel-primary': !Channels[ActiveChannel].outOfTime || !$first}" ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id">
                                         <div class="panel-heading">
                                             <button aria-label="Fjern spørgsmål" class="close"
                                                     type="button" ng-click="RemoveQuestion(question.Id)"
