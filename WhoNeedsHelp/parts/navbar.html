@@ -1,0 +1,75 @@
+﻿<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Hvem mangler hjælp</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="nav navbar-nav">
+                <li>
+                    <p class="navbar-text">Nuværende kanal ID: <span ng-if="!ActiveChannel">Ikke forbundet til nogen kanal</span><span ng-if="ActiveChannel">{{ActiveChannel}}</span></p>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <p class="navbar-text">
+                        Navn:
+                        <span ng-if="!Me.Name">Navn endnu ikke valgt</span>
+                        <span ng-if="Me.Name">
+                            {{Me.Name}}
+                            <span aria-hidden="true"
+                                  class="glyphicon glyphicon-pencil close"
+                                  id="editUsername"
+                                  popover-trigger="click"
+                                  popover-append-to-body="true"
+                                  popover-template="changeUsernamePopover.templateUrl"
+                                  popover-title="{{changeUsernamePopover.title}}"
+                                  popover-placement="bottom"></span>
+                        </span>
+
+                    </p>
+                </li>
+                <!--Should only be shown when the user is not logged in-->
+                <li ng-show="!Me.LoggedIn">
+                    <button id="createUserBtn" class="btn btn-default navbar-btn"
+                            popover-trigger="click"
+                            popover-append-to-body="true"
+                            popover-template="createUserPopover.templateUrl"
+                            popover-title="{{createUserPopover.title}}"
+                            popover-placement="bottom">
+                        Opret Bruger
+                    </button>
+                </li>
+                <li ng-show="!Me.LoggedIn">
+                    <button id="loginBtn" class="btn btn-default navbar-btn"
+                            popover-trigger="click"
+                            popover-append-to-body="true"
+                            popover-template="loginUserPopover.templateUrl"
+                            popover-title="{{loginUserPopover.title}}"
+                            popover-placement="bottom">
+                        Log in
+                    </button>
+                </li>
+                <!--Should only be shown when the user is logged in-->
+                <li ng-show="Me.LoggedIn">
+                    <button class="btn btn-default navbar-btn"
+                            popover-trigger="click"
+                            popover-append-to-body="true"
+                            popover-template="changePasswordPopover.templateUrl"
+                            popover-placement="bottom">
+                        Skift kodeord
+                    </button>
+                </li>
+                <li ng-show="Me.LoggedIn">
+                    <button class="btn btn-default navbar-btn" ng-click="logout()">Log ud</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

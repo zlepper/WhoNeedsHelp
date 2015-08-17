@@ -1,0 +1,75 @@
+﻿<div class="center">
+    <div class="row">
+        <h1>Velkommen</h1>
+    </div>
+    <!-- Normal login -->
+    <div ng-show="pwReset.step == 0" class="row">
+        <div class="row">
+            <h2>Brug uden login</h2>
+            <form onsubmit=" return false; " id="usernameModalForm" ng-submit="Start()">
+                <div class="input-field col s12" id="usernameGroup">
+                    <label for="usernameModalInput">Navn</label>
+                    <input type="text" class="validate" id="usernameModalInput" ng-model="StartingModal.Name" required="required" />
+                </div>
+                <input type="submit" class="btn waves-effect waves-light" id="selectUsernameButton" value="Start" />
+            </form>
+        </div>
+        <hr />
+        <div class="row">
+            <h2>Login</h2>
+            <form onsubmit="return false;" id="loginUserFormModal" ng-submit="login()">
+                <div class="input-field">
+                    <label for="LoginUserEmailModal">Email</label>
+                    <input type="email" class="validate" id="LoginUserEmailModal" ng-model="StartingModal.Email" />
+                </div>
+                <div class="input-field">
+                    <label for="LoginUserPasswordModal">Kodeord</label>
+                    <input type="password" class="validate" id="LoginUserPasswordModal" ng-model="StartingModal.Password" />
+                </div>
+                <p ng-init="StartingModal.StayLoggedIn = false">
+                    <input type="checkbox" id="StayLoggedIn" ng-model="StartingModal.StayLoggedIn"/>
+                    <label for="StayLoggedIn">Forbliv logget ind</label>
+                </p>
+                <div style="margin-top: 1em;"></div>
+                <input class="btn waves-effect waves-light" type="submit" value="Login" />
+            </form>
+        </div>
+        <button class="btn waves-effect waves-light btn-flat" ng-click="startPasswordReset()">Jeg har glemt mit kodeord</button>
+    </div>
+    <!-- Part 1 of the password reset process Enter email-->
+    <div ng-show="pwReset.step == 1">
+        <form onsubmit=" return false; " ng-submit="RequestPasswordReset()">
+            <div class="input-field">
+                <label for="pwResetEmailInput">Email</label>
+                <input type="email" class="validate" id="pwResetEmailInput" ng-model="pwReset.email" required="required"/>
+            </div>
+            <input type="submit" class="btn waves-effect waves-light" value="Bestil Nulstilling"/>
+        </form>
+
+        <div class="card-panel red" ng-show="pwReset.invalidEmail" close="pwReset.invalidEmail = false">Der findes ingen bruger med denne emailaddresse.</div>
+        <div class="card-panel red" ng-show="pwReset.missingEmail" close="pwReset.missingEmail = false">Af sikkerhedsårsager skal du indtaste din email igen. Efterfølgende kan du bare klikke "Nulstil".</div>
+        <!-- Part 2 of the password reset process Enter key from email and new password -->
+        <div class="card-panel green" ng-if="pwReset.mailSent" close="pwReset.mailSent = false">Der er blevet sendt en email til {{::pwReset.email}} med en nøgle til nulstilling.<br/>Du har 2 timer til at nulstille kodeordet.
+        </div>
+
+        <form onsubmit=" return false; " ng-submit="ResetPassword()">
+            <div class="input-field">
+                <label for="pwResetKeyInput">Nøgle</label>
+                <input type="text" class="validate" id="pwResetKeyInput" ng-model="pwReset.key" required="required" autocomplete="off"  ng-class="{'valid': pwReset.key && pwReset.key.trim()}"/>
+            </div>
+            <div class="input-field">
+                <label for="pwResetPass1">Nyt kodeord</label>
+                <input type="password" class="validate" id="pwResetPass1" ng-model="pwReset.pass1" required="required" autocomplete="off"  ng-class="{'invalid': pwReset.pass1 != pwReset.pass2, 'valid': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}"/>
+            </div>
+            <div class="input-field">
+                <label for="pwResetPass2">Gentag kodeord</label>
+                <input type="password" class="validate" id="pwResetPass2" ng-model="pwReset.pass2" required="required" autocomplete="off"  ng-class="{'invalid': pwReset.pass1 != pwReset.pass2, 'valid': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}"/>
+            </div>
+            <input type="submit" class="btn waves-effect waves-light" value="Nulstil" />
+        </form>
+        <div class="card-panel red" ng-show="pwReset.key && !pwReset.key.trim()">Du skal indtaste en nøgle</div>
+        <div class="card-panel red" ng-show="pwReset.pass1 !== pwReset.pass2">Kodeord stemmer ikke overens</div>
+        <div class="card-panel red" ng-show="pwReset.resetFailed" close="pwReset.resetFailed = false">Nulstilling mislykkedes</div>
+        <button class="btn waves-effect waves-light" ng-click="stopPasswordReset()">Annuller</button>
+    </div>
+</div>

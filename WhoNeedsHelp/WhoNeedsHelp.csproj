@@ -130,18 +130,18 @@
     <Content Include="Content\perfect-scrollbar.min.css" />
     <Content Include="Content\pnotify.custom.min.css" />
     <Content Include="Content\ui-bootstrap-csp.css" />
-    <Content Include="css\bootstrap-theme.css" />
-    <Content Include="css\bootstrap-theme.min.css" />
-    <Content Include="css\bootstrap.css" />
-    <Content Include="css\bootstrap.min.css" />
-    <Content Include="custom.css">
+    <Content Include="css\custom.css">
       <DependentUpon>custom.scss</DependentUpon>
     </Content>
-    <Content Include="custom.min.css">
+    <Content Include="css\custom.min.css">
       <DependentUpon>custom.css</DependentUpon>
     </Content>
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="js\countdown.js" />
+    <Content Include="js\directives\login.js" />
+    <Content Include="js\directives\navbar.js" />
+    <Content Include="parts\login.html" />
+    <Content Include="parts\navbar.html" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-cookies.js" />
@@ -162,8 +162,8 @@
     <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.min.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap.min.js" />
-    <Content Include="custom.scss" />
-    <Content Include="custom.css.map">
+    <Content Include="css\custom.scss" />
+    <Content Include="css\custom.css.map">
       <DependentUpon>custom.css</DependentUpon>
     </Content>
     <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.min.js.map">
@@ -183,7 +183,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="css\config.json" />
+    <Content Include="css\_login.scss" />
+    <Content Include="css\_help.scss" />
+    <None Include="compilerconfig.json" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -296,11 +298,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="helper.ts" />
-    <TypeScriptCompile Include="ICentralClient.ts" />
-    <TypeScriptCompile Include="ICentralHubProxy.ts" />
-    <TypeScriptCompile Include="ICentralServer.ts" />
-    <TypeScriptCompile Include="IHelpScope.ts" />
+    <TypeScriptCompile Include="js\helper.ts" />
+    <TypeScriptCompile Include="js\ICentralClient.ts" />
+    <TypeScriptCompile Include="js\ICentralHubProxy.ts" />
+    <TypeScriptCompile Include="js\ICentralServer.ts" />
+    <TypeScriptCompile Include="js\IHelpScope.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -315,8 +317,8 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
-    <TypeScriptCompile Include="ServerActions.ts" />
-    <TypeScriptCompile Include="SignalR.ts" />
+    <TypeScriptCompile Include="js\ServerActions.ts" />
+    <TypeScriptCompile Include="js\SignalR.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Client\" />

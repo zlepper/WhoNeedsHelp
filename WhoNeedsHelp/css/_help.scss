@@ -92,6 +92,10 @@
     overflow-x: hidden;
     max-height: 300px;
 
+    .collection-item {
+        cursor: pointer;
+    }
+
     .active {
         -moz-transition: all ease-in 0.5s;
         -o-transition: all ease-in 0.5s;

@@ -1,13 +1,4 @@
-﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts" />
-/// <reference path="Scripts/typings/signalr/signalr.d.ts" />
-/// <reference path="Scripts/typings/bootstrap/bootstrap.d.ts"/>
-/// <reference path="Scripts/typings/jqueryui/jqueryui.d.ts"/>
-/// <reference path="Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
-/// <reference path="scripts/typings/angularjs/angular.d.ts" />
-/// <reference path="scripts/typings/angularjs/angular-animate.d.ts" />
-/// <reference path="scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
-/// <reference path="scripts/typings/angularjs/angular-cookies.d.ts" />
-function isNullOrWhitespace(input: any) {
+﻿function isNullOrWhitespace(input: any) {
     if (typeof input === "undefined" || input == null) return true;
     return input.replace(/\s/g, "").length < 1;
 }
@@ -28,7 +19,10 @@ module Help {
 
         constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any, public $cookieStore: any, public $interval: any) {
             super();
-            $scope.Loading = true;
+            $scope.State = "loading";
+
+
+
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
             $scope.Channels = {};
@@ -183,28 +177,19 @@ module Help {
                 var n = name.match(patt);
                 if (n.length > 0) {
                     this.setUsername(n[0]);
-                    if ($scope.LoginModal) {
-                        $scope.Ready = true;
-                        $scope.LoginModal.close();
-                        $scope.LoginModal = null;
-                    } else {
-                        $timeout(() => {
-                            jQuery("#editUsername").click();
-                        });
-                    }
-
+                    $scope.State = "help";
                 }
             };
             $.connection.hub.start().done(() => {
                 $timeout(() => {
                     var token: LoginToken = $cookieStore.get("token");
                     if (!token) {
-                        $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                        //$scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                     } else {
                         this.loginWithToken(token.id, token.key);
                     }
 
-                    $scope.Loading = false;
+                    $scope.State = "login";
                 });
             });
             this.helper.client.tokenLoginFailed = () => {

@@ -5,13 +5,40 @@
     -o-transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0); }
-
   100% {
     -moz-transform: translate3d(0, 100%, 0);
     -ms-transform: translate3d(0, 100%, 0);
     -o-transform: translate3d(0, 100%, 0);
     -webkit-transform: translate3d(0, 100%, 0);
     transform: translate3d(0, 100%, 0); } }
+
+@-moz-keyframes noHeight {
+  0% {
+    -moz-transform: scale3d(0, 1, 0);
+    -ms-transform: scale3d(0, 1, 0);
+    -o-transform: scale3d(0, 1, 0);
+    -webkit-transform: scale3d(0, 1, 0);
+    transform: scale3d(0, 1, 0); }
+  100% {
+    -moz-transform: scale3d(0, 1, 0);
+    -ms-transform: scale3d(0, 1, 0);
+    -o-transform: scale3d(0, 1, 0);
+    -webkit-transform: scale3d(0, 1, 0);
+    transform: scale3d(0, 1, 0); } }
+
+@-webkit-keyframes noHeight {
+  0% {
+    -moz-transform: scale3d(0, 1, 0);
+    -ms-transform: scale3d(0, 1, 0);
+    -o-transform: scale3d(0, 1, 0);
+    -webkit-transform: scale3d(0, 1, 0);
+    transform: scale3d(0, 1, 0); }
+  100% {
+    -moz-transform: scale3d(0, 1, 0);
+    -ms-transform: scale3d(0, 1, 0);
+    -o-transform: scale3d(0, 1, 0);
+    -webkit-transform: scale3d(0, 1, 0);
+    transform: scale3d(0, 1, 0); } }
 
 @keyframes noHeight {
   0% {
@@ -20,7 +47,6 @@
     -o-transform: scale3d(0, 1, 0);
     -webkit-transform: scale3d(0, 1, 0);
     transform: scale3d(0, 1, 0); }
-
   100% {
     -moz-transform: scale3d(0, 1, 0);
     -ms-transform: scale3d(0, 1, 0);
@@ -32,6 +58,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 300px; }
+  .ChannelList .collection-item {
+    cursor: pointer; }
   .ChannelList .active {
     -moz-transition: all ease-in 0.5s;
     -o-transition: all ease-in 0.5s;
@@ -108,7 +136,9 @@
     -webkit-animation: moveUp 1s;
     animation: moveUp 1s; }
 
-a:active, a:hover, a:focus {
+a:active,
+a:hover,
+a:focus {
   text-decoration: none;
   outline: 0; }
 
@@ -178,6 +208,7 @@ nav.navbar-nav .ng-hide-add {
   -o-animation: lightSpeedIn 1s;
   -webkit-animation: lightSpeedIn 1s;
   animation: lightSpeedIn 1s; }
+
 nav.navbar-nav .ng-hide-remove {
   -moz-animation: lightSpeedOut 1s;
   -o-animation: lightSpeedOut 1s;
@@ -192,22 +223,46 @@ nav.navbar-nav .ng-hide-remove {
     text-align: center; }
     .navbar-text #editUsername {
       margin-right: 4em; }
-
   .navbar-btn {
     display: block;
     margin-left: auto;
-    margin-right: auto; }
- }
+    margin-right: auto; } }
 
 #userlistlist .ng-enter {
   -moz-animation: slideInRight 0.2s;
   -o-animation: slideInRight 0.2s;
   -webkit-animation: slideInRight 0.2s;
   animation: slideInRight 0.2s; }
+
 #userlistlist .ng-leave {
   -moz-animation: slideOutRight 0.2s;
   -o-animation: slideOutRight 0.2s;
   -webkit-animation: slideOutRight 0.2s;
   animation: slideOutRight 0.2s; }
 
-/*# sourceMappingURL=custom.css.map */
+.login {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row; }
+  .login .center {
+    width: 50%;
+    margin: auto;
+    vertical-align: middle; }
+    .login .center h1 {
+      margin-top: 0; }
+
+@media screen and (max-width: 992px) {
+  .login .center {
+    width: 75%; } }
+
+@media screen and (max-width: 600px) {
+  .login .center {
+    width: 95%; } }
