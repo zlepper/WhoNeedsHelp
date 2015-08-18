@@ -62,12 +62,14 @@
                     <div class="collection with-header ChannelList" id="ChannelList">
                         <div class="collection-header"><h5>Nuværende kanaler</h5></div>
                         <!--Current channels will appear here-->
-                        <a ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="collection-item" href="#"
-                           ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
-                            <i class="material-icons" ng-click="exitChannel(channel.Id)">close</i>
-                            <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
-                            {{channel.ChannelName}}
-                        </a>
+                        <div ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="collection-item" href="#"
+                             ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
+                            <span>{{channel.ChannelName}}</span>
+                            <a href="#" class="secondary-content">
+                                <span class="badge">{{(channel.Questions | keylength) + "/" + (channel.Users | keylength)}}</span>
+                                <i class="material-icons" ng-click="exitChannel(channel.Id)">close</i>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="panel-footer">
@@ -77,10 +79,6 @@
                                 <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                 <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
                                        class="tooltipped" data-position="right" data-delay="50" data-tooltip="Skriv navnet på en ny kanal her for at oprette den eller skriv id'et på en existerende kanal for at forbinde til den." />
-                                <!--tooltip-placement="top"
-                                tooltip-trigger="mouseenter"
-                                tooltip-enable="!newChannelName && (Channels | keylength) == 0"
-                                tooltip="Skriv navnet på en ny kanal her for at oprette den, eller skriv id'et på en existerende kanal for at forbinde til den."-->
                             </div>
                             <div class="form-group hidden">
                                 <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
