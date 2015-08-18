@@ -10,14 +10,13 @@ function removeFromArray(arr: any, index: any) {
 var confirmNotice: any = null;
 
 module Help {
-    import ModalService = angular.ui.bootstrap.IModalService;
-    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
+    var app = angular.module("Help", ["ngAnimate", "ngCookies"]);
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", "$modal", "$timeout", "$cookieStore", "$interval"];
+        static $inject = ["$scope", /*"$modal",*/ "$timeout", "$cookieStore", "$interval"];
 
-        constructor(public $scope: IHelpScope, public $Modal: ModalService, public $timeout: any, public $cookieStore: any, public $interval: any) {
+        constructor(public $scope: IHelpScope,/* public $Modal: ModalService,*/ public $timeout: any, public $cookieStore: any, public $interval: any) {
             super();
             $scope.State = "loading";
 
@@ -34,6 +33,13 @@ module Help {
             $scope.pwReset = {
                 step: 0
             }
+
+            $scope.$watch("State", () => {
+                console.log("State changed");
+                $timeout(() => {
+                    $('.tooltipped').tooltip({ delay: 50 });
+                }, 1000);
+            });
 
             // Syncronise the current data with the server every 30 second
             $interval(() => {
@@ -194,7 +200,7 @@ module Help {
             });
             this.helper.client.tokenLoginFailed = () => {
                 $timeout(() => {
-                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                    //$scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                 });
             }
             $scope.exitChannel = (channelid) => {
@@ -319,7 +325,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             this.helper.client.sendQuestion = (questionText) => {
                 $timeout(() => {
                     $scope.editQuestionText.text = questionText;
-                    $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
                 });
             };
             $scope.UpdateQuestion = () => {

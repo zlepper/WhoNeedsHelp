@@ -32,8 +32,8 @@
     <script src="Scripts/angular.js"></script>
     <script src="Scripts/angular-animate.js"></script>
     <script src="Scripts/angular-cookies.js"></script>
-    <script src="Scripts/angular-ui/ui-bootstrap.min.js"></script>
-    <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>
+    <!--<script src="Scripts/angular-ui/ui-bootstrap.min.js"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>-->
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="js/ServerActions.js"></script>
     <script type="text/javascript" src="js/IHelpScope.js"></script>
@@ -73,10 +73,10 @@
                     <div class="panel-footer">
                         <!--Create new channel form-->
                         <form onsubmit=" return false; " class="form" id="CreateChannelForm" ng-submit="CreateNewChannel(newChannelName)">
-                            <div class="form-group">
+                            <div class="input-field">
                                 <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                 <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
-                                       placeholder="Tilslut eller opret kanal" class="form-control" />
+                                       class="tooltipped" data-position="right" data-delay="50" data-tooltip="Skriv navnet på en ny kanal her for at oprette den eller skriv id'et på en existerende kanal for at forbinde til den." />
                                 <!--tooltip-placement="top"
                                 tooltip-trigger="mouseenter"
                                 tooltip-enable="!newChannelName && (Channels | keylength) == 0"

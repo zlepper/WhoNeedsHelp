@@ -16,14 +16,13 @@ function removeFromArray(arr, index) {
 var confirmNotice = null;
 var Help;
 (function (Help) {
-    var app = angular.module("Help", ["ui.bootstrap", "ngAnimate", "ngCookies"]);
+    var app = angular.module("Help", ["ngAnimate", "ngCookies"]);
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
-        function HelpCtrl($scope, $Modal, $timeout, $cookieStore, $interval) {
+        function HelpCtrl($scope, /* public $Modal: ModalService,*/ $timeout, $cookieStore, $interval) {
             var _this = this;
             _super.call(this);
             this.$scope = $scope;
-            this.$Modal = $Modal;
             this.$timeout = $timeout;
             this.$cookieStore = $cookieStore;
             this.$interval = $interval;
@@ -39,6 +38,12 @@ var Help;
             $scope.pwReset = {
                 step: 0
             };
+            $scope.$watch("State", function () {
+                console.log("State changed");
+                $timeout(function () {
+                    $('.tooltipped').tooltip({ delay: 50 });
+                }, 1000);
+            });
             // Syncronise the current data with the server every 30 second
             $interval(function () {
                 if (Object.keys($scope.Channels)) {
@@ -190,7 +195,7 @@ var Help;
             });
             this.helper.client.tokenLoginFailed = function () {
                 $timeout(function () {
-                    $scope.LoginModal = $Modal.open($scope.LoginModalOptions);
+                    //$scope.LoginModal = $Modal.open($scope.LoginModalOptions);
                 });
             };
             $scope.exitChannel = function (channelid) {
@@ -317,7 +322,7 @@ var Help;
             this.helper.client.sendQuestion = function (questionText) {
                 $timeout(function () {
                     $scope.editQuestionText.text = questionText;
-                    $scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
                 });
             };
             $scope.UpdateQuestion = function () {
@@ -587,7 +592,7 @@ var Help;
                 _this.alert("success", "Din bruger er blevet logget ud alle andre steder.", "Log ud lykkedes");
             };
         }
-        HelpCtrl.$inject = ["$scope", "$modal", "$timeout", "$cookieStore", "$interval"];
+        HelpCtrl.$inject = ["$scope", "$timeout", "$cookieStore", "$interval"];
         return HelpCtrl;
     })(Help.ServerActions);
     Help.HelpCtrl = HelpCtrl;
