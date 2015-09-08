@@ -121,22 +121,14 @@
     <Content Include="alarm.mp3" />
     <Content Include="Content\animate.css" />
     <Content Include="Content\animate.min.css" />
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css">
-      <DependentUpon>bootstrap-theme.css</DependentUpon>
-    </Content>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\perfect-scrollbar.min.css" />
     <Content Include="Content\pnotify.custom.min.css" />
-    <Content Include="Content\ui-bootstrap-csp.css" />
     <Content Include="css\custom.css">
       <DependentUpon>custom.scss</DependentUpon>
     </Content>
     <Content Include="css\custom.min.css">
       <DependentUpon>custom.css</DependentUpon>
     </Content>
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="js\countdown.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
@@ -149,8 +141,6 @@
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="templates\changePasswordPopover.html" />
     <Content Include="templates\changeUsernamePopover.html" />
     <Content Include="templates\createUserPopover.html" />
@@ -158,34 +148,17 @@
     <Content Include="loading.css" />
     <Content Include="loading.js" />
     <Content Include="Scripts\analytics.js" />
-    <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.js" />
-    <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.min.js" />
-    <Content Include="Scripts\angular-ui\ui-bootstrap.js" />
-    <Content Include="Scripts\angular-ui\ui-bootstrap.min.js" />
     <Content Include="css\custom.scss" />
     <Content Include="css\custom.css.map">
       <DependentUpon>custom.css</DependentUpon>
     </Content>
-    <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.min.js.map">
-      <DependentUpon>ui-bootstrap-tpls.min.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\angular-ui\ui-bootstrap.min.js.map">
-      <DependentUpon>ui-bootstrap.min.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\bootstrap.min.js.map">
-      <DependentUpon>bootstrap.min.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\angular.min.js.map" />
-    <Content Include="Scripts\angular-animate.min.js.map" />
-    <Content Include="Scripts\angular-cookies.min.js.map" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="css\_login.scss" />
     <Content Include="css\_help.scss" />
     <None Include="compilerconfig.json" />
+    <Content Include="css\_main.scss" />
+    <Content Include="Scripts\angular.min.js.map" />
+    <Content Include="Scripts\angular-animate.min.js.map" />
+    <Content Include="Scripts\angular-cookies.min.js.map" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -311,7 +284,6 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.pnotify\jquery.pnotify.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />

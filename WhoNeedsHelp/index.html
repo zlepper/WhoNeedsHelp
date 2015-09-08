@@ -52,16 +52,107 @@
     </script>
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
-    <div ng-if="State == 'help'" class="container">
-        <div class="row">
-            <!--<div nav-bar></div>-->
+    <div ng-if="State == 'help'" class="app">
+        <ul id="slide-out-left" class="side-nav fixed">
+            <li><a>Nuværende kanal ID: {{ActiveChannel}}</a></li>
+            <li><a>Navn: {{Me.Name}}</a></li>
+            <li ng-repeat="(Id, channel) in Channels" class="collection-item" href="#"
+                ng-class="{'active': channel.Id === ActiveChannel}">
+                <span>
+                    <button class="as-text" ng-click="setActiveChannel(channel.Id)">
+                        {{channel.ChannelName}}
+                    </button>
+                    <button class="as-text" ng-click="exitChannel(channel.Id)">
+                        <i class="material-icons badge">close</i>
+                    </button>
+                </span>
+            </li>
+            <li class="bottom-aligned">
+                <form onsubmit="return false;" ng-submit="CreateNewChannel(newChannelName)">
+                    <div class="input-field">
+                        <label for="newChannelName">Tilslut eller Opret kanal</label>
+                        <input id="newChannelName" ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" class="validate" autocomplete="false" />
+                    </div>
+                </form>
+            </li>
+        </ul>
+    <div class="main">
+        <div class="helplist">
+            <main>
+                <ul class="collapsible popout" data-collapsible="expandable">
+                    <li ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id">
+                        <div class="collapsible-header active">
+                            <strong>{{question.User.Name}}</strong>
+                            <button class="as-text right" ng-click="RemoveQuestion(question.Id)" ng-if="Channels[ActiveChannel].IsAdmin">
+                                <i class="material-icons">close</i>
+                            </button>
+                        </div>
+                        <div class="collapsible-body" ng-if="question.Text">
+                            <p>{{question.Text}}</p>
+                        </div>
+                    </li>
+                </ul>
+            </main>
+
+            <footer>
+                <form class="row" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
+                    <div class="input-field col s9">
+                        <label for="question">Spørgsmål - er valgtfrit</label>
+                        <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
+                    </div>
+                    <div class="col s3">
+                        <button type="submit" class="btn waves-effect waves-light" id="requestHelp">
+                            Efterspørg hjælp
+                            <i class="material-icons">send</i>
+                        </button>
+                    </div>
+                </form>
+
+                <form class="row" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
+                    <div class="input-field col s6">
+                        <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
+                    </div>
+                    <div class="input-field col s6">
+                        <button type="button" class="btn waves-effect waves-light" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
+                    </div>
+                </form>
+
+                <p class="flow-text" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+            </footer>
+        </div>
+
+
+        <div class="chat">
+            <div class="chat-messages">
+                <div class="card-panel hoverable" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
+                    <span class="card-title">
+                        {{message.User.Name}}
+                        <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(message.Id)">
+                            <i class="material-icons">close</i>
+                        </button>
+                    </span>
+                    <p>{{message.Text}}</p>
+                </div>
+            </div>
+            <form onsubmit="return false" ng-submit="Chat()" ng-show="ActiveChannel">
+                <div class="input-field">
+                    <label for="newChatMessage">Chat</label>
+                    <input id="newChatMessage" type="text" ng-model="Channels[ActiveChannel].MessageText"/>
+                </div>
+            </form>
+        </div>
+    </div>
+        <!--<ul id="slide-out-right" class="side-nav fixed right-aligned">
+            <li><a>HAX</a></li>
+        </ul>-->
+        <!--<div class="row">
+        <!--<div nav-bar></div>
         </div>
         <div class="row">
             <div class="col m3">
                 <div class="panel panel-primary">
                     <div class="collection with-header ChannelList" id="ChannelList">
                         <div class="collection-header"><h5>Nuværende kanaler</h5></div>
-                        <!--Current channels will appear here-->
                         <div ng-repeat="(Id, channel) in Channels" id="{{channel.Id}}" class="collection-item" href="#"
                              ng-class="{'active': channel.Id === ActiveChannel}" ng-click="setActiveChannel(channel.Id)">
                             <span>{{channel.ChannelName}}</span>
@@ -73,12 +164,11 @@
                     </div>
 
                     <div class="panel-footer">
-                        <!--Create new channel form-->
                         <form onsubmit=" return false; " class="form" id="CreateChannelForm" ng-submit="CreateNewChannel(newChannelName)">
                             <div class="input-field">
                                 <label class="sr-only" for="newChannelName">Tilslut eller Opret kanal</label>
                                 <input ng-model="newChannelName" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" id="newChannelName"
-                                       class="tooltipped" data-position="right" data-delay="50" data-tooltip="Skriv navnet på en ny kanal her for at oprette den eller skriv id'et på en existerende kanal for at forbinde til den." />
+                                       class="tooltipped" data-position="right" data-delay="50" data-tooltip="Skriv navnet på en ny kanal her for at oprette den eller skriv id'et på en existerende kanal for at forbinde til den."/>
                             </div>
                             <div class="form-group hidden">
                                 <button type="submit" value="Opret" class="btn btn-primary">Opret</button>
@@ -93,21 +183,20 @@
                         <h5 class="panel-title">
                             Hj&aelig;lpeliste
                             <span class="pull-right" ng-if="ActiveChannel && (!(Channels[ActiveChannel].Questions | keylength)) && Channels[ActiveChannel].IsAdmin">
-                                <button class="astext" title="Klik for at deaktivere" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = false">Timer aktiv</button>
-                                <button class="astext" title="Klik for at aktivere" ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = true">Timer ikke aktiv</button>
-                            </span>
+                                    <button class="astext" title="Klik for at deaktivere" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = false">Timer aktiv</button>
+                                    <button class="astext" title="Klik for at aktivere" ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = true">Timer ikke aktiv</button>
+                                </span>
                             <span class="pull-right" ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
-                                <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
-                                <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>
-                                <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
-                                <button class="astext" ng-click="EditTimer()"><span class="glyphicon glyphicon-pencil"></span></button>
-                            </span>
+                                    <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
+                                    <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>
+                                    <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
+                                    <button class="astext" ng-click="EditTimer()"><span class="glyphicon glyphicon-pencil"></span></button>
+                                </span>
                         </h5>
                     </div>
                     <div class="panel-body" id="HelpList">
                         <div class="wrapper">
                             <inner class="box">
-                                <!--Help panels will appear here-->
                                 <div class="panel" ng-class="{'panel-danger': Channels[ActiveChannel].outOfTime && $first, 'panel-primary': !Channels[ActiveChannel].outOfTime || !$first}" ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id">
                                     <div class="panel-heading">
                                         <button aria-label="Fjern spørgsmål" class="close"
@@ -128,10 +217,10 @@
                         <form class="form-inline" id="requestHelpForm" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
                             <div class="form-group">
                                 <label class="sr-only" for="question">Spørgsmåls Tekst</label>
-                                <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].Text" />
+                                <input type="text" name="question" id="question" placeholder="Spørgsmål - er valgtfrit" class="form-control" ng-model="Channels[ActiveChannel].Text"/>
                             </div>
                             <div class="form-group">
-                                <input type="submit" class="btn btn-primary" value="Efterspørg hjælp" />
+                                <input type="submit" class="btn btn-primary" value="Efterspørg hjælp"/>
                             </div>
                         </form>
 
@@ -150,7 +239,6 @@
             </div>
             <div class="col m3">
                 <div role="tabpanel">
-                    <!-- Nav tabs -->
                     <ul class="nav nav-tabs nav-justified" role="tablist">
                         <li role="presentation" class="active"><a href="#chat" aria-controls="chat" role="tab" data-toggle="tab">Chat</a></li>
                         <li role="presentation"><a href="#userlist" aria-controls="userlist" role="tab" data-toggle="tab">Brugerliste</a></li>
@@ -173,16 +261,15 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                             <span>
-                                                {{message.Text}}
-                                            </span>
+                                                    {{message.Text}}
+                                                </span>
                                         </p>
                                     </div>
                                 </li>
                             </ul>
-                            <!--Chat input-->
                             <form class="form" onsubmit=" return false; " ng-submit="Chat()">
                                 <div class="form-group">
-                                    <input type="text" ng-model="Channels[ActiveChannel].MessageText" placeholder="Chat" class="form-control" />
+                                    <input type="text" ng-model="Channels[ActiveChannel].MessageText" placeholder="Chat" class="form-control"/>
                                 </div>
                             </form>
                             <button class="btn btn-danger" id="ClearChatButton" ng-click="ClearChat()">Ryd chat</button>
@@ -206,7 +293,7 @@
             <p>
                 Fejl og nye idéer modtages <a href="https://github.com/zlepper/WhoNeedsHelp/issues" target="_blank">her</a>.
             </p>
-        </footer>
+        </footer>-->
     </div>
     <div id="loadingAnimation" ng-if="State == 'loading'">
         <div class="loading">

@@ -1,6 +1,5 @@
 /// <reference path="../Scripts/typings/jquery/jquery.d.ts" />
 /// <reference path="../Scripts/typings/signalr/signalr.d.ts" />
-/// <reference path="../Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="../Scripts/typings/jqueryui/jqueryui.d.ts"/>
 /// <reference path="../Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 /// <reference path="../scripts/typings/angularjs/angular.d.ts" />
@@ -81,13 +80,13 @@ module Help {
         newChannelName: string;
         RemoveChatMessage: (messageId: number) => void;
         Chat: () => void;
-        createUserPopover: PopoverOptions;
+        createUserPopover: any;
         createUser: () => void;
         logout: () => void;
-        loginUserPopover: PopoverOptions;
+        loginUserPopover: any;
         login: () => void;
         lastActiveChannel: number;
-        changeUsernamePopover: PopoverOptions;
+        changeUsernamePopover: any;
         ClearChat: () => void;
         StartTimer: (channel: Channel) => void;
         countDown: (channel: Channel) => void;
@@ -101,7 +100,7 @@ module Help {
         stopPasswordReset: () => void;
         RequestPasswordReset: () => void;
         ResetPassword: () => void;
-        changePasswordPopover: PopoverOptions;
+        changePasswordPopover: any;
         ChangePassword: () => void;
         LogoutAll: () => void;
         State: string;

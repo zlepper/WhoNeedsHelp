@@ -1,0 +1,136 @@
+﻿$bottom: 200px;
+
+.app {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    .side-nav.fixed {
+        li {
+            padding: 0;
+
+            form {
+                padding: 0 30px;
+            }
+
+            > span {
+                color: #444;
+                font-size: 1rem;
+                height: 64px;
+                line-height: 64px;
+                padding: 0 30px;
+                display: flex;
+                -ms-flex-direction: row;
+                -webkit-flex-direction: row;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    }
+
+    .main {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 240px;
+        right: 0;
+        padding-top: 15px;
+        overflow-y: auto;
+    }
+
+    .helplist {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 300px;
+    }
+
+    main {
+        padding: 1.5em 3em;
+    }
+
+
+
+    footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0 30px;
+    }
+
+    .collapsible-header {
+        -webkit-user-select: none; /* Chrome/Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+ */
+        user-select: none;
+    }
+
+    .chat {
+        position: absolute;
+        right: 0;
+        width: 300px;
+        padding: 1.5em;
+        top: 0;
+        bottom: 0;
+        border-left: 1px solid rgb(128, 128, 128, 0.5);
+
+        .chat-messages {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: calc(100vh - 76px);
+            padding: 15px 30px 0;
+            overflow-y: auto;
+        }
+
+        form {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            .input-field {
+                padding: 0 1.5em;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+        }
+    }
+}
+
+form {
+    button {
+        width: 100%;
+    }
+}
+
+.as-text {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font: inherit;
+    /*border is optional*/
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+}
+
+
+
+
+.bottom-aligned {
+    bottom: 0;
+    width: 240px;
+    position: fixed;
+}
+
+@media only screen and (max-width : 992px) {
+    main {
+        left: 0;
+    }
+}

@@ -14,14 +14,12 @@ module Help {
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", /*"$modal",*/ "$timeout", "$cookieStore", "$interval"];
+        static $inject = ["$scope", "$timeout", "$cookieStore", "$interval"];
 
-        constructor(public $scope: IHelpScope,/* public $Modal: ModalService,*/ public $timeout: any, public $cookieStore: any, public $interval: any) {
+        constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any) {
             super();
             $scope.State = "loading";
-
-
-
+            
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
             $scope.Channels = {};
@@ -35,9 +33,10 @@ module Help {
             }
 
             $scope.$watch("State", () => {
-                console.log("State changed");
                 $timeout(() => {
                     $('.tooltipped').tooltip({ delay: 50 });
+                    var collapse: any = $(".button-collapse");
+                    collapse.sideNav();
                 }, 1000);
             });
 
@@ -104,9 +103,11 @@ module Help {
 
             window.onbeforeunload = () => {
                 for (var key in $scope.Channels) {
-                    var channel = $scope.Channels[key];
-                    if (channel.timing) {
-                        this.sendCountdownTime(channel.TimeLeft, key);
+                    if ($scope.Channels.hasOwnProperty(key)) {
+                        var channel = $scope.Channels[key];
+                        if (channel.timing) {
+                            this.sendCountdownTime(channel.TimeLeft, key);
+                        }
                     }
                 }
 
@@ -176,6 +177,10 @@ module Help {
 
             $scope.setActiveChannel = (channelid) => {
                 $scope.ActiveChannel = channelid;
+                $timeout(() => {
+                    var c: any = $(".collapsible");
+                    c.collapsible();
+                }, 100);
             };
             $scope.Start = () => {
                 var name = $scope.StartingModal.Name;
@@ -215,10 +220,12 @@ module Help {
                     this.joinChannel(Number(channelName));
                 }
                 $scope.newChannelName = "";
+                console.log($scope.newChannelName);
             };
             $scope.RequestHelp = () => {
                 var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
                 this.requestHelp(qt, $scope.ActiveChannel);
+                $scope.Channels[$scope.ActiveChannel].Text = "";
             };
             $scope.RemoveQuestion = (questionid) => {
                 this.removeQuestion(questionid);
@@ -266,7 +273,6 @@ module Help {
                         $scope.startTime = 300;
                     }
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.exitChannel = (channelId) => {
                 $timeout(() => {
@@ -294,14 +300,18 @@ module Help {
                 question.User = $scope.Channels[channelid].Users[question.User.Id];
                 $timeout(() => {
                     $scope.Channels[channelid].Questions[question.Id] = question;
+                    $timeout(() => {
+                        var c: any = $(".collapsible");
+                        c.collapsible();
+                    }, 50);
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
                         this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? `
 Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     }
                 }
+
             };
             this.helper.client.removeQuestion = (questionid: number) => {
                 $timeout(() => {
@@ -340,7 +350,6 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                         }
                     }
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             $scope.CloseEditModal = () => {
                 $scope.changeQuestionModal.close();
@@ -385,11 +394,15 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                 });
             }
             $scope.Chat = () => {
-                var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
-                if (mes) {
-                    this.chat(mes, $scope.ActiveChannel);
+                if ($scope.ActiveChannel) {
+                    var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
+                    if (mes) {
+                        this.chat(mes, $scope.ActiveChannel);
+                    }
+                    $scope.Channels[$scope.ActiveChannel].MessageText = "";
+                } else {
+                    this.alert("error", "Du er ikke i en kanal, og kan derfor ikke chatte med noget", "");
                 }
-                $scope.Channels[$scope.ActiveChannel].MessageText = "";
             }
             this.helper.client.sendChatMessage = (message: ChatMessage, channelId) => {
                 if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {

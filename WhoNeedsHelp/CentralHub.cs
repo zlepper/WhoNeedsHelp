@@ -943,6 +943,7 @@ namespace WhoNeedsHelp
                 foreach (KeyValuePair<int, int[]> c in chs)
                 {
                     Channel channel = db.Channels.Find(c.Key);
+                    if (channel == null) continue;
                     List<Question> l = channel.Questions.ToList();
                     int[] questions = new int[l.Count];
                     for (int i = 0; i < questions.Length; i++)

@@ -1,6 +1,5 @@
 /// <reference path="../Scripts/typings/jquery/jquery.d.ts" />
 /// <reference path="../Scripts/typings/signalr/signalr.d.ts" />
-/// <reference path="../Scripts/typings/bootstrap/bootstrap.d.ts"/>
 /// <reference path="../Scripts/typings/jqueryui/jqueryui.d.ts"/>
 /// <reference path="../Scripts/typings/jquery.pnotify/jquery.pnotify.d.ts"/>
 /// <reference path="../scripts/typings/angularjs/angular.d.ts" />
@@ -151,3 +150,4 @@ var Help;
     })();
     Help.ServerActions = ServerActions;
 })(Help || (Help = {}));
+//# sourceMappingURL=ServerActions.js.map

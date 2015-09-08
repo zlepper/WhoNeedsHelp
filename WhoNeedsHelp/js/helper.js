@@ -19,7 +19,7 @@ var Help;
     var app = angular.module("Help", ["ngAnimate", "ngCookies"]);
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
-        function HelpCtrl($scope, /* public $Modal: ModalService,*/ $timeout, $cookieStore, $interval) {
+        function HelpCtrl($scope, $timeout, $cookieStore, $interval) {
             var _this = this;
             _super.call(this);
             this.$scope = $scope;
@@ -39,9 +39,10 @@ var Help;
                 step: 0
             };
             $scope.$watch("State", function () {
-                console.log("State changed");
                 $timeout(function () {
                     $('.tooltipped').tooltip({ delay: 50 });
+                    var collapse = $(".button-collapse");
+                    collapse.sideNav();
                 }, 1000);
             });
             // Syncronise the current data with the server every 30 second
@@ -102,9 +103,11 @@ var Help;
                 $scope.Channels[$scope.ActiveChannel].TimeLeft = 0;
             window.onbeforeunload = function () {
                 for (var key in $scope.Channels) {
-                    var channel = $scope.Channels[key];
-                    if (channel.timing) {
-                        _this.sendCountdownTime(channel.TimeLeft, key);
+                    if ($scope.Channels.hasOwnProperty(key)) {
+                        var channel = $scope.Channels[key];
+                        if (channel.timing) {
+                            _this.sendCountdownTime(channel.TimeLeft, key);
+                        }
                     }
                 }
             };
@@ -172,6 +175,10 @@ var Help;
             };
             $scope.setActiveChannel = function (channelid) {
                 $scope.ActiveChannel = channelid;
+                $timeout(function () {
+                    var c = $(".collapsible");
+                    c.collapsible();
+                }, 100);
             };
             $scope.Start = function () {
                 var name = $scope.StartingModal.Name;
@@ -211,10 +218,12 @@ var Help;
                     _this.joinChannel(Number(channelName));
                 }
                 $scope.newChannelName = "";
+                console.log($scope.newChannelName);
             };
             $scope.RequestHelp = function () {
                 var qt = $scope.Channels[$scope.ActiveChannel].Text;
                 _this.requestHelp(qt, $scope.ActiveChannel);
+                $scope.Channels[$scope.ActiveChannel].Text = "";
             };
             $scope.RemoveQuestion = function (questionid) {
                 _this.removeQuestion(questionid);
@@ -263,7 +272,6 @@ var Help;
                         $scope.startTime = 300;
                     }
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             this.helper.client.exitChannel = function (channelId) {
                 $timeout(function () {
@@ -293,8 +301,11 @@ var Help;
                 question.User = $scope.Channels[channelid].Users[question.User.Id];
                 $timeout(function () {
                     $scope.Channels[channelid].Questions[question.Id] = question;
+                    $timeout(function () {
+                        var c = $(".collapsible");
+                        c.collapsible();
+                    }, 50);
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
                         _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil sp\u00F8rgsm\u00E5let er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
@@ -337,7 +348,6 @@ var Help;
                         }
                     }
                 });
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
             };
             $scope.CloseEditModal = function () {
                 $scope.changeQuestionModal.close();
@@ -382,11 +392,16 @@ var Help;
                 });
             };
             $scope.Chat = function () {
-                var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
-                if (mes) {
-                    _this.chat(mes, $scope.ActiveChannel);
+                if ($scope.ActiveChannel) {
+                    var mes = $scope.Channels[$scope.ActiveChannel].MessageText;
+                    if (mes) {
+                        _this.chat(mes, $scope.ActiveChannel);
+                    }
+                    $scope.Channels[$scope.ActiveChannel].MessageText = "";
                 }
-                $scope.Channels[$scope.ActiveChannel].MessageText = "";
+                else {
+                    _this.alert("error", "Du er ikke i en kanal, og kan derfor ikke chatte med noget", "");
+                }
             };
             this.helper.client.sendChatMessage = function (message, channelId) {
                 if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
@@ -691,3 +706,4 @@ var Help;
     })();
     Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
+//# sourceMappingURL=helper.js.map
