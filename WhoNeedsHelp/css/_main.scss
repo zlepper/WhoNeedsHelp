@@ -7,6 +7,10 @@
     left: 0;
     right: 0;
 
+    .btn {
+        height: auto;
+    }
+
     .side-nav.fixed {
         li {
             padding: 0;
@@ -76,7 +80,7 @@
         padding: 1.5em;
         top: 0;
         bottom: 0;
-        border-left: 1px solid rgb(128, 128, 128, 0.5);
+        border-left: 1px solid rgba(128, 128, 128, 0.5);
 
         .chat-messages {
             position: absolute;
