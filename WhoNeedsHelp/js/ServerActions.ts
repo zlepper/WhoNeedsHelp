@@ -112,8 +112,14 @@ module Help {
         syncChannels(chs: Object) {
             return this.helper.server.syncChannels(chs);
         }
+        loginOrCreateUserWithApi(username: string, userid: number, password: string) {
+            return this.helper.server.loginOrCreateUserWithApi(username, userid, password);
+        }
+        joinOrCreateChannelWithApi(channelname: string, channelid: number, teacherKey: string) {
+            return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
+        }
+
         alert(typ: string, text: string, title: string) {
-            // ReSharper disable once UnusedLocals
             var notify = new PNotify({
                 title: title,
                 text: text,

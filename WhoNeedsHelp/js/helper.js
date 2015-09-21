@@ -4,15 +4,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-function isNullOrWhitespace(input) {
-    if (typeof input === "undefined" || input == null)
-        return true;
-    return input.replace(/\s/g, "").length < 1;
-}
-var patt = /[\w][\wæøåöäÆØÅÖÄ ]+[\w]/;
-function removeFromArray(arr, index) {
-    return arr.slice(0, index).concat(arr.slice(index + 1));
-}
 var confirmNotice = null;
 var Help;
 (function (Help) {
@@ -27,8 +18,8 @@ var Help;
             this.$cookieStore = $cookieStore;
             this.$interval = $interval;
             $scope.State = "loading";
-            $scope.StartingModal = new LoginOptions();
-            $scope.Me = new Me();
+            $scope.StartingModal = new Help.LoginOptions();
+            $scope.Me = new Help.Me();
             $scope.Channels = {};
             $scope.ActiveChannel = 0;
             $scope.editQuestionText = { text: "" };
@@ -527,7 +518,7 @@ var Help;
             };
             this.helper.client.sendReloginData = function (key, id) {
                 $timeout(function () {
-                    var token = new LoginToken(id, key);
+                    var token = new Help.LoginToken(id, key);
                     $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
                     $scope.Me.LoggedIn = true;
                 });
@@ -639,71 +630,4 @@ var Help;
             };
         }
     ]);
-    (function (QuestionState) {
-        QuestionState[QuestionState["HaveQuestion"] = 0] = "HaveQuestion";
-        QuestionState[QuestionState["NoQuestion"] = 1] = "NoQuestion";
-    })(Help.QuestionState || (Help.QuestionState = {}));
-    var QuestionState = Help.QuestionState;
-    var Question = (function () {
-        function Question(id, user, questionText) {
-            this.Id = id;
-            this.User = user;
-            this.Text = questionText;
-        }
-        return Question;
-    })();
-    Help.Question = Question;
-    var User = (function () {
-        function User(id, name) {
-            this.Id = id;
-            this.Name = name;
-        }
-        return User;
-    })();
-    Help.User = User;
-    var Me = (function () {
-        function Me() {
-            this.Name = null;
-            this.LoggedIn = false;
-        }
-        return Me;
-    })();
-    Help.Me = Me;
-    var Channel = (function () {
-        function Channel(id, channelName) {
-            this.counting = false;
-            this.outOfTime = false;
-            this.timing = false;
-            this.TimeLeft = 300;
-            this.Id = id;
-            this.ChannelName = channelName;
-        }
-        return Channel;
-    })();
-    Help.Channel = Channel;
-    var ChatMessage = (function () {
-        function ChatMessage() {
-        }
-        return ChatMessage;
-    })();
-    Help.ChatMessage = ChatMessage;
-    var LoginOptions = (function () {
-        function LoginOptions() {
-            this.Name = "";
-            this.Email = "";
-            this.Password = "";
-            this.Passwordcopy = "";
-        }
-        return LoginOptions;
-    })();
-    Help.LoginOptions = LoginOptions;
-    var LoginToken = (function () {
-        function LoginToken(i, k) {
-            this.id = i;
-            this.key = k;
-        }
-        return LoginToken;
-    })();
-    Help.LoginToken = LoginToken;
 })(Help || (Help = {}));
-//# sourceMappingURL=helper.js.map

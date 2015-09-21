@@ -92,8 +92,13 @@ var Help;
         ServerActions.prototype.syncChannels = function (chs) {
             return this.helper.server.syncChannels(chs);
         };
+        ServerActions.prototype.loginOrCreateUserWithApi = function (username, userid, password) {
+            return this.helper.server.loginOrCreateUserWithApi(username, userid, password);
+        };
+        ServerActions.prototype.joinOrCreateChannelWithApi = function (channelname, channelid, teacherKey) {
+            return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
+        };
         ServerActions.prototype.alert = function (typ, text, title) {
-            // ReSharper disable once UnusedLocals
             var notify = new PNotify({
                 title: title,
                 text: text,
@@ -150,4 +155,3 @@ var Help;
     })();
     Help.ServerActions = ServerActions;
 })(Help || (Help = {}));
-//# sourceMappingURL=ServerActions.js.map
