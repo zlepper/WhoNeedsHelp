@@ -104,5 +104,6 @@ module Help {
         ChangePassword: () => void;
         LogoutAll: () => void;
         State: string;
+        CancelUpdateQuestion: () => void;
     }
 }

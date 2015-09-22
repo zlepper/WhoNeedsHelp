@@ -7,7 +7,7 @@ interface ICentralClient {
     errorChannelAlreadyMade: () => void;
     log: (text: string) => void;
     exitChannel: (channelId: number) => void;
-    setChannel: (channel: number, areUserQuestioning: boolean) => void;
+    setChannel: (channel: number) => void;
     sendQuestion: (question: string) => void;
     updateQuestion: (question: string, questionId: number, channelId: number) => void;
     reloadPage: () => void;

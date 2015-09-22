@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = new __();
 };
 var confirmNotice = null;
+var l;
 var Help;
 (function (Help) {
     var app = angular.module("Help", ["ngAnimate", "ngCookies", "ngRoute"]);
@@ -19,6 +20,7 @@ var Help;
             this.$cookieStore = $cookieStore;
             this.$interval = $interval;
             this.$route = $route;
+            l = $scope;
             $scope.State = "loading";
             $scope.StartingModal = new Help.LoginOptions();
             $scope.Me = new Help.Me();
@@ -141,17 +143,23 @@ var Help;
                 }
                 $scope.startTime = m;
             };
+            var params;
             $.connection.hub.start().done(function () {
                 // Get the url parameters
-                var params = new UrlParams(getQueryParams(document.location.search));
-                console.log(params);
+                params = new UrlParams(getQueryParams(document.location.search));
                 // Make sure they a valid
-                if (params.isValid) {
+                if (!params.isValid) {
                     alert("Unvalid api parameters, plz fix!");
+                    return;
                 }
                 // Request a login at the server
                 _this.loginOrCreateUserWithApi(params.uname, params.uid, params.upass);
             });
+            this.helper.client.setChannel = function (id) {
+                $timeout(function () {
+                    $scope.ActiveChannel = id;
+                }, 0);
+            };
             this.helper.client.tokenLoginFailed = function () {
                 $timeout(function () {
                     //$scope.LoginModal = $Modal.open($scope.LoginModalOptions);
@@ -170,7 +178,6 @@ var Help;
                     _this.joinChannel(Number(channelName));
                 }
                 $scope.newChannelName = "";
-                console.log($scope.newChannelName);
             };
             $scope.RequestHelp = function () {
                 var qt = $scope.Channels[$scope.ActiveChannel].Text;
@@ -200,6 +207,10 @@ var Help;
             this.helper.client.sendUserId = function (id) {
                 $timeout(function () {
                     $scope.Me.Id = id;
+                    if ($scope.State === "loading") {
+                        _this.joinOrCreateChannelWithApi(params.cname, params.cid, params.teacherToken);
+                        $scope.State = "help";
+                    }
                 }, 0);
             };
             this.helper.client.appendChannel = function (channel) {
@@ -207,6 +218,9 @@ var Help;
                     if (channel.Questions.hasOwnProperty(questionId)) {
                         var question = channel.Questions[questionId];
                         question.User = channel.Users[question.User.Id];
+                        if (question.User.Id === $scope.Me.Id) {
+                            channel.HaveQuestion = true;
+                        }
                     }
                 }
                 for (var chatMessageId in channel.ChatMessages) {
@@ -223,6 +237,10 @@ var Help;
                         $scope.StartTimer(channel);
                         $scope.startTime = 300;
                     }
+                    $timeout(function () {
+                        var c = $(".collapsible");
+                        c.collapsible();
+                    }, 200);
                 });
             };
             this.helper.client.exitChannel = function (channelId) {
@@ -285,12 +303,18 @@ var Help;
             this.helper.client.sendQuestion = function (questionText) {
                 $timeout(function () {
                     $scope.editQuestionText.text = questionText;
-                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    var m = $("#editQuestionModal");
+                    m.openModal();
                 });
             };
             $scope.UpdateQuestion = function () {
                 _this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
-                $scope.changeQuestionModal.close();
+                var m = $("#editQuestionModal");
+                m.closeModal();
+            };
+            $scope.CancelUpdateQuestion = function () {
+                var m = $("#editQuestionModal");
+                m.closeModal();
             };
             this.helper.client.updateQuestion = function (questionText, questionid, channelid) {
                 $timeout(function () {
@@ -595,23 +619,23 @@ var Help;
     // uid: Number = User id
     // upass: String = password, should be a key of some sort, maybe a GUID
     // uname: String = User name, the actual displayname
-    // teacherKey: string = A unique key each channel should have the designates that this is actually a teacher connecting. 
+    // teacherToken: string = A unique key each channel should have the designates that this is actually a teacher connecting. 
     //                      If ommited to connecting client is considered a student
     //                      If not valid then connecting client is considered a student
     // cname: String = Channel name
     // cid: Number = Channel id
     var UrlParams = (function () {
         function UrlParams(params) {
-            this.uid = Number(params.uid);
+            this.uid = params.uid;
             this.upass = params.upass;
             this.uname = params.uname;
-            this.teacherKey = params.teacher;
+            this.teacherToken = params.teacherToken;
             this.cname = params.cname;
-            this.cid = Number(params.cid);
+            this.cid = params.cid;
             this.isValid = this.validate();
         }
         UrlParams.prototype.validate = function () {
-            if (this.uid === NaN || this.uid == null || this.uid == undefined)
+            if (isNullOrWhitespace(this.uid))
                 return false;
             if (isNullOrWhitespace(this.upass))
                 return false;
@@ -619,8 +643,9 @@ var Help;
                 return false;
             if (isNullOrWhitespace(this.cname))
                 return false;
-            if (this.cid === NaN || this.cid == null || this.cid == undefined)
+            if (isNullOrWhitespace(this.cid))
                 return false;
+            return true;
         };
         return UrlParams;
     })();

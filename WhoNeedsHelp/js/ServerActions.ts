@@ -112,10 +112,10 @@ module Help {
         syncChannels(chs: Object) {
             return this.helper.server.syncChannels(chs);
         }
-        loginOrCreateUserWithApi(username: string, userid: number, password: string) {
+        loginOrCreateUserWithApi(username: string, userid: string, password: string) {
             return this.helper.server.loginOrCreateUserWithApi(username, userid, password);
         }
-        joinOrCreateChannelWithApi(channelname: string, channelid: number, teacherKey: string) {
+        joinOrCreateChannelWithApi(channelname: string, channelid: string, teacherKey: string) {
             return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
         }
 

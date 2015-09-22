@@ -19,6 +19,9 @@ namespace WhoNeedsHelp.Server.Chat
 
         //[Key]
         public int Id { get; set; }
+
+        public string VirtualId { get; set; }
+
         //[InverseProperty("ChannelsIn")]
         public virtual ICollection<User> Users { get; set; }
         //[InverseProperty("ChannelsRequestingHelpIn")]
@@ -30,6 +33,9 @@ namespace WhoNeedsHelp.Server.Chat
 
         public string ChannelName { get; set; }
         public int TimeLeft { get; set; }
+
+        public string PasswordHash { get; set; }
+        public string AdminHash { get; set; }
 
         public Channel()
         {

@@ -1,4 +1,6 @@
 ﻿var confirmNotice: any = null;
+var l;
+
 
 module Help {
     var app = angular.module("Help", ["ngAnimate", "ngCookies", "ngRoute"]);
@@ -10,6 +12,7 @@ module Help {
         // TODO Remove all the extra code not needed. Which should be a looooot
         constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any, public $route: any) {
             super();
+            l = $scope;
             $scope.State = "loading";
 
             $scope.StartingModal = new LoginOptions();
@@ -24,12 +27,6 @@ module Help {
                 step: 0
             }
             
-
-            
-
-
-
-
 
             $scope.$watch("State", () => {
                 $timeout(() => {
@@ -148,21 +145,24 @@ module Help {
                 }
                 $scope.startTime = m;
             }
-
+            var params: UrlParams;
             $.connection.hub.start().done(() => {
                 // Get the url parameters
-                var params = new UrlParams(getQueryParams(document.location.search));
-                console.log(params);
+                params = new UrlParams(getQueryParams(document.location.search));
                 // Make sure they a valid
-                if (params.isValid) {
+                if (!params.isValid) {
                     alert("Unvalid api parameters, plz fix!");
+                    return;
                 }
 
                 // Request a login at the server
                 this.loginOrCreateUserWithApi(params.uname, params.uid, params.upass);
-
-
             });
+            this.helper.client.setChannel = (id) => {
+                $timeout(() => {
+                    $scope.ActiveChannel = id;
+                }, 0);
+            };
 
             this.helper.client.tokenLoginFailed = () => {
                 $timeout(() => {
@@ -181,7 +181,6 @@ module Help {
                     this.joinChannel(Number(channelName));
                 }
                 $scope.newChannelName = "";
-                console.log($scope.newChannelName);
             };
             $scope.RequestHelp = () => {
                 var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
@@ -210,6 +209,10 @@ module Help {
             this.helper.client.sendUserId = (id) => {
                 $timeout(() => {
                     $scope.Me.Id = id;
+                    if ($scope.State === "loading") {
+                        this.joinOrCreateChannelWithApi(params.cname, params.cid, params.teacherToken);
+                        $scope.State = "help";
+                    }
                 }, 0);
             }
             this.helper.client.appendChannel = (channel) => {
@@ -217,6 +220,9 @@ module Help {
                     if (channel.Questions.hasOwnProperty(questionId)) {
                         var question = channel.Questions[questionId];
                         question.User = channel.Users[question.User.Id];
+                        if (question.User.Id === $scope.Me.Id) {
+                            channel.HaveQuestion = true;
+                        }
                     }
                 }
                 for (var chatMessageId in channel.ChatMessages) {
@@ -233,6 +239,10 @@ module Help {
                         $scope.StartTimer(channel);
                         $scope.startTime = 300;
                     }
+                    $timeout(() => {
+                        var c: any = $(".collapsible");
+                        c.collapsible();
+                    }, 200);
                 });
             };
             this.helper.client.exitChannel = (channelId) => {
@@ -296,13 +306,19 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             this.helper.client.sendQuestion = (questionText) => {
                 $timeout(() => {
                     $scope.editQuestionText.text = questionText;
-                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    var m: any = $("#editQuestionModal");
+                    m.openModal();
                 });
             };
             $scope.UpdateQuestion = () => {
                 this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
-                $scope.changeQuestionModal.close();
+                var m: any = $("#editQuestionModal");
+                m.closeModal();
             };
+            $scope.CancelUpdateQuestion = () => {
+                var m: any = $("#editQuestionModal");
+                m.closeModal();
+            }
             this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
                 $timeout(() => {
                     if ($scope.Channels[channelid] != null) {
@@ -614,36 +630,37 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
     // uid: Number = User id
     // upass: String = password, should be a key of some sort, maybe a GUID
     // uname: String = User name, the actual displayname
-    // teacherKey: string = A unique key each channel should have the designates that this is actually a teacher connecting. 
+    // teacherToken: string = A unique key each channel should have the designates that this is actually a teacher connecting. 
     //                      If ommited to connecting client is considered a student
     //                      If not valid then connecting client is considered a student
     // cname: String = Channel name
     // cid: Number = Channel id
     export class UrlParams {
-        uid: number;
+        uid: string;
         upass: string;
         uname: string;
-        teacherKey: string;
+        teacherToken: string;
         cname: string;
-        cid: number;
+        cid: string;
         isValid: boolean;
 
         constructor(params: any) {
-            this.uid = Number(params.uid);
+            this.uid = params.uid;
             this.upass = params.upass;
             this.uname = params.uname;
-            this.teacherKey = params.teacher;
+            this.teacherToken = params.teacherToken;
             this.cname = params.cname;
-            this.cid = Number(params.cid);
+            this.cid = params.cid;
             this.isValid = this.validate();
         }
 
         private validate(): boolean {
-            if (this.uid === NaN || this.uid == null || this.uid == undefined) return false;
+            if (isNullOrWhitespace(this.uid)) return false;
             if (isNullOrWhitespace(this.upass)) return false;
             if (isNullOrWhitespace(this.uname)) return false;
             if (isNullOrWhitespace(this.cname)) return false;
-            if (this.cid === NaN || this.cid == null || this.cid == undefined) return false;
+            if (isNullOrWhitespace(this.cid)) return false;
+            return true;
         }
     }
 }

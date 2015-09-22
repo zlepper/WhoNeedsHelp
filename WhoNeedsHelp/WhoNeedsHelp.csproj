@@ -200,7 +200,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CentralHub.cs" />
+    <Compile Include="App\CentralHub.cs" />
+    <Compile Include="App\CentralHub_API.cs" />
+    <Compile Include="App\CentralHub_Channels.cs" />
+    <Compile Include="App\CentralHub_Chat.cs" />
+    <Compile Include="App\CentralHub_Questions.cs" />
+    <Compile Include="App\CentralHub_UserManagement.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -223,6 +228,14 @@
     <Compile Include="Migrations\201508121906085_AddResetData.cs" />
     <Compile Include="Migrations\201508121906085_AddResetData.Designer.cs">
       <DependentUpon>201508121906085_AddResetData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509221725538_addChannelPassword.cs" />
+    <Compile Include="Migrations\201509221725538_addChannelPassword.Designer.cs">
+      <DependentUpon>201509221725538_addChannelPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509221832377_addVirtualId.cs" />
+    <Compile Include="Migrations\201509221832377_addVirtualId.Designer.cs">
+      <DependentUpon>201509221832377_addVirtualId.cs</DependentUpon>
     </Compile>
     <Compile Include="Server\Chat\Connection.cs" />
     <Compile Include="Migrations\201503051130379_initinal.cs" />
@@ -369,6 +382,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508121906085_AddResetData.resx">
       <DependentUpon>201508121906085_AddResetData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509221725538_addChannelPassword.resx">
+      <DependentUpon>201509221725538_addChannelPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509221832377_addVirtualId.resx">
+      <DependentUpon>201509221832377_addVirtualId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

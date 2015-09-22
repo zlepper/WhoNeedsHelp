@@ -16,11 +16,13 @@ namespace WhoNeedsHelp.Server.Chat
         {
             unchecked
             {
-                return (Id * 397) ^ (EmailAddress != null ? EmailAddress.GetHashCode() : 0);
+                return (Id * 397) ^ (EmailAddress?.GetHashCode() ?? 0);
             }
         }
 
         public int Id { get; set; }
+
+        public string VirtualId { get; set; }
 
         //public ICollection<Connection> Connections { get; set; } 
         public string Name { get; set; }

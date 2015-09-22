@@ -83,7 +83,6 @@ namespace WhoNeedsHelp
                 .WithRequired(lk => lk.User)
                 .HasForeignKey(lk => lk.UserId);
 
-
             // Configure the channel model
             // No need to configure relations with the "User" class. 
             // this has already been done above.

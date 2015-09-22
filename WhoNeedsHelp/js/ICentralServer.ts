@@ -27,6 +27,6 @@ interface ICentralServer {
     logoutAll(): JQueryPromise<void>;
     syncChannels(chs: Object): JQueryPromise<void>;
     
-    loginOrCreateUserWithApi(username: string, userid: number, password: string): JQueryPromise<void>;
-    joinOrCreateChannelWithApi(channelname: string, channelid: number, teacherKey: string): JQueryPromise<void>;
+    loginOrCreateUserWithApi(username: string, userid: string, password: string): JQueryPromise<void>;
+    joinOrCreateChannelWithApi(channelname: string, channelid: string, teacherKey: string): JQueryPromise<void>;
 }

@@ -57,12 +57,36 @@
     right: 0;
     padding-top: 15px;
     overflow-y: auto; }
+  .app.api .main {
+    left: 0; }
+  .app.api .helplist {
+    right: 0; }
   .app .helplist {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
     right: 300px; }
+    .app .helplist .ng-enter {
+      -moz-animation: fadeInDown 1s;
+      -o-animation: fadeInDown 1s;
+      -webkit-animation: fadeInDown 1s;
+      animation: fadeInDown 1s; }
+      .app .helplist .ng-enter-stagger {
+        -moz-animation-delay: 0.2s;
+        -o-animation-delay: 0.2s;
+        -webkit-animation-delay: 0.2s;
+        animation-delay: 0.2s; }
+    .app .helplist .ng-leave {
+      -moz-animation: zoomOut 1s;
+      -o-animation: zoomOut 1s;
+      -webkit-animation: zoomOut 1s;
+      animation: zoomOut 1s; }
+      .app .helplist .ng-leave-stagger {
+        -moz-animation-delay: 0.2s;
+        -o-animation-delay: 0.2s;
+        -webkit-animation-delay: 0.2s;
+        animation-delay: 0.2s; }
   .app main {
     padding: 1.5em 3em; }
   .app footer {
@@ -70,7 +94,21 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 0 30px; }
+    padding: 0 30px;
+    /*.ng-leave {
+            @include animation(fadeOut, 1s);
+        }*/ }
+    .app footer form {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 30px; }
+    .app footer .ng-enter {
+      -moz-animation: fadeIn 1s;
+      -o-animation: fadeIn 1s;
+      -webkit-animation: fadeIn 1s;
+      animation: fadeIn 1s; }
   .app .collapsible-header {
     -webkit-user-select: none;
     /* Chrome/Safari */

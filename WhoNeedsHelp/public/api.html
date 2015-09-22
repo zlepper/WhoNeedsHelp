@@ -61,7 +61,7 @@
     </script>
 </head>
 <body ng-app="Help" ng-controller="ApiCtrl">
-    <div ng-if="State == 'help'" class="app">
+    <div ng-if="State == 'help'" class="app api">
         <div class="main">
             <div class="helplist">
                 <main>
@@ -81,7 +81,7 @@
                 </main>
 
                 <footer>
-                    <form class="row" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
+                    <form class="row" onsubmit=" return false; " ng-if="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
                         <div class="input-field col s9">
                             <label for="question">Spørgsmål - er valgtfrit</label>
                             <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
@@ -94,7 +94,7 @@
                         </div>
                     </form>
 
-                    <form class="row" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
+                    <form class="row" onsubmit=" return false; " ng-if="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
                         <div class="input-field col s6">
                             <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
                         </div>
@@ -103,9 +103,27 @@
                         </div>
                     </form>
 
-                    <p class="flow-text" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+                    <p class="flow-text" ng-if="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
                 </footer>
             </div>
+        </div>
+    </div>
+    <!-- Edit question modal -->
+    <div id="editQuestionModal" class="modal">
+        <div class="modal-content">
+            <h4>Rediger spørgsmål</h4>
+            <form>
+                <div class="row">
+                    <div class="input-field">
+                        <textarea id="editQuestion" class="validate materialize-textarea" ng-model="editQuestionText.text"></textarea>
+                        <label for="editQuestion">Nyt spørgsmål</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:" class="modal-action waves-effect waves-green btn-flat" ng-click="UpdateQuestion()">Gem</a>
+            <a href="javascript:" class="modal-action waves-effect waves-red btn-flat" ng-click="CancelUpdateQuestion()">Annuler</a>
         </div>
     </div>
     <div id="loadingAnimation" ng-if="State == 'loading'">
