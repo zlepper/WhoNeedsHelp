@@ -1,6 +1,7 @@
 ﻿var confirmNotice: any = null;
 var l;
 
+var params: Help.UrlParams;
 
 module Help {
     var app = angular.module("Help", ["ngAnimate", "ngCookies", "ngRoute"]);
@@ -145,7 +146,6 @@ module Help {
                 }
                 $scope.startTime = m;
             }
-            var params: UrlParams;
             $.connection.hub.start().done(() => {
                 // Get the url parameters
                 params = new UrlParams(getQueryParams(document.location.search));

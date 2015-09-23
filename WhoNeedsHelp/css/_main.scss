@@ -112,9 +112,9 @@
         .ng-enter {
             @include animation(fadeIn, 1s);
         }
-        /*.ng-leave {
+        .ng-leave {
             @include animation(fadeOut, 1s);
-        }*/
+        }
     }
 
     .collapsible-header {

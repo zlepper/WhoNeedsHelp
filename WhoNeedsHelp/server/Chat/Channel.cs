@@ -51,6 +51,7 @@ namespace WhoNeedsHelp.Server.Chat
             UsersRequestingHelp = new List<User>();
             Administrators = new List<User>();
             AddAdministrator(user);
+            AddUser(user);
         }
 
         public bool HasIp(string ip)

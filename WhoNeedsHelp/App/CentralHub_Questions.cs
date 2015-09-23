@@ -134,7 +134,6 @@ namespace WhoNeedsHelp.App
                 if (q == null) return;
                 db.Questions.Add(q);
                 db.SaveChanges();
-                SimpleUser su = new SimpleUser(userFromDb.Id, userFromDb.Name);
                 SimpleQuestion sq = q.ToSimpleQuestion();
                 foreach (Connection connection in channel.Users.SelectMany(user => user.Connections))
                 {

@@ -8,15 +8,22 @@ function removeFromArray(arr: any, index: any) {
 }
 
 function getQueryParams(qs) {
-    qs = qs.split('+').join(' ');
+    var parse = (params, pairs) => {
+        var pair = pairs[0];
+        var parts = pair.split("=");
+        var key = decodeURIComponent(parts[0]);
+        var value = decodeURIComponent(parts.slice(1).join("="));
 
-    var params = {},
-        tokens,
-        re = /[?&]?([^=]+)=([^&]*)/g;
+        // Handle multiple parameters of the same name
+        if (typeof params[key] === "undefined") {
+            params[key] = value;
+        } else {
+            params[key] = [].concat(params[key], value);
+        }
 
-    while (tokens = re.exec(qs)) {
-        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+        return pairs.length === 1 ? params : parse(params, pairs.slice(1));
     }
 
-    return params;
+    // Get rid of leading ?
+    return qs.length === 0 ? {} : parse({}, qs.substr(1).split("&"));
 }

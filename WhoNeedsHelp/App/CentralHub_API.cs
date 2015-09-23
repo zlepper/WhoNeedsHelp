@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,9 +55,14 @@ namespace WhoNeedsHelp.App
                     {
                         // Save this connection so we can find it later
                         user.Connections.Add(new Connection() {ConnectionId = Context.ConnectionId});
-                        
+                        db.SaveChanges();
                         // Inform the client that it can proceed
                         Clients.Caller.SendUserId(user.Id);
+
+                        if (!user.Name.Equals(username))
+                        {
+                            SetUsername(username);
+                        }
                     }
                     else
                     {
@@ -155,6 +161,11 @@ namespace WhoNeedsHelp.App
                                 foreach (Connection con in user.Connections)
                                 {
                                     Clients.Client(con.ConnectionId).AppendChannel(sch);
+                                }
+                                var su = user.ToSimpleUser();
+                                foreach (Connection connection in channel.Users.SelectMany(u => u.Connections))
+                                {
+                                    Clients.Client(connection.ConnectionId).AppendUser(su, channel.Id);
                                 }
                             }
                             else

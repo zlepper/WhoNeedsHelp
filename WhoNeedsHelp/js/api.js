@@ -6,6 +6,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var confirmNotice = null;
 var l;
+var params;
 var Help;
 (function (Help) {
     var app = angular.module("Help", ["ngAnimate", "ngCookies", "ngRoute"]);
@@ -143,7 +144,6 @@ var Help;
                 }
                 $scope.startTime = m;
             };
-            var params;
             $.connection.hub.start().done(function () {
                 // Get the url parameters
                 params = new UrlParams(getQueryParams(document.location.search));
