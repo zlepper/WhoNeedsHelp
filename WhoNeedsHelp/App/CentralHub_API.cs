@@ -141,11 +141,17 @@ namespace WhoNeedsHelp.App
                         {
                             // It's a student that is trying to connect
                             channel.AddUser(user);
+                            db.SaveChanges();
                             var sch = channel.ToSimpleChannel();
                             sch.IsAdmin = channel.IsUserAdministrator(user);
+                            var su = user.ToSimpleUser();
                             foreach (Connection con in user.Connections)
                             {
                                 Clients.Client(con.ConnectionId).AppendChannel(sch);
+                            }
+                            foreach (Connection connection in channel.Users.SelectMany(u => u.Connections))
+                            {
+                                Clients.Client(connection.ConnectionId).AppendUser(su, channel.Id);
                             }
                         }
                         else

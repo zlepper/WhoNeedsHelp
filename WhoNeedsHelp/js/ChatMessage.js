@@ -7,3 +7,4 @@ var Help;
     })();
     Help.ChatMessage = ChatMessage;
 })(Help || (Help = {}));
+//# sourceMappingURL=ChatMessage.js.map

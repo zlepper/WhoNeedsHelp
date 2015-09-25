@@ -146,7 +146,9 @@
     <Content Include="css\custom.min.css">
       <DependentUpon>custom.css</DependentUpon>
     </Content>
-    <Content Include="Global.asax" />
+    <Content Include="Global.asax">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="js\countdown.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
@@ -182,6 +184,7 @@
     <Content Include="Scripts\angular-route.min.js.map" />
     <Content Include="Scripts\angular-animate.min.js.map" />
     <Content Include="Scripts\angular-cookies.min.js.map" />
+    <None Include="Properties\PublishProfiles\help.otg.dk.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -208,6 +211,7 @@
     <Compile Include="App\CentralHub_UserManagement.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Migrations\201503141119032_multipleConnections.cs" />
     <Compile Include="Migrations\201503141119032_multipleConnections.Designer.cs">
@@ -344,7 +348,6 @@
   <ItemGroup>
     <Folder Include="Client\" />
     <Folder Include="Content\themes\" />
-    <Folder Include="fonts\bootstrap\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503051130379_initinal.resx">

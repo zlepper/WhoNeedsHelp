@@ -126,10 +126,7 @@ module Help {
                 type: typ,
                 animation: "show",
                 styling: "fontawesome",
-                mouse_reset: false,
-                desktop: {
-                    desktop: document.hidden
-                }
+                mouse_reset: false
             });
             notify.elem.click(() => {
                 notify.remove();

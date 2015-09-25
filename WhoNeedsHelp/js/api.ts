@@ -31,7 +31,8 @@ module Help {
 
             $scope.$watch("State", () => {
                 $timeout(() => {
-                    $('.tooltipped').tooltip({ delay: 50 });
+                    var t: any = $('.tooltipped');
+                    t.tooltip({ delay: 50 });
                     var collapse: any = $(".button-collapse");
                     collapse.sideNav();
                 }, 1000);
@@ -601,8 +602,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
         if (!(obj instanceof Object)) {
             return obj;
         }
-
-        return Object.keys(obj).map(key => Object.defineProperty(obj[key], "$key", { __proto__: null, value: key }));
+        return Object.keys(obj).map(key => Object.defineProperty(obj[key], "$key", <any>{ __proto__: null, value: key }));
     });;
 
     app.directive("wrapper", [

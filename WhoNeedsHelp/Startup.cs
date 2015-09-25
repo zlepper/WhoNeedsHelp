@@ -29,7 +29,6 @@ namespace WhoNeedsHelp
 
             app.UseStaticFiles("/css");
             app.UseStaticFiles("/Content");
-            app.UseStaticFiles("/fonts");
             app.UseStaticFiles("/parts");
             app.UseStaticFiles("/public");
             app.UseStaticFiles("/Scripts");

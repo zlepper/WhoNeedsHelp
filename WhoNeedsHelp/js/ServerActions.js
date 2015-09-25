@@ -105,10 +105,7 @@ var Help;
                 type: typ,
                 animation: "show",
                 styling: "fontawesome",
-                mouse_reset: false,
-                desktop: {
-                    desktop: document.hidden
-                }
+                mouse_reset: false
             });
             notify.elem.click(function () {
                 notify.remove();
@@ -155,3 +152,4 @@ var Help;
     })();
     Help.ServerActions = ServerActions;
 })(Help || (Help = {}));
+//# sourceMappingURL=ServerActions.js.map

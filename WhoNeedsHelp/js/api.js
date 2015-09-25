@@ -1,4 +1,4 @@
-var __extends = (this && this.__extends) || function (d, b) {
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -36,7 +36,8 @@ var Help;
             };
             $scope.$watch("State", function () {
                 $timeout(function () {
-                    $('.tooltipped').tooltip({ delay: 50 });
+                    var t = $('.tooltipped');
+                    t.tooltip({ delay: 50 });
                     var collapse = $(".button-collapse");
                     collapse.sideNav();
                 }, 1000);
@@ -651,3 +652,4 @@ var Help;
     })();
     Help.UrlParams = UrlParams;
 })(Help || (Help = {}));
+//# sourceMappingURL=api.js.map

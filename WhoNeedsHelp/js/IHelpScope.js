@@ -6,3 +6,4 @@
 /// <reference path="../scripts/typings/angularjs/angular-animate.d.ts" />
 /// <reference path="../scripts/typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts" />
 /// <reference path="../scripts/typings/angularjs/angular-cookies.d.ts" />
+//# sourceMappingURL=IHelpScope.js.map
