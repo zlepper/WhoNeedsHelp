@@ -25,4 +25,3 @@ function getQueryParams(qs) {
     // Get rid of leading ?
     return qs.length === 0 ? {} : parse({}, qs.substr(1).split("&"));
 }
-//# sourceMappingURL=helpers.js.map

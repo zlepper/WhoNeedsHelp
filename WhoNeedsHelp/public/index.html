@@ -41,7 +41,16 @@
     <script type="text/javascript" src="/js/ICentralHubProxy.js"></script>
     <script type="text/javascript" src="/js/ICentralClient.js"></script>
     <script type="text/javascript" src="/js/ICentralServer.js"></script>
-    <script type="text/javascript" src="/js/helper.js"></script><script type="text/javascript" src="../js/Question.js/js/helper.js"></script><script type="text/javascript" src="../js/User.js/js/helper.js"></script><script type="text/javascript" src="../js/Me.js/js/helper.js"></script><script type="text/javascript" src="../js/Channel.js/js/helper.js"></script><script type="text/javascript" src="../js/ChatMessage.js/js/helper.js"></script><script type="text/javascript" src="../js/LoginOptions.js/js/helper.js"></script><script type="text/javascript" src="../js/LoginToken.js/js/helper.js"></script><script type="text/javascript" src="/js/helper.js"></script>
+    <script type="text/javascript" src="/js/LoginOptions.js"></script>
+    <script type="text/javascript" src="/js/LoginToken.js"></script>
+    <script type="text/javascript" src="/js/Me.js"></script>
+    <script type="text/javascript" src="/js/User.js"></script>
+    <script type="text/javascript" src="/js/Question.js"></script>
+    <script type="text/javascript" src="/js/QuestionState.js"></script>
+    <script type="text/javascript" src="/js/Channel.js"></script>
+    <script type="text/javascript" src="/js/ChatMessage.js"></script>
+    <script type="text/javascript" src="/js/helpers.js"></script>
+    <script type="text/javascript" src="/js/helper.js"></script>
     <script type="text/javascript" src="/js/directives/navbar.js"></script>
     <script src="/js/directives/login.js"></script>
     <script src="/js/countdown.js"></script>
@@ -76,72 +85,72 @@
                 </form>
             </li>
         </ul>
-    <div class="main">
-        <div class="helplist">
-            <main>
-                <ul class="collapsible popout" data-collapsible="expandable">
-                    <li ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id">
-                        <div class="collapsible-header active">
-                            <strong>{{question.User.Name}}</strong>
-                            <button class="as-text right" ng-click="RemoveQuestion(question.Id)" ng-if="Channels[ActiveChannel].IsAdmin">
-                                <i class="material-icons">close</i>
+        <div class="main">
+            <div class="helplist">
+                <main>
+                    <ul class="collapsible popout" data-collapsible="expandable">
+                        <li ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id">
+                            <div class="collapsible-header active">
+                                <strong>{{question.User.Name}}</strong>
+                                <button class="as-text right" ng-click="RemoveQuestion(question.Id)" ng-if="Channels[ActiveChannel].IsAdmin">
+                                    <i class="material-icons">close</i>
+                                </button>
+                            </div>
+                            <div class="collapsible-body" ng-if="question.Text">
+                                <p>{{question.Text}}</p>
+                            </div>
+                        </li>
+                    </ul>
+                </main>
+
+                <footer>
+                    <form class="row" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
+                        <div class="input-field col s9">
+                            <label for="question">Spørgsmål - er valgtfrit</label>
+                            <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
+                        </div>
+                        <div class="col s3">
+                            <button type="submit" class="btn waves-effect waves-light" id="requestHelp">
+                                Efterspørg hjælp
+                                <i class="material-icons">send</i>
                             </button>
                         </div>
-                        <div class="collapsible-body" ng-if="question.Text">
-                            <p>{{question.Text}}</p>
+                    </form>
+
+                    <form class="row" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
+                        <div class="input-field col s6">
+                            <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
                         </div>
-                    </li>
-                </ul>
-            </main>
+                        <div class="input-field col s6">
+                            <button type="button" class="btn waves-effect waves-light" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
+                        </div>
+                    </form>
 
-            <footer>
-                <form class="row" onsubmit=" return false; " ng-show="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
-                    <div class="input-field col s9">
-                        <label for="question">Spørgsmål - er valgtfrit</label>
-                        <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
-                    </div>
-                    <div class="col s3">
-                        <button type="submit" class="btn waves-effect waves-light" id="requestHelp">
-                            Efterspørg hjælp
-                            <i class="material-icons">send</i>
-                        </button>
-                    </div>
-                </form>
-
-                <form class="row" onsubmit=" return false; " ng-show="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
-                    <div class="input-field col s6">
-                        <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
-                    </div>
-                    <div class="input-field col s6">
-                        <button type="button" class="btn waves-effect waves-light" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
-                    </div>
-                </form>
-
-                <p class="flow-text" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
-            </footer>
-        </div>
-
-
-        <div class="chat">
-            <div class="chat-messages">
-                <div class="card-panel hoverable" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
-                    <span class="card-title">
-                        {{message.User.Name}}
-                        <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(message.Id)">
-                            <i class="material-icons">close</i>
-                        </button>
-                    </span>
-                    <p>{{message.Text}}</p>
-                </div>
+                    <p class="flow-text" ng-show="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+                </footer>
             </div>
-            <form onsubmit="return false" ng-submit="Chat()" ng-show="ActiveChannel">
-                <div class="input-field">
-                    <label for="newChatMessage">Chat</label>
-                    <input id="newChatMessage" type="text" ng-model="Channels[ActiveChannel].MessageText"/>
+
+
+            <div class="chat">
+                <div class="chat-messages">
+                    <div class="card-panel hoverable" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
+                        <span class="card-title">
+                            {{message.User.Name}}
+                            <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(message.Id)">
+                                <i class="material-icons">close</i>
+                            </button>
+                        </span>
+                        <p>{{message.Text}}</p>
+                    </div>
                 </div>
-            </form>
+                <form onsubmit="return false" ng-submit="Chat()" ng-show="ActiveChannel">
+                    <div class="input-field">
+                        <label for="newChatMessage">Chat</label>
+                        <input id="newChatMessage" type="text" ng-model="Channels[ActiveChannel].MessageText" />
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
         <!--<ul id="slide-out-right" class="side-nav fixed right-aligned">
             <li><a>HAX</a></li>
         </ul>-->

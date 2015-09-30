@@ -640,3 +640,9 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
         }
     ]);
 }
+
+$(document).ready(() => {
+    $("body").resize(() => {
+        console.log("Resized");
+    });
+});
