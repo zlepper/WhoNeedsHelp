@@ -16,6 +16,17 @@
     }
 }
 
+
+.everything {
+    > .ng-enter {
+        @include animation(fadeIn, 1s);
+    }
+
+    > .ng-leave {
+        @include animation(fadeOut, 1s);
+    }
+}
+
 .app {
     position: absolute;
     top: 0;
@@ -165,7 +176,7 @@ form {
     }
 }
 
-.as-text {
+.as-text,.astext {
     background: none !important;
     border: none !important;
     padding: 0 !important;

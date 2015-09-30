@@ -1,0 +1,36 @@
+﻿.timer {
+    position: absolute;
+    width: auto;
+    top: 200px;
+    right: 0;
+    padding: 5px;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+
+    .time {
+        display: none;
+        font-size: 2em;
+    }
+
+    &.active {
+        .time {
+            display: initial;
+        }
+    }
+}
+
+.app {
+    .main {
+        .helplist {
+            .out-of-time {
+                background-color: red !important;
+                border-bottom-color: red !important;
+
+                .collapsible-header {
+                    background-color: red !important;
+                    border-bottom-color: red !important;
+                }
+            }
+        }
+    }
+}

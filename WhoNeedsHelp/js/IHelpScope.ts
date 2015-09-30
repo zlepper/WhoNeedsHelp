@@ -105,5 +105,7 @@ module Help {
         LogoutAll: () => void;
         State: string;
         CancelUpdateQuestion: () => void;
+        ToggleShowClock: () => void;
+        showingTimer: boolean;
     }
 }

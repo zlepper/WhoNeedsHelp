@@ -27,6 +27,7 @@ module Help {
             $scope.pwReset = {
                 step: 0
             }
+            $scope.showingTimer = false;
             
 
             $scope.$watch("State", () => {
@@ -60,8 +61,18 @@ module Help {
 
             this.helper = $.connection.centralHub;
             var that = this;
-            
-            // TODO Change this to a materialize modal
+
+            $scope.ToggleShowClock = () => {
+                if ($scope.showingTimer) {
+                    $("#timerClock").stop().removeClass("active", 1000);
+                } else {
+                    $("#timerClock").stop().addClass("active", 1000);
+                }
+                $scope.showingTimer = !$scope.showingTimer;
+            }
+
+
+// TODO Change this to a materialize modal
             $scope.changeQuestionModalOptions = {
                 templateUrl: "/templates/editQuestionModal.html",
                 scope: $scope,

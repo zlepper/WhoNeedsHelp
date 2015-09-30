@@ -26,6 +26,18 @@
   .login .center {
     width: 95%; } }
 
+.everything > .ng-enter {
+  -moz-animation: fadeIn 1s;
+  -o-animation: fadeIn 1s;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s; }
+
+.everything > .ng-leave {
+  -moz-animation: fadeOut 1s;
+  -o-animation: fadeOut 1s;
+  -webkit-animation: fadeOut 1s;
+  animation: fadeOut 1s; }
+
 .app {
   position: absolute;
   top: 0;
@@ -149,7 +161,7 @@
 form button {
   width: 100%; }
 
-.as-text {
+.as-text, .astext {
   background: none !important;
   border: none !important;
   padding: 0 !important;
@@ -166,4 +178,25 @@ form button {
 @media only screen and (max-width: 992px) {
   main {
     left: 0; } }
+
+.timer {
+  position: absolute;
+  width: auto;
+  top: 200px;
+  right: 0;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white; }
+  .timer .time {
+    display: none;
+    font-size: 2em; }
+  .timer.active .time {
+    display: initial; }
+
+.app .main .helplist .out-of-time {
+  background-color: red !important;
+  border-bottom-color: red !important; }
+  .app .main .helplist .out-of-time .collapsible-header {
+    background-color: red !important;
+    border-bottom-color: red !important; }
 

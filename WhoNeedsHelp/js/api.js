@@ -1,7 +1,8 @@
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var confirmNotice = null;
 var l;
@@ -33,6 +34,7 @@ var Help;
             $scope.pwReset = {
                 step: 0
             };
+            $scope.showingTimer = false;
             $scope.$watch("State", function () {
                 $timeout(function () {
                     var t = $('.tooltipped');
@@ -62,6 +64,15 @@ var Help;
             }, 30000);
             this.helper = $.connection.centralHub;
             var that = this;
+            $scope.ToggleShowClock = function () {
+                if ($scope.showingTimer) {
+                    $("#timerClock").stop().removeClass("active", 1000);
+                }
+                else {
+                    $("#timerClock").stop().addClass("active", 1000);
+                }
+                $scope.showingTimer = !$scope.showingTimer;
+            };
             // TODO Change this to a materialize modal
             $scope.changeQuestionModalOptions = {
                 templateUrl: "/templates/editQuestionModal.html",
@@ -651,3 +662,4 @@ var Help;
     })();
     Help.UrlParams = UrlParams;
 })(Help || (Help = {}));
+//# sourceMappingURL=api.js.map
