@@ -157,7 +157,7 @@
         </div>
     </div>
 </div>
-<div class="timer" id="timerClock">
+<div class="timer" id="timerClock" ng-if="Channels[ActiveChannel].IsAdmin">
     <button class="astext clock" ng-click="ToggleShowClock()">
         <i class="material-icons">alarm</i>
     </button>
