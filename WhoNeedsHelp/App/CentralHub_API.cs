@@ -99,7 +99,7 @@ namespace WhoNeedsHelp.App
                     // Only people with a admintoken should be able to create channels with the API
                     if (string.IsNullOrWhiteSpace(admintoken))
                     {
-                        Clients.Caller.Alert("Du skal være lærer for at gøre dette. ", "Manglende rettighed", "error");
+                        Clients.Caller.Alert("Din lærer har endnu ikke oprette klassen, bed ham/hende gøre dette først, ved at gå ind på siden.", "", "error");
                     }
                     else
                     {
