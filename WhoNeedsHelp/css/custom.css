@@ -108,11 +108,13 @@
     right: 0;
     padding: 0 30px; }
     .app footer form {
-      position: absolute;
+      background-color: rgba(255, 255, 255, 0.95);
+      position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 0 30px; }
+      padding: 30px;
+      margin-bottom: 0; }
     .app footer .ng-enter {
       -moz-animation: fadeIn 1s;
       -o-animation: fadeIn 1s;
