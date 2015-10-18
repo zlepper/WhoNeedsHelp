@@ -17,7 +17,7 @@
           <SQLDebugging>False</SQLDebugging>
           <ExternalProgram>
           </ExternalProgram>
-          <StartExternalURL>https://localhost:44300/api?uid=zl-47&amp;upass=password&amp;uname=rasmus&amp;teacherToken=teacher&amp;cname=testchannel&amp;cid=zl-54</StartExternalURL>
+          <StartExternalURL>https://localhost:44300/</StartExternalURL>
           <StartCmdLineArguments>
           </StartCmdLineArguments>
           <StartWorkingDirectory>

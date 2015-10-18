@@ -152,8 +152,10 @@
     <Content Include="js\countdown.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
+    <Content Include="parts\chat.html" />
     <Content Include="parts\login.html" />
     <Content Include="parts\navbar.html" />
+    <Content Include="parts\usermanage.html" />
     <Content Include="public\api.html" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
@@ -164,6 +166,7 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="templates\ask-question.html" />
     <Content Include="templates\changePasswordPopover.html" />
     <Content Include="templates\changeUsernamePopover.html" />
     <Content Include="templates\createUserPopover.html" />
@@ -185,6 +188,7 @@
     <Content Include="Scripts\angular-animate.min.js.map" />
     <Content Include="Scripts\angular-cookies.min.js.map" />
     <Content Include="css\_timer.scss" />
+    <Content Include="css\_centering.scss" />
     <None Include="Properties\PublishProfiles\help.otg.dk.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
@@ -197,8 +201,11 @@
     <Content Include="public\index.html" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="templates\loading.html" />
     <Content Include="templates\loginPopover.html" />
+    <Content Include="templates\questions.html" />
     <Content Include="templates\startModal.html" />
+    <Content Include="templates\timer.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -318,6 +325,13 @@
     <TypeScriptCompile Include="js\api.ts" />
     <TypeScriptCompile Include="js\Channel.ts" />
     <TypeScriptCompile Include="js\ChatMessage.ts" />
+    <TypeScriptCompile Include="js\directives\ask-question.ts" />
+    <TypeScriptCompile Include="js\directives\chat.ts" />
+    <TypeScriptCompile Include="js\directives\editQuestionModal.ts" />
+    <TypeScriptCompile Include="js\directives\loading.ts" />
+    <TypeScriptCompile Include="js\directives\questions.ts" />
+    <TypeScriptCompile Include="js\directives\timer.ts" />
+    <TypeScriptCompile Include="js\directives\usermanage.ts" />
     <TypeScriptCompile Include="js\helper.ts" />
     <TypeScriptCompile Include="js\helpers.ts" />
     <TypeScriptCompile Include="js\ICentralClient.ts" />
@@ -330,6 +344,7 @@
     <TypeScriptCompile Include="js\Question.ts" />
     <TypeScriptCompile Include="js\QuestionState.ts" />
     <TypeScriptCompile Include="js\User.ts" />
+    <TypeScriptCompile Include="js\zl-features.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -349,6 +364,7 @@
   <ItemGroup>
     <Folder Include="Client\" />
     <Folder Include="Content\themes\" />
+    <Folder Include="Scripts\typings\materializecss\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503051130379_initinal.resx">
@@ -399,6 +415,36 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />

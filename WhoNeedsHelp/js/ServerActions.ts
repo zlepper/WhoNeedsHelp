@@ -8,6 +8,8 @@
 /// <reference path="../scripts/typings/angularjs/angular-cookies.d.ts" />
 
 module Help {
+
+    declare var Materialize: any;
     export class ServerActions {
         helper: ICentralHubProxy;
         confirmNotice: PNotify;
@@ -119,18 +121,8 @@ module Help {
             return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
         }
 
-        alert(typ: string, text: string, title: string) {
-            var notify = new PNotify({
-                title: title,
-                text: text,
-                type: typ,
-                animation: "show",
-                styling: "fontawesome",
-                mouse_reset: false
-            });
-            notify.elem.click(() => {
-                notify.remove();
-            });
+        alert(text: string) {
+            Materialize.toast(text, 6000);
         }
 
         confirm(text: string, title: string, callback: Function) {

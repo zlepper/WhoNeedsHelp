@@ -13,7 +13,6 @@ namespace WhoNeedsHelp.Server.Chat
         void SendChatMessage(SimpleChatMessage message, int channelId);
         void CheckVersion(int version);
         void RemoveChatMessage(int messageId);
-        void IpDiscover(string[] channelIds, string[] channelNames);
         void ClearChat(int channelId);
         void LoginSuccess();
         void UserCreationSuccess();
@@ -21,7 +20,7 @@ namespace WhoNeedsHelp.Server.Chat
         void UpdateUsername(string name);
         void AppendUser(SimpleUser user, int channelId);
         void RemoveUser(int id, int channelid);
-        void Alert(string message, string title, string type);
+        void Alert(string message);
         void SetQuestionState(bool hasQuestion, int channelid);
         void SendUserId(int id);
         void UpdateOtherUsername(string name, int userid, int channelid);

@@ -11,8 +11,20 @@ function getQueryParams(qs) {
     var parse = function (params, pairs) {
         var pair = pairs[0];
         var parts = pair.split("=");
-        var key = decodeURIComponent(parts[0]);
-        var value = decodeURIComponent(parts.slice(1).join("="));
+        var key;
+        try {
+            key = decodeURIComponent(parts[0]);
+        }
+        catch (err) {
+            key = parts[0];
+        }
+        var value;
+        try {
+            value = decodeURIComponent(parts.slice(1).join("="));
+        }
+        catch (err) {
+            value = parts.slice(1).join("=");
+        }
         // Handle multiple parameters of the same name
         if (typeof params[key] === "undefined") {
             params[key] = value;

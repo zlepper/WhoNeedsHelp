@@ -67,8 +67,10 @@
     bottom: 0;
     left: 240px;
     right: 0;
-    padding-top: 15px;
-    overflow-y: auto; }
+    padding-top: 15px; }
+  .app.api footer form {
+    left: 0;
+    right: 0; }
   .app.api .main {
     left: 0; }
   .app.api .helplist {
@@ -78,23 +80,24 @@
     left: 0;
     top: 0;
     bottom: 0;
-    right: 300px; }
-    .app .helplist .ng-enter {
+    right: 300px;
+    overflow-y: auto; }
+    .app .helplist .ng-enter, .app .helplist .ng-hide-remove {
       -moz-animation: fadeInDown 1s;
       -o-animation: fadeInDown 1s;
       -webkit-animation: fadeInDown 1s;
       animation: fadeInDown 1s; }
-      .app .helplist .ng-enter-stagger {
+      .app .helplist .ng-enter-stagger, .app .helplist .ng-hide-remove-stagger {
         -moz-animation-delay: 0.2s;
         -o-animation-delay: 0.2s;
         -webkit-animation-delay: 0.2s;
         animation-delay: 0.2s; }
-    .app .helplist .ng-leave {
+    .app .helplist .ng-leave, .app .helplist .ng-hide-add {
       -moz-animation: zoomOut 1s;
       -o-animation: zoomOut 1s;
       -webkit-animation: zoomOut 1s;
       animation: zoomOut 1s; }
-      .app .helplist .ng-leave-stagger {
+      .app .helplist .ng-leave-stagger, .app .helplist .ng-hide-add-stagger {
         -moz-animation-delay: 0.2s;
         -o-animation-delay: 0.2s;
         -webkit-animation-delay: 0.2s;
@@ -110,9 +113,9 @@
     .app footer form {
       background-color: rgba(255, 255, 255, 0.95);
       position: fixed;
+      left: 240px;
+      right: 300px;
       bottom: 0;
-      left: 0;
-      right: 0;
       padding: 30px;
       margin-bottom: 0; }
     .app footer .ng-enter {
@@ -146,14 +149,17 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: calc(100vh - 76px);
-      padding: 15px 30px 0;
+      bottom: 76px;
+      padding: 15px 30px 15px;
       overflow-y: auto; }
+      .app .chat .chat-messages .card-panel {
+        margin-bottom: 20px; }
     .app .chat form {
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 0; }
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.95); }
       .app .chat form .input-field {
         padding: 0 1.5em;
         -moz-box-sizing: border-box;
@@ -181,6 +187,13 @@ form button {
   main {
     left: 0; } }
 
+body div input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  background-color: white !important; }
+
+.user-managing {
+  padding-top: 2em; }
+
 .timer {
   position: absolute;
   width: auto;
@@ -201,4 +214,18 @@ form button {
   .app .main .helplist .out-of-time .collapsible-header {
     background-color: red !important;
     border-bottom-color: red !important; }
+
+.centering {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; }
+  .centering > div {
+    display: flex;
+    justify-content: center;
+    align-items: center; }
+
+.strong {
+  font-weight: bold; }
 

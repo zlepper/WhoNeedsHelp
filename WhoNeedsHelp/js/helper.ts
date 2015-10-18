@@ -1,15 +1,17 @@
 ﻿var confirmNotice: any = null;
-
+var l;
 module Help {
-    var app = angular.module("Help", ["ngAnimate", "ngCookies"]);
+    var app = angular.module("Help", ["ngAnimate", "ngCookies", "zlFeatures"]);
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$scope", "$timeout", "$cookieStore", "$interval"];
+        static $inject = ["$rootScope", "$timeout", "$cookieStore", "$interval"];
 
         constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any) {
             super();
-            $scope.State = "loading";
+            l = $scope;
+            $scope.Application = new Application();
+            $scope.Application.State = "loading";
             
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
@@ -22,8 +24,10 @@ module Help {
             $scope.pwReset = {
                 step: 0
             }
+            $scope.newChannel = {};
 
             $scope.$watch("State", () => {
+                console.log($scope.Application.State);
                 $timeout(() => {
                     $('.tooltipped').tooltip(<any>{ delay: 50 });
                     var collapse: any = $(".button-collapse");
@@ -54,40 +58,20 @@ module Help {
             this.helper = $.connection.centralHub;
             var that = this;
 
+            $scope.showingTimer = false;
+
+            $scope.ToggleShowClock = () => {
+                if ($scope.showingTimer) {
+                    $("#timerClock").stop().removeClass("active", 1000);
+                } else {
+                    $("#timerClock").stop().addClass("active", 1000);
+                }
+                $scope.showingTimer = !$scope.showingTimer;
+            }
+
             $scope.$watch("ActiveChannel", (newValue: number, oldValue: number) => {
                 $scope.lastActiveChannel = oldValue;
             });
-
-            $scope.changeUsernamePopover = {
-                templateUrl: "/templates/changeUsernamePopover.html",
-                title: "Skift brugernavn"
-            }
-            $scope.createUserPopover = {
-                templateUrl: "/templates/createUserPopover.html",
-                title: "Opret bruger"
-            };
-            $scope.loginUserPopover = {
-                templateUrl: "/templates/loginPopover.html",
-                title: "Login"
-            }
-            $scope.changePasswordPopover = {
-                templateUrl: "/templates/changePasswordPopover.html",
-                title: "Skift kodeord"
-            }
-            $scope.LoginModalOptions = {
-                templateUrl: "/templates/startModal.html",
-                scope: $scope,
-                keyboard: false,
-                backdrop: "static",
-                animation: false
-            };
-            $scope.changeQuestionModalOptions = {
-                templateUrl: "/templates/editQuestionModal.html",
-                scope: $scope,
-                keyboard: false,
-                backdrop: "static",
-                animation: false
-            };
 
             if ($scope.ActiveChannel)
                 $scope.Channels[$scope.ActiveChannel].TimeLeft = 0;
@@ -107,7 +91,7 @@ module Help {
             $scope.countDown = (channel: Channel) => {
                 if (channel) {
                     channel.TimeLeft = channel.TimeLeft - 1;
-                    if (channel.TimeLeft % 10 == 0) {
+                    if (channel.TimeLeft % 10 === 0) {
                         this.sendCountdownTime(channel.TimeLeft, channel.Id);
                     }
                     if (channel.TimeLeft <= 0) {
@@ -158,10 +142,10 @@ module Help {
                 var n = prompt("Hvad skal den nye tid være? \n Tal i sekunder");
                 var m = Number(n);
                 if (m === NaN) {
-                    return this.alert("error", "Ikke et tal!", "Fejl");
+                    this.alert("Ikke et tal!");
                 }
                 if (m <= 0) {
-                    return this.alert("error", "Tiden kan ikke være mindre end 1 sekund!", "Fejl");
+                    this.alert("Tiden kan ikke være mindre end 1 sekund!");
                 }
                 $scope.startTime = m;
             }
@@ -179,7 +163,11 @@ module Help {
                 var n = name.match(patt);
                 if (n.length > 0) {
                     this.setUsername(n[0]);
-                    $scope.State = "help";
+                    if ($scope.Application.State === "usermanage") {
+
+                    } else {
+                        $scope.Application.State = "help";
+                    }
                 }
             };
             $.connection.hub.start().done(() => {
@@ -191,7 +179,7 @@ module Help {
                         this.loginWithToken(token.id, token.key);
                     }
 
-                    $scope.State = "login";
+                    $scope.Application.State = "login";
                 });
             });
             this.helper.client.tokenLoginFailed = () => {
@@ -210,8 +198,8 @@ module Help {
                 } else {
                     this.joinChannel(Number(channelName));
                 }
-                $scope.newChannelName = "";
-                console.log($scope.newChannelName);
+                $scope.newChannel.Name = "";
+                console.log($scope.newChannel.Name);
             };
             $scope.RequestHelp = () => {
                 var qt: string = $scope.Channels[$scope.ActiveChannel].Text;
@@ -235,6 +223,7 @@ module Help {
             this.helper.client.updateUsername = (name) => {
                 $timeout(() => {
                     $scope.Me.Name = name;
+                    this.alert("Dit navn er blevet ændret til \"" + name + "\"");
                 }, 0);
             };
             this.helper.client.sendUserId = (id) => {
@@ -298,8 +287,8 @@ module Help {
                 });
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
-                        this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? `
-Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
+                        this.alert(question.User.Name + " har brug for hjælp." + (question.Text ? `
+Til spørgsmålet er teksten: "${question.Text}"` : ""));
                     }
                 }
 
@@ -326,13 +315,19 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             this.helper.client.sendQuestion = (questionText) => {
                 $timeout(() => {
                     $scope.editQuestionText.text = questionText;
-                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    var m: any = $("#editQuestionModal");
+                    m.openModal();
                 });
             };
             $scope.UpdateQuestion = () => {
                 this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
-                $scope.changeQuestionModal.close();
+                var m: any = $("#editQuestionModal");
+                m.closeModal();
             };
+            $scope.CancelUpdateQuestion = () => {
+                var m: any = $("#editQuestionModal");
+                m.closeModal();
+            }
             this.helper.client.updateQuestion = (questionText, questionid, channelid) => {
                 $timeout(() => {
                     if ($scope.Channels[channelid] != null) {
@@ -392,14 +387,14 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     }
                     $scope.Channels[$scope.ActiveChannel].MessageText = "";
                 } else {
-                    this.alert("error", "Du er ikke i en kanal, og kan derfor ikke chatte med noget", "");
+                    this.alert("Du er ikke i en kanal, og kan derfor ikke chatte med noget");
                 }
             }
             this.helper.client.sendChatMessage = (message: ChatMessage, channelId) => {
                 if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
                     if (message.User.Id !== $scope.Me.Id) {
                         if (channelId !== $scope.ActiveChannel || document.hidden) {
-                            this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
+                            this.alert(message.Text);
                         }
                     }
                 }
@@ -408,16 +403,16 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     $scope.Channels[channelId].ChatMessages[message.Id] = message;
                 });
             }
-            this.helper.client.alert = (message, heading, oftype) => {
-                this.alert(oftype, message, heading);
+            this.helper.client.alert = (message) => {
+                this.alert(message);
             }
             $scope.createUser = () => {
                 if ($scope.StartingModal.Password !== $scope.StartingModal.Passwordcopy) {
-                    this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
+                    this.alert("Kodeord stemmer ikke overens");
                     return;
                 }
                 if (!$scope.StartingModal.Name || !$scope.StartingModal.Email) {
-                    this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
+                    this.alert("Du har felter der endnu ikke er udfyldte");
                     return;
                 }
                 var email = $scope.StartingModal.Email;
@@ -437,9 +432,10 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     $scope.StartingModal.Password = "";
                     $scope.$apply();
                 }, 1000);
-                this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
+                this.alert("Din bruger er nu oprettet");
             }
             $scope.logout = () => {
+                console.log("Logging out");
                 var token: LoginToken = $cookieStore.get("token");
                 if (!token)
                     this.logoutUser(null);
@@ -449,6 +445,8 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             this.helper.client.userLoggedOut = () => {
                 $timeout(() => {
                     $scope.Me.LoggedIn = false;
+                    $scope.Application.State = "help";
+                    console.log($scope.Application.State);
                     for (var ch in $scope.Channels) {
                         if ($scope.Channels.hasOwnProperty(ch)) {
                             delete $scope.Channels[ch];
@@ -456,31 +454,22 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     }
                     $scope.setActiveChannel(0);
                     $cookieStore.remove("token");
+                    $scope.$apply();
                 });
             }
             $scope.login = () => {
                 if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {
-                    this.alert("error", "Manglende info", "Manglende info");
+                    this.alert("Manglende info");
                     return;
                 }
                 this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             }
-            function loginClear() {
-                $scope.Me.LoggedIn = true;
-                $scope.StartingModal.Passwordcopy = "";
-                $scope.StartingModal.Password = "";
-                $scope.$apply();
-            }
             this.helper.client.loginSuccess = () => {
-                if ($scope.LoginModal) {
-                    $scope.LoginModal.close();
-                    $scope.LoginModal = null;
-                    loginClear();
-                } else {
-                    $("#loginBtn").click();
-                    setTimeout(loginClear(), 1000);
+                if ($scope.Application.State === "login") {
+                    $scope.Application.State = "help";
                 }
-                this.alert("success", "Du er nu logget ind.", "Login successfuld");
+                $scope.Me.LoggedIn = true;
+                this.alert("Du er nu logget ind.");
             }
             this.helper.client.updateOtherUsername = (name, userid, channelid) => {
                 $timeout(() => {
@@ -521,6 +510,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
                     var token = new LoginToken(id, key);
                     $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
                     $scope.Me.LoggedIn = true;
+                    $scope.Application.State = "help";
                 });
             }
 
@@ -563,7 +553,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             }
             this.helper.client.passwordResetResult = (success: boolean) => {
                 if (success) {
-                    this.alert("success", "Dit kodeord er blevet nulstillet.", "Nulstiling lykkedes");
+                    this.alert("Dit kodeord er blevet nulstillet.");
                     $scope.pwReset = {};
                 } else {
                     $timeout(() => {
@@ -585,9 +575,9 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
 
             this.helper.client.passwordChanged = (success: boolean) => {
                 if (success) {
-                    this.alert("success", "Dit password are blevet ændret.", "");
+                    this.alert("Dit password are blevet ændret.");
                 } else {
-                    this.alert("error", "Kunne ikke skifte kodeord.", "");
+                    this.alert("Kunne ikke skifte kodeord.");
                 }
             }
 
@@ -598,7 +588,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             }
 
             this.helper.client.allUsersLoggedOut = () => {
-                this.alert("success", "Din bruger er blevet logget ud alle andre steder.", "Log ud lykkedes");
+                this.alert("Din bruger er blevet logget ud alle andre steder.");
             }
 
         }
@@ -639,6 +629,10 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""), "Nyt spørgsmål");
             };
         }
     ]);
+
+    export  class Application {
+        State: string;
+    }
 }
 
 $(document).ready(() => {

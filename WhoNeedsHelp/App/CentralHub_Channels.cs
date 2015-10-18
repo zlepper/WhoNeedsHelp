@@ -18,14 +18,14 @@ namespace WhoNeedsHelp.App
                 Channel channel = db.Channels.Find(channelId);
                 if (channel == null)
                 {
-                    Clients.Caller.Alert("Kanalen med id \"" + channelId + "\" blev ikke fundet.", "Kanal ikke fundet", "info");
+                    Clients.Caller.Alert("Kanalen med id \"" + channelId + "\" blev ikke fundet.");
                     return;
                 }
                 User user = db.Connections.Find(Context.ConnectionId).User;
                 if (user == null) return;
                 if (channel.GetUsers().Contains(user))
                 {
-                    Clients.Caller.Alert("Du er allerede i denne kanal.", "Allerede i kanal", "info");
+                    Clients.Caller.Alert("Du er allerede i denne kanal.");
                     return;
                 }
                 channel.AddUser(user);
@@ -99,7 +99,7 @@ namespace WhoNeedsHelp.App
                     }
                     else
                     {
-                        Clients.Caller.Alert("Kanalen blev ikke funder", "Kan ikke findes", "error");
+                        Clients.Caller.Alert("Kanalen blev ikke funder");
                     }
                 }
                 db.SaveChanges();
@@ -117,7 +117,7 @@ namespace WhoNeedsHelp.App
                 if (user == null) return;
                 if (user.AreAdministratorIn.Count > 4)
                 {
-                    Clients.Caller.Alert("Du kan ikke oprette mere end 5 kanaler af gangen", "Maks oprettede kanaler nået", "error");
+                    Clients.Caller.Alert("Du kan ikke oprette mere end 5 kanaler af gangen");
                     return;
                 }
                 Channel channel = new Channel(user, channelName);
@@ -151,7 +151,7 @@ namespace WhoNeedsHelp.App
                 }
                 if (callingUser.Id == user.Id)
                 {
-                    Clients.Caller.Alert("Du har lige forsøgt at smide dig selv ud af kanalen...", "Really?!", "warning");
+                    Clients.Caller.Alert("Du har lige forsøgt at smide dig selv ud af kanalen...");
                     return;
                 }
                 if (channel.IsUserAdministrator(callingUser))

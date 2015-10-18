@@ -55,7 +55,7 @@ namespace WhoNeedsHelp.App
             Debug.WriteLine("Here");
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(pw))
             {
-                Clients.Caller.Alert("En af værdier er ikke blevet sat.", "Fejl under oprettelse af bruger", "error");
+                Clients.Caller.Alert("En af værdier er ikke blevet sat.");
                 return;
             }
             using (HelpContext db = new HelpContext())
@@ -63,7 +63,7 @@ namespace WhoNeedsHelp.App
                 User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
                 if (user != null)
                 {
-                    Clients.Caller.Alert("Emailadressen er allerede i brug.", "Fejl under oprettelse af bruger", "error");
+                    Clients.Caller.Alert("Emailadressen er allerede i brug.");
                     return;
                 }
                 Connection con = db.Connections.Find(Context.ConnectionId);
@@ -72,7 +72,7 @@ namespace WhoNeedsHelp.App
                 if (user == null) return;
                 if (!string.IsNullOrWhiteSpace(user.Pw) || !string.IsNullOrWhiteSpace(user.EmailAddress))
                 {
-                    Clients.Caller.Alert("Du er allerede logget ind.", "Fejl under oprettelse af bruger", "error");
+                    Clients.Caller.Alert("Du er allerede logget ind.");
                     return;
                 }
                 string pass = PasswordHash.CreateHash(pw);
@@ -115,6 +115,13 @@ namespace WhoNeedsHelp.App
                     user.GenerateLoginToken(newKey);
                     db.LoginTokens.Remove(lt);
                     user.LastLogin = DateTime.Now;
+                    Connection connection =
+                        db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+                    var u = connection?.User;
+                    u?.Connections.Remove(connection);
+                    user.Connections.Add(connection);
+                    db.Users.Remove(u);
+                    db.SaveChanges();
                 }
                 else
                 {
@@ -133,7 +140,7 @@ namespace WhoNeedsHelp.App
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                Clients.Caller.Alert("Ikke alt info er indtastet", "Fejl i indtasting", "error");
+                Clients.Caller.Alert("Ikke alt info er indtastet");
                 return;
             }
             using (HelpContext db = new HelpContext())
@@ -144,13 +151,13 @@ namespace WhoNeedsHelp.App
                 User currentUser = con.User;
                 if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
                 {
-                    Clients.Caller.Alert("Du er allerede logget ind", "Allerede logget ind", "error");
+                    Clients.Caller.Alert("Du er allerede logget ind");
                     return;
                 }
                 User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
                 if (user == null)
                 {
-                    Clients.Caller.Alert("Forkert mail eller kodeord", "Fejl under login", "error");
+                    Clients.Caller.Alert("Forkert mail eller kodeord");
                     return;
                 }
                 bool success = PasswordHash.ValidatePassword(password, user.Pw);
@@ -211,7 +218,7 @@ namespace WhoNeedsHelp.App
                 }
                 else
                 {
-                    Clients.Caller.Alert("Forkert mail eller kodeord", "Fejl under login", "error");
+                    Clients.Caller.Alert("Forkert mail eller kodeord");
                 }
             }
         }
@@ -323,6 +330,7 @@ namespace WhoNeedsHelp.App
                 }
                 db.LoginTokens.RemoveRange(user.LoginTokens);
                 Clients.Caller.AllUsersLoggedOut();
+                db.SaveChanges();
             }
         }
         private void ExitChannel(Channel channel, User user)

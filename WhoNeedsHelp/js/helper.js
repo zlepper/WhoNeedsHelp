@@ -1,13 +1,13 @@
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var confirmNotice = null;
+var l;
 var Help;
 (function (Help) {
-    var app = angular.module("Help", ["ngAnimate", "ngCookies"]);
+    var app = angular.module("Help", ["ngAnimate", "ngCookies", "zlFeatures"]);
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
         function HelpCtrl($scope, $timeout, $cookieStore, $interval) {
@@ -17,7 +17,9 @@ var Help;
             this.$timeout = $timeout;
             this.$cookieStore = $cookieStore;
             this.$interval = $interval;
-            $scope.State = "loading";
+            l = $scope;
+            $scope.Application = new Application();
+            $scope.Application.State = "loading";
             $scope.StartingModal = new Help.LoginOptions();
             $scope.Me = new Help.Me();
             $scope.Channels = {};
@@ -29,7 +31,9 @@ var Help;
             $scope.pwReset = {
                 step: 0
             };
+            $scope.newChannel = {};
             $scope.$watch("State", function () {
+                console.log($scope.Application.State);
                 $timeout(function () {
                     $('.tooltipped').tooltip({ delay: 50 });
                     var collapse = $(".button-collapse");
@@ -57,39 +61,19 @@ var Help;
             }, 30000);
             this.helper = $.connection.centralHub;
             var that = this;
+            $scope.showingTimer = false;
+            $scope.ToggleShowClock = function () {
+                if ($scope.showingTimer) {
+                    $("#timerClock").stop().removeClass("active", 1000);
+                }
+                else {
+                    $("#timerClock").stop().addClass("active", 1000);
+                }
+                $scope.showingTimer = !$scope.showingTimer;
+            };
             $scope.$watch("ActiveChannel", function (newValue, oldValue) {
                 $scope.lastActiveChannel = oldValue;
             });
-            $scope.changeUsernamePopover = {
-                templateUrl: "/templates/changeUsernamePopover.html",
-                title: "Skift brugernavn"
-            };
-            $scope.createUserPopover = {
-                templateUrl: "/templates/createUserPopover.html",
-                title: "Opret bruger"
-            };
-            $scope.loginUserPopover = {
-                templateUrl: "/templates/loginPopover.html",
-                title: "Login"
-            };
-            $scope.changePasswordPopover = {
-                templateUrl: "/templates/changePasswordPopover.html",
-                title: "Skift kodeord"
-            };
-            $scope.LoginModalOptions = {
-                templateUrl: "/templates/startModal.html",
-                scope: $scope,
-                keyboard: false,
-                backdrop: "static",
-                animation: false
-            };
-            $scope.changeQuestionModalOptions = {
-                templateUrl: "/templates/editQuestionModal.html",
-                scope: $scope,
-                keyboard: false,
-                backdrop: "static",
-                animation: false
-            };
             if ($scope.ActiveChannel)
                 $scope.Channels[$scope.ActiveChannel].TimeLeft = 0;
             window.onbeforeunload = function () {
@@ -105,7 +89,7 @@ var Help;
             $scope.countDown = function (channel) {
                 if (channel) {
                     channel.TimeLeft = channel.TimeLeft - 1;
-                    if (channel.TimeLeft % 10 == 0) {
+                    if (channel.TimeLeft % 10 === 0) {
                         _this.sendCountdownTime(channel.TimeLeft, channel.Id);
                     }
                     if (channel.TimeLeft <= 0) {
@@ -157,10 +141,10 @@ var Help;
                 var n = prompt("Hvad skal den nye tid være? \n Tal i sekunder");
                 var m = Number(n);
                 if (m === NaN) {
-                    return _this.alert("error", "Ikke et tal!", "Fejl");
+                    _this.alert("Ikke et tal!");
                 }
                 if (m <= 0) {
-                    return _this.alert("error", "Tiden kan ikke være mindre end 1 sekund!", "Fejl");
+                    _this.alert("Tiden kan ikke være mindre end 1 sekund!");
                 }
                 $scope.startTime = m;
             };
@@ -177,7 +161,11 @@ var Help;
                 var n = name.match(patt);
                 if (n.length > 0) {
                     _this.setUsername(n[0]);
-                    $scope.State = "help";
+                    if ($scope.Application.State === "usermanage") {
+                    }
+                    else {
+                        $scope.Application.State = "help";
+                    }
                 }
             };
             $.connection.hub.start().done(function () {
@@ -188,7 +176,7 @@ var Help;
                     else {
                         _this.loginWithToken(token.id, token.key);
                     }
-                    $scope.State = "login";
+                    $scope.Application.State = "login";
                 });
             });
             this.helper.client.tokenLoginFailed = function () {
@@ -208,8 +196,8 @@ var Help;
                 else {
                     _this.joinChannel(Number(channelName));
                 }
-                $scope.newChannelName = "";
-                console.log($scope.newChannelName);
+                $scope.newChannel.Name = "";
+                console.log($scope.newChannel.Name);
             };
             $scope.RequestHelp = function () {
                 var qt = $scope.Channels[$scope.ActiveChannel].Text;
@@ -234,6 +222,7 @@ var Help;
             this.helper.client.updateUsername = function (name) {
                 $timeout(function () {
                     $scope.Me.Name = name;
+                    _this.alert("Dit navn er blevet ændret til \"" + name + "\"");
                 }, 0);
             };
             this.helper.client.sendUserId = function (id) {
@@ -299,7 +288,7 @@ var Help;
                 });
                 if ($scope.Channels[channelid].IsAdmin) {
                     if (document.hidden) {
-                        _this.alert("info", question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil sp\u00F8rgsm\u00E5let er teksten: \"" + question.Text + "\"" : ""), "Nyt spørgsmål");
+                        _this.alert(question.User.Name + " har brug for hjælp." + (question.Text ? "\nTil sp\u00F8rgsm\u00E5let er teksten: \"" + question.Text + "\"" : ""));
                     }
                 }
             };
@@ -324,12 +313,18 @@ var Help;
             this.helper.client.sendQuestion = function (questionText) {
                 $timeout(function () {
                     $scope.editQuestionText.text = questionText;
-                    //$scope.changeQuestionModal = $Modal.open($scope.changeQuestionModalOptions);
+                    var m = $("#editQuestionModal");
+                    m.openModal();
                 });
             };
             $scope.UpdateQuestion = function () {
                 _this.changeQuestion($scope.editQuestionText.text, $scope.ActiveChannel);
-                $scope.changeQuestionModal.close();
+                var m = $("#editQuestionModal");
+                m.closeModal();
+            };
+            $scope.CancelUpdateQuestion = function () {
+                var m = $("#editQuestionModal");
+                m.closeModal();
             };
             this.helper.client.updateQuestion = function (questionText, questionid, channelid) {
                 $timeout(function () {
@@ -391,14 +386,14 @@ var Help;
                     $scope.Channels[$scope.ActiveChannel].MessageText = "";
                 }
                 else {
-                    _this.alert("error", "Du er ikke i en kanal, og kan derfor ikke chatte med noget", "");
+                    _this.alert("Du er ikke i en kanal, og kan derfor ikke chatte med noget");
                 }
             };
             this.helper.client.sendChatMessage = function (message, channelId) {
                 if (message.Text.toLowerCase().indexOf($scope.Me.Name.toLowerCase()) !== -1) {
                     if (message.User.Id !== $scope.Me.Id) {
                         if (channelId !== $scope.ActiveChannel || document.hidden) {
-                            _this.alert("info", message.Text, $scope.Channels[channelId].ChannelName);
+                            _this.alert(message.Text);
                         }
                     }
                 }
@@ -407,16 +402,16 @@ var Help;
                     $scope.Channels[channelId].ChatMessages[message.Id] = message;
                 });
             };
-            this.helper.client.alert = function (message, heading, oftype) {
-                _this.alert(oftype, message, heading);
+            this.helper.client.alert = function (message) {
+                _this.alert(message);
             };
             $scope.createUser = function () {
                 if ($scope.StartingModal.Password !== $scope.StartingModal.Passwordcopy) {
-                    _this.alert("error", "Kodeord stemmer ikke overens", "Problem med kodeord");
+                    _this.alert("Kodeord stemmer ikke overens");
                     return;
                 }
                 if (!$scope.StartingModal.Name || !$scope.StartingModal.Email) {
-                    _this.alert("error", "Du har felter der endnu ikke er udfyldte", "Mangelende information");
+                    _this.alert("Du har felter der endnu ikke er udfyldte");
                     return;
                 }
                 var email = $scope.StartingModal.Email;
@@ -436,9 +431,10 @@ var Help;
                     $scope.StartingModal.Password = "";
                     $scope.$apply();
                 }, 1000);
-                _this.alert("success", "Din bruger er nu oprettet", "Oprettelse lykkedes");
+                _this.alert("Din bruger er nu oprettet");
             };
             $scope.logout = function () {
+                console.log("Logging out");
                 var token = $cookieStore.get("token");
                 if (!token)
                     _this.logoutUser(null);
@@ -448,6 +444,8 @@ var Help;
             this.helper.client.userLoggedOut = function () {
                 $timeout(function () {
                     $scope.Me.LoggedIn = false;
+                    $scope.Application.State = "help";
+                    console.log($scope.Application.State);
                     for (var ch in $scope.Channels) {
                         if ($scope.Channels.hasOwnProperty(ch)) {
                             delete $scope.Channels[ch];
@@ -455,32 +453,22 @@ var Help;
                     }
                     $scope.setActiveChannel(0);
                     $cookieStore.remove("token");
+                    $scope.$apply();
                 });
             };
             $scope.login = function () {
                 if (!$scope.StartingModal.Email || !$scope.StartingModal.Password) {
-                    _this.alert("error", "Manglende info", "Manglende info");
+                    _this.alert("Manglende info");
                     return;
                 }
                 _this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             };
-            function loginClear() {
-                $scope.Me.LoggedIn = true;
-                $scope.StartingModal.Passwordcopy = "";
-                $scope.StartingModal.Password = "";
-                $scope.$apply();
-            }
             this.helper.client.loginSuccess = function () {
-                if ($scope.LoginModal) {
-                    $scope.LoginModal.close();
-                    $scope.LoginModal = null;
-                    loginClear();
+                if ($scope.Application.State === "login") {
+                    $scope.Application.State = "help";
                 }
-                else {
-                    $("#loginBtn").click();
-                    setTimeout(loginClear(), 1000);
-                }
-                _this.alert("success", "Du er nu logget ind.", "Login successfuld");
+                $scope.Me.LoggedIn = true;
+                _this.alert("Du er nu logget ind.");
             };
             this.helper.client.updateOtherUsername = function (name, userid, channelid) {
                 $timeout(function () {
@@ -521,6 +509,7 @@ var Help;
                     var token = new Help.LoginToken(id, key);
                     $cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
                     $scope.Me.LoggedIn = true;
+                    $scope.Application.State = "help";
                 });
             };
             $scope.startPasswordReset = function () {
@@ -561,7 +550,7 @@ var Help;
             };
             this.helper.client.passwordResetResult = function (success) {
                 if (success) {
-                    _this.alert("success", "Dit kodeord er blevet nulstillet.", "Nulstiling lykkedes");
+                    _this.alert("Dit kodeord er blevet nulstillet.");
                     $scope.pwReset = {};
                 }
                 else {
@@ -583,10 +572,10 @@ var Help;
             };
             this.helper.client.passwordChanged = function (success) {
                 if (success) {
-                    _this.alert("success", "Dit password are blevet ændret.", "");
+                    _this.alert("Dit password are blevet ændret.");
                 }
                 else {
-                    _this.alert("error", "Kunne ikke skifte kodeord.", "");
+                    _this.alert("Kunne ikke skifte kodeord.");
                 }
             };
             $scope.LogoutAll = function () {
@@ -595,10 +584,10 @@ var Help;
                 });
             };
             this.helper.client.allUsersLoggedOut = function () {
-                _this.alert("success", "Din bruger er blevet logget ud alle andre steder.", "Log ud lykkedes");
+                _this.alert("Din bruger er blevet logget ud alle andre steder.");
             };
         }
-        HelpCtrl.$inject = ["$scope", "$timeout", "$cookieStore", "$interval"];
+        HelpCtrl.$inject = ["$rootScope", "$timeout", "$cookieStore", "$interval"];
         return HelpCtrl;
     })(Help.ServerActions);
     Help.HelpCtrl = HelpCtrl;
@@ -630,6 +619,12 @@ var Help;
             };
         }
     ]);
+    var Application = (function () {
+        function Application() {
+        }
+        return Application;
+    })();
+    Help.Application = Application;
 })(Help || (Help = {}));
 $(document).ready(function () {
     $("body").resize(function () {

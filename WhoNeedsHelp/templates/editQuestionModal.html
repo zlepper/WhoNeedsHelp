@@ -1,16 +1,18 @@
-﻿<<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="CloseEditModal()"><span aria-hidden="true">&times;</span></button>
-    <h4 class="modal-title">Rediger Spørgsmål</h4>
-</div>
-<div class="modal-body">
-    <form onsubmit=" return false; " id="newQuestionForm" ng-submit="UpdateQuestion()">
-        <div class="form-group">
-            <label class="sr-only" for="newQuestionText">Nyt spørgsmål tekst</label>
-            <input type="text" class="form-control" ng-model="editQuestionText.text" />
-        </div>
-    </form>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="CloseEditModal()">Luk</button>
-    <input id="newQuestionSubmit" type="submit" class="btn btn-primary" value="Rediger" form="newQuestionForm">
+﻿<!-- Edit question modal -->
+<div id="editQuestionModal" class="modal">
+    <div class="modal-content">
+        <h4>Rediger spørgsmål</h4>
+        <form>
+            <div class="row">
+                <div class="input-field">
+                    <textarea id="editQuestion" class="validate materialize-textarea" ng-model="editQuestionText.text"></textarea>
+                    <label for="editQuestion" class="active">Nyt spørgsmål</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:" class="modal-action waves-effect waves-green btn-flat" ng-click="UpdateQuestion()">Gem</a>
+        <a href="javascript:" class="modal-action waves-effect waves-red btn-flat" ng-click="CancelUpdateQuestion()">Annuler</a>
+    </div>
 </div>

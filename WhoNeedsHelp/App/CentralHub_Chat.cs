@@ -43,7 +43,7 @@ namespace WhoNeedsHelp.App
                 Channel channel = db.Channels.Find(channelId);
                 if (channel == null)
                 {
-                    Clients.Caller.Alert("Something went odd", "ehh", "error");
+                    Clients.Caller.Alert("Something went odd");
                     return;
                 }
                 if (message.StartsWith("/"))
@@ -51,7 +51,7 @@ namespace WhoNeedsHelp.App
                     string[] parts = message.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length <= 0)
                     {
-                        Clients.Caller.Alert("Du har ikke indtastet nogen kommando.", "Ingen kommando", "error");
+                        Clients.Caller.Alert("Du har ikke indtastet nogen kommando.");
                         return;
                     }
                     switch (parts[0])
@@ -60,7 +60,7 @@ namespace WhoNeedsHelp.App
                             PromoteToAdmin(parts, channelId);
                             break;
                         default:
-                            Clients.Caller.Alert("Ukendt kommando", "Ukendt kommando", "error");
+                            Clients.Caller.Alert("Ukendt kommando");
                             return;
                     }
                 }
@@ -117,13 +117,12 @@ namespace WhoNeedsHelp.App
                 Channel channel = helpcontext.Channels.Find(channelId);
                 if (!channel.IsUserAdministrator(callingUser))
                 {
-                    Clients.Caller.Alert("Du skal være administrator i kanalen for at kunne bruge denne command.", "Manglende rettigheder", "error");
+                    Clients.Caller.Alert("Du skal være administrator i kanalen for at kunne bruge denne command.");
                     return;
                 }
                 if (parts.Length < 2)
                 {
-                    Clients.Caller.Alert("Du har ikke specificeret nogen personer at promote til administrator.",
-                        "Ingen personer specificeret", "error");
+                    Clients.Caller.Alert("Du har ikke specificeret nogen personer at promote til administrator.");
                     return;
                 }
                 foreach (string s in parts)
@@ -135,14 +134,12 @@ namespace WhoNeedsHelp.App
                         User user = helpcontext.Users.First(u => u.EmailAddress.Equals(mail, StringComparison.OrdinalIgnoreCase));
                         if (user == null)
                         {
-                            Clients.Caller.Alert("Ingen bruger fundet med email \"" + mail + "\"", "Bruger ikke fundet",
-                                "error");
+                            Clients.Caller.Alert("Ingen bruger fundet med email \"" + mail + "\"");
                             continue;
                         }
                         if (!user.ChannelsIn.Contains(channel))
                         {
-                            Clients.Caller.Alert("Brugeren med \"" + mail + "\" er ikke i denne kanal.",
-                                "Bruger ikke i kanal", "error");
+                            Clients.Caller.Alert("Brugeren med \"" + mail + "\" er ikke i denne kanal.");
                             continue;
                         }
                         channel.AddAdministrator(user);
@@ -152,15 +149,15 @@ namespace WhoNeedsHelp.App
                             Clients.Client(con.ConnectionId)
                                 .Alert(
                                     "Du er blevet gjort til administrator i kanalen \"" +
-                                    channel.ChannelName + "\".", "Administrator", "info");
+                                    channel.ChannelName + "\".");
                             Clients.Client(con.ConnectionId).SetAdminState(channel.Id, true);
                         }
-                        Clients.Caller.Alert(user.Name + " er nu blevet gjort til administrator.", "Admin", "success");
+                        Clients.Caller.Alert(user.Name + " er nu blevet gjort til administrator.");
 
                     }
                     else
                     {
-                        Clients.Caller.Alert(s + " Er ikke en emailaddresse", "Forkert format", "error");
+                        Clients.Caller.Alert(s + " Er ikke en emailaddresse");
                     }
                 }
             }

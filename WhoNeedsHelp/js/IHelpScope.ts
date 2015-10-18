@@ -77,7 +77,7 @@ module Help {
         CloseEditModal: () => void;
         editQuestionText: { text: string };
         RemoveUser: (userid: number) => void;
-        newChannelName: string;
+        "newChannel.Name": string;
         RemoveChatMessage: (messageId: number) => void;
         Chat: () => void;
         createUserPopover: any;
@@ -103,9 +103,10 @@ module Help {
         changePasswordPopover: any;
         ChangePassword: () => void;
         LogoutAll: () => void;
-        State: string;
         CancelUpdateQuestion: () => void;
         ToggleShowClock: () => void;
         showingTimer: boolean;
+        Application: Application;
+        newChannel;
     }
 }

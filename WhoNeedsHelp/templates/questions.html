@@ -1,0 +1,16 @@
+﻿<main>
+    <ul class="collapsible popout" data-collapsible="expandable">
+        <li ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id"
+            ng-class="{'out-of-time': Channels[ActiveChannel].outOfTime && $first}">
+            <div class="collapsible-header active">
+                <strong>{{question.User.Name}}</strong>
+                <button class="as-text right" ng-click="RemoveQuestion(question.Id)" ng-if="Channels[ActiveChannel].IsAdmin">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="collapsible-body" ng-show="question.Text">
+                <p>{{question.Text}}</p>
+            </div>
+        </li>
+    </ul>
+</main>

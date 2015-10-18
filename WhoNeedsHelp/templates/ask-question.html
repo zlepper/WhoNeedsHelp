@@ -1,0 +1,25 @@
+﻿<footer>
+    <form class="row" onsubmit=" return false; " ng-if="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
+        <div class="input-field col s9">
+            <label for="question">Spørgsmål - er valgtfrit</label>
+            <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
+        </div>
+        <div class="col s3">
+            <button type="submit" class="btn waves-effect waves-light" id="requestHelp">
+                Efterspørg hjælp
+                <i class="material-icons">send</i>
+            </button>
+        </div>
+    </form>
+
+    <form class="row" onsubmit=" return false; " ng-if="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
+        <div class="input-field col s6">
+            <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
+        </div>
+        <div class="input-field col s6">
+            <button type="button" class="btn waves-effect waves-light" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
+        </div>
+    </form>
+
+    <p class="flow-text" ng-if="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
+</footer>

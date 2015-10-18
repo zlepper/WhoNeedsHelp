@@ -1,0 +1,18 @@
+﻿<div class="timer" id="timerClock" ng-if="Channels[ActiveChannel].IsAdmin">
+    <button class="astext clock" ng-click="ToggleShowClock()">
+        <i class="material-icons">alarm</i>
+    </button>
+    <div class="time">
+        <span ng-if="ActiveChannel && (!(Channels[ActiveChannel].Questions | keylength)) && Channels[ActiveChannel].IsAdmin">
+            <button class="astext" title="Klik for at deaktivere" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = false">Timer aktiv</button>
+            <button class="astext" title="Klik for at aktivere" ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = true">Timer ikke aktiv</button>
+        </span>
+        <span ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
+            <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
+            <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>
+            <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
+            <button class="astext" ng-click="EditTimer()"><i class="material-icons">mode edit</i></button>
+        </span>
+
+    </div>
+</div>

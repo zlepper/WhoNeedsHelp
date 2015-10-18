@@ -98,18 +98,8 @@ var Help;
         ServerActions.prototype.joinOrCreateChannelWithApi = function (channelname, channelid, teacherKey) {
             return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
         };
-        ServerActions.prototype.alert = function (typ, text, title) {
-            var notify = new PNotify({
-                title: title,
-                text: text,
-                type: typ,
-                animation: "show",
-                styling: "fontawesome",
-                mouse_reset: false
-            });
-            notify.elem.click(function () {
-                notify.remove();
-            });
+        ServerActions.prototype.alert = function (text) {
+            Materialize.toast(text, 6000);
         };
         ServerActions.prototype.confirm = function (text, title, callback) {
             if (confirmNotice == null)

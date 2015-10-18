@@ -67,7 +67,7 @@ namespace WhoNeedsHelp.App
                     else
                     {
                         // Somebody send an invalid user password in the connection url
-                        Clients.Caller.Alert("Connection refused", "", "error");
+                        Clients.Caller.Alert("Connection refused");
                     }
                 }
                 
@@ -99,7 +99,7 @@ namespace WhoNeedsHelp.App
                     // Only people with a admintoken should be able to create channels with the API
                     if (string.IsNullOrWhiteSpace(admintoken))
                     {
-                        Clients.Caller.Alert("Din lærer har endnu ikke oprette klassen, bed ham/hende gøre dette først, ved at gå ind på siden.", "", "error");
+                        Clients.Caller.Alert("Din lærer har endnu ikke oprette klassen, bed ham/hende gøre dette først, ved at gå ind på siden.");
                     }
                     else
                     {
@@ -176,7 +176,7 @@ namespace WhoNeedsHelp.App
                             }
                             else
                             {
-                                Clients.Caller.Alert("Invalid channeltoken", "", "error");
+                                Clients.Caller.Alert("Invalid channeltoken");
                             }
                         }
                     }

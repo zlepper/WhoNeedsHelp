@@ -1,0 +1,110 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col s6">
+            <button class="btn waves-effect waves-light" ng-click="$parent.Application.State = 'help'">Tilbage</button>
+        </div>
+        <div class="col s6" ng-if="Me.LoggedIn">
+            <button class="btn waves-effect waves-light" ng-click="logout()">Log ud</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m5" ng-if="!Me.LoggedIn">
+            <div class="row">
+                <div class="col s12">
+                    <h4 ng-if="!StartingModal.login">Log ind</h4>
+                    <h4 ng-if="StartingModal.login">Opret bruger</h4>
+                </div>
+            </div>
+            <div class="row">
+                <form onsubmit=" return false; " id="createUserForm" name="createUserForm" ng-init="createUserOptions.Name = Me.Name" ng-submit="!StartingModal.login ? login() : createUser()" class="col s12">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <label for="CreateUserEmail" class="active">Email</label>
+                            <input id="CreateUserEmail" name="CreateUserEmail" required="required" type="email" class="validate" ng-model="StartingModal.Email" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="switch col s12">
+                            <label>
+                                Login
+                                <input type="checkbox" ng-model="StartingModal.login">
+                                <span class="lever"></span>
+                                Opret Bruger
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <label for="CreateUserPw" class="active">Kodeord</label>
+                            <input id="CreateUserPw" name="CreateUserPw" required="required" type="password" class="validate" ng-model="StartingModal.Password" autocomplete="off"/>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="StartingModal.login">
+                        <div class="input-field col s12">
+                            <label for="CreateUserPwConfirm" class="active">Gentag kodeord</label>
+                            <input id="CreateUserPwConfirm" required="required" type="password" class="validate"
+                                   ui-validate="$value == createUserOptions.Password"
+                                   ui-validate-watch="'createUserOptions.Password'" ng-model="StartingModal.Passwordcopy" autocomplete="off"/>
+                        </div>
+                        <div class="card-panel red" ng-show="createUserForm.Password.$error.validator">Kodeord stemmer ikke overens</div>
+                    </div>
+                    <div class="row" ng-if="StartingModal.login">
+                        <div class="input-field col s12">
+                            <label for="CreateUserName" class="active">Navn</label>
+                            <input id="CreateUserName" required type="text" ng-model="StartingModal.Name" class="validate"/>
+                        </div>
+
+                        <div class="card-panel red" ng-show="createUserForm.CreateUserEmail.$touched && createUserForm.CreateUserEmail.$error.required">Du skal indtaste en email-addrese</div>
+                        <div class="card-panel red" ng-show="createUserForm.CreateUserEmail.$touched && createUserForm.CreateUserEmail.$error.email">Dette er ikke en email-addrese</div>
+                    </div>
+
+                    <input type="checkbox" ng-model="StartingModal.StayLoggedIn" id="stayloggedincheckbox">
+                    <label for="stayloggedincheckbox">Forbliv logget ind</label><br/>
+
+                    <button class="btn waves-effect waves-light" type="submit" ng-show="!StartingModal.login">Login</button>
+                    <button class="btn waves-effect waves-light" type="submit" ng-show="StartingModal.login">Opret bruger</button>
+                </form>
+            </div>
+        </div>
+        <div class="col s12 m5" ng-if="Me.LoggedIn">
+            <div class="row">
+                <h4>Skift kodeord</h4>
+            </div>
+            <div ng-if="Me.LoggedIn" class="row">
+                <form onsubmit="return false;" ng-submit="ChangePassword()">
+                    <div class="input-field">
+                        <label for="pwResetCurrent">Nuværende kodeord</label>
+                        <input required="required" type="password" class="validate" id="pwResetCurrent" ng-model="pwReset.old" autocomplete="off" ng-class="{'invalid': pwReset.oldEmpty}"/>
+                    </div>
+                    <div class="input-field">
+                        <label for="pwResetPass1">Nyt kodeord</label>
+                        <input type="password" class="validate" id="pwResetPass1" ng-model="pwReset.pass1" required="required" autocomplete="off" ng-class="{'invalid': pwReset.pass1 != pwReset.pass2, 'valid': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}"/>
+                    </div>
+                    <div class="input-field">
+                        <label for="pwResetPass2">Gentag kodeord</label>
+                        <input type="password" class="validate" id="pwResetPass2" ng-model="pwReset.pass2" required="required" autocomplete="off" ng-class="{'invalid': pwReset.pass1 != pwReset.pass2, 'valid': pwReset.pass1 == pwReset.pass2 && pwReset.pass1 && pwReset.pass1.trim()}"/>
+                    </div>
+                    <div class="card-panel red" ng-show="pwReset.pass1 !== pwReset.pass2">Kodeord stemmer ikke overens</div>
+                    <input class="btn waves-effect waves-light" type="submit" value="Skift"/>
+                </form>
+                <button class="btn waves-effect waves-light red" ng-click="LogoutAll()">Log alle ud</button>
+            </div>
+        </div>
+        <div class="col s12 m6 offset-m1">
+            <div class="row">
+                <h5>Skift navn</h5>
+                <form onsubmit="return false;" id="changeusernameForm" ng-submit="Start()">
+                    <div class="input-field">
+                        <label for="changeusernameInput" class="active">Brugernavn</label>
+                        <input required="required" type="text" class="validate" id="changeusernameInput" ng-model="StartingModal.Name"/>
+                    </div>
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Skift
+                        <i class="material-icons right">send</i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -37,6 +37,8 @@
     <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js"></script>-->
     <script type="text/javascript" src="/js/helpers.js"></script>
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="/js/zl-features.js"></script>
+    <script type="text/javascript" src="/js/directives/timer.js"></script>
     <script type="text/javascript" src="/js/ServerActions.js"></script>
     <script type="text/javascript" src="/js/IHelpScope.js"></script>
     <script type="text/javascript" src="/js/SignalR.js"></script>
@@ -52,127 +54,31 @@
     <script type="text/javascript" src="/js/LoginOptions.js"></script>
     <script type="text/javascript" src="/js/LoginToken.js"></script>
     <script type="text/javascript" src="/js/api.js"></script>
-    <script src="/js/directives/login.js"></script>
-    <script src="/js/countdown.js"></script>
+    <script type="text/javascript" src="/js/directives/login.js"></script>
+    <script type="text/javascript" src="/js/countdown.js"></script>
     <script type="text/javascript" src="/js/loading.js"></script>
+    <script type="text/javascript" src="/js/directives/loading.js"></script>
+    <script type="text/javascript" src="/js/directives/questions.js"></script>
+    <script type="text/javascript" src="/js/directives/ask-question.js"></script>
+    <script type="text/javascript" src="/js/directives/editQuestionModal.js"></script>
     <link href="/css/loading.css" type="text/css" rel="stylesheet" />
     <script>
         Notification.requestPermission();
     </script>
 </head>
 <body ng-app="Help" ng-controller="ApiCtrl">
-    <div ng-if="State == 'help'" class="app api">
+    <div ng-if="Application.State == 'help'" class="app api">
         <div class="main">
             <div class="helplist">
-                <main>
-                    <ul class="collapsible popout" data-collapsible="expandable">
-                        <li ng-repeat="(id, question) in Channels[ActiveChannel].Questions | orderBy:Id"
-                            ng-class="{'out-of-time': Channels[ActiveChannel].outOfTime && $first}">
-                            <div class="collapsible-header active">
-                                <strong>{{question.User.Name}}</strong>
-                                <button class="as-text right" ng-click="RemoveQuestion(question.Id)" ng-if="Channels[ActiveChannel].IsAdmin">
-                                    <i class="material-icons">close</i>
-                                </button>
-                            </div>
-                            <div class="collapsible-body" ng-if="question.Text">
-                                <p>{{question.Text}}</p>
-                            </div>
-                        </li>
-                    </ul>
-                </main>
+                <questions></questions>
 
-                <footer>
-                    <form class="row" onsubmit=" return false; " ng-if="ActiveChannel && !Channels[ActiveChannel].HaveQuestion" ng-submit="RequestHelp()">
-                        <div class="input-field col s9">
-                            <label for="question">Spørgsmål - er valgtfrit</label>
-                            <textarea type="text" id="question" class="validate materialize-textarea" ng-model="Channels[ActiveChannel].Text"></textarea>
-                        </div>
-                        <div class="col s3">
-                            <button type="submit" class="btn waves-effect waves-light" id="requestHelp">
-                                Efterspørg hjælp
-                                <i class="material-icons">send</i>
-                            </button>
-                        </div>
-                    </form>
-
-                    <form class="row" onsubmit=" return false; " ng-if="Channels[ActiveChannel] && Channels[ActiveChannel].HaveQuestion">
-                        <div class="input-field col s6">
-                            <button type="button" class="btn waves-effect waves-light" ng-click="RemoveOwnQuestion()">Fjern Spørgsmål</button>
-                        </div>
-                        <div class="input-field col s6">
-                            <button type="button" class="btn waves-effect waves-light" ng-click="EditOwnQuestion()">Rediger Spørgsmål</button>
-                        </div>
-                    </form>
-
-                    <p class="flow-text" ng-if="!ActiveChannel">Ingen kanal valgt, kan ikke stille spørgsmål.</p>
-                </footer>
+                <ask-question></ask-question>
             </div>
         </div>
 
     </div>
-    <!-- Edit question modal -->
-    <div id="editQuestionModal" class="modal">
-        <div class="modal-content">
-            <h4>Rediger spørgsmål</h4>
-            <form>
-                <div class="row">
-                    <div class="input-field">
-                        <textarea id="editQuestion" class="validate materialize-textarea" ng-model="editQuestionText.text"></textarea>
-                        <label for="editQuestion">Nyt spørgsmål</label>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <a href="javascript:" class="modal-action waves-effect waves-green btn-flat" ng-click="UpdateQuestion()">Gem</a>
-            <a href="javascript:" class="modal-action waves-effect waves-red btn-flat" ng-click="CancelUpdateQuestion()">Annuler</a>
-        </div>
-    </div>
-<div id="loadingAnimation" ng-if="State == 'loading'">
-    <div class="loading">
-        <div class="finger finger-1">
-            <div class="finger-item">
-                <span></span><i></i>
-            </div>
-        </div>
-        <div class="finger finger-2">
-            <div class="finger-item">
-                <span></span><i></i>
-            </div>
-        </div>
-        <div class="finger finger-3">
-            <div class="finger-item">
-                <span></span><i></i>
-            </div>
-        </div>
-        <div class="finger finger-4">
-            <div class="finger-item">
-                <span></span><i></i>
-            </div>
-        </div>
-        <div class="last-finger">
-            <div class="last-finger-item">
-                <i></i>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="timer" id="timerClock" ng-if="Channels[ActiveChannel].IsAdmin">
-    <button class="astext clock" ng-click="ToggleShowClock()">
-        <i class="material-icons">alarm</i>
-    </button>
-    <div class="time">
-        <span ng-if="ActiveChannel && (!(Channels[ActiveChannel].Questions | keylength)) && Channels[ActiveChannel].IsAdmin">
-            <button class="astext" title="Klik for at deaktivere" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = false">Timer aktiv</button>
-            <button class="astext" title="Klik for at aktivere" ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" ng-click="Channels[ActiveChannel].timing = true">Timer ikke aktiv</button>
-        </span>
-        <span ng-if="ActiveChannel && (Channels[ActiveChannel].Questions | keylength) && Channels[ActiveChannel].IsAdmin">
-            <button ng-show="!Channels[ActiveChannel].counting && !Channels[ActiveChannel].timing" class="astext" ng-click="StartTimer()">Start Timer</button>
-            <button class="astext" ng-show="Channels[ActiveChannel].counting" title="Klik for at stoppe" ng-click="StopTimer()">{{Channels[ActiveChannel].TimeLeft|countdown}}</button>
-            <button class="astext" ng-show="!Channels[ActiveChannel].counting && Channels[ActiveChannel].timing" ng-click="StopTimer()">Stop Timer</button>
-            <button class="astext" ng-click="EditTimer()"><i class="material-icons">mode edit</i></button>
-        </span>
-    </div>
-</div>
+    <edit-question-modal></edit-question-modal>
+    <loading></loading>
+    <timer></timer>
 </body>
 </html>

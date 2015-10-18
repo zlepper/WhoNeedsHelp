@@ -68,10 +68,16 @@
         left: 240px;
         right: 0;
         padding-top: 15px;
-        overflow-y: auto;
     }
 
     &.api {
+        footer {
+            form {
+                left: 0;
+                right: 0;
+            }
+        }
+
         .main {
             left: 0;
         }
@@ -87,13 +93,14 @@
         top: 0;
         bottom: 0;
         right: 300px;
+        overflow-y: auto;
 
-        .ng-enter {
+        .ng-enter, .ng-hide-remove {
             @include animation(fadeInDown, 1s);
             @include stagger();
         }
 
-        .ng-leave {
+        .ng-leave, .ng-hide-add {
             @include animation(zoomOut, 1s);
             @include stagger();
         }
@@ -115,9 +122,9 @@
         form {
             background-color: rgba(255,255,255,0.95);
             position: fixed;
+            left: 240px;
+            right: 300px;
             bottom: 0;
-            left: 0;
-            right: 0;
             padding: 30px;
             margin-bottom: 0;
         }
@@ -152,9 +159,13 @@
             top: 0;
             left: 0;
             right: 0;
-            bottom: calc(100vh - 76px);
-            padding: 15px 30px 0;
+            bottom: 76px;
+            padding: 15px 30px 15px;
             overflow-y: auto;
+
+            .card-panel {
+                margin-bottom: 20px;
+            }
         }
 
         form {
@@ -162,6 +173,7 @@
             left: 0;
             right: 0;
             bottom: 0;
+            background-color: rgba(255,255,255,0.95);
 
             .input-field {
                 padding: 0 1.5em;
@@ -202,4 +214,18 @@ form {
     main {
         left: 0;
     }
+}
+
+body {
+    div {
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+            background-color: white !important;
+        }
+    }
+}
+
+
+.user-managing {
+    padding-top: 2em;
 }
