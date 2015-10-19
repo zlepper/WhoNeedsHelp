@@ -54,7 +54,7 @@
     <script type="text/javascript" src="/js/loading.js"></script>
     <link href="/css/loading.css" type="text/css" rel="stylesheet" />
     <script>
-        if (Notification)
+        if (Notification !== undefined && Notification !== null)
             Notification.requestPermission();
     </script>
 </head>
