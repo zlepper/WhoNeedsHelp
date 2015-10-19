@@ -54,8 +54,12 @@
     <script type="text/javascript" src="/js/loading.js"></script>
     <link href="/css/loading.css" type="text/css" rel="stylesheet" />
     <script>
-        if (Notification !== undefined && Notification !== null)
-            Notification.requestPermission();
+        try {
+            if (Notification !== undefined && Notification !== null)
+                Notification.requestPermission();
+        } catch (err) {
+            console.log("Fuck you IE!" + err);
+        }
     </script>
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
