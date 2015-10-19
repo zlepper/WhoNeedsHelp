@@ -66,22 +66,23 @@ var Help;
             });
             // Syncronise the current data with the server every 30 second
             $interval(function () {
-                if (Object.keys($scope.Channels)) {
-                    var chs = {};
-                    for (var key in $scope.Channels) {
-                        if ($scope.Channels.hasOwnProperty(key)) {
-                            var channel = $scope.Channels[key];
-                            chs[key] = [];
-                            for (var qKey in channel.Questions) {
-                                if (channel.Questions.hasOwnProperty(qKey)) {
-                                    var question = channel.Questions[qKey];
-                                    chs[key].push(question.Id);
+                if ($.connection.state === 1)
+                    if (Object.keys($scope.Channels)) {
+                        var chs = {};
+                        for (var key in $scope.Channels) {
+                            if ($scope.Channels.hasOwnProperty(key)) {
+                                var channel = $scope.Channels[key];
+                                chs[key] = [];
+                                for (var qKey in channel.Questions) {
+                                    if (channel.Questions.hasOwnProperty(qKey)) {
+                                        var question = channel.Questions[qKey];
+                                        chs[key].push(question.Id);
+                                    }
                                 }
                             }
                         }
+                        _this.syncChannels(chs);
                     }
-                    _this.syncChannels(chs);
-                }
             }, 30000);
             this.helper = $.connection.centralHub;
             var that = this;
