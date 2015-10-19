@@ -23,12 +23,16 @@ module Help {
             $scope.editQuestionText = { text: "" };
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
-            $scope.alarm = new Audio("alarm.mp3");
+            try {
+                $scope.alarm = new Audio("alarm.mp3");
+            } catch (err) {
+                $scope.alarm = null;
+            }
             $scope.pwReset = {
                 step: 0
             }
             $scope.showingTimer = false;
-            
+
 
             $scope.$watch("State", () => {
                 $timeout(() => {
@@ -94,7 +98,8 @@ module Help {
                     }
                     if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
-                        $scope.alarm.play();
+                        if ($scope.alarm)
+                            $scope.alarm.play();
                         $scope.HaltTimer(channel);
                     }
                 } else {

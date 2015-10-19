@@ -12,7 +12,7 @@ module Help {
             l = $scope;
             $scope.Application = new Application();
             $scope.Application.State = "loading";
-            
+
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
             $scope.Channels = {};
@@ -20,7 +20,11 @@ module Help {
             $scope.editQuestionText = { text: "" };
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
-            $scope.alarm = new Audio("alarm.mp3");
+            try {
+                $scope.alarm = new Audio("alarm.mp3");
+            } catch (err) {
+                $scope.alarm = null;
+            }
             $scope.pwReset = {
                 step: 0
             }
@@ -57,7 +61,7 @@ module Help {
             
             // Syncronise the current data with the server every 30 second
             $interval(() => {
-                if(Object.keys($scope.Channels)) {
+                if (Object.keys($scope.Channels)) {
                     var chs = {};
                     for (var key in $scope.Channels) {
                         if ($scope.Channels.hasOwnProperty(key)) {
@@ -116,7 +120,8 @@ module Help {
                     }
                     if (channel.TimeLeft <= 0) {
                         channel.outOfTime = true;
-                        $scope.alarm.play();
+                        if ($scope.alarm)
+                            $scope.alarm.play();
                         $scope.HaltTimer(channel);
                     }
                 } else {
@@ -559,10 +564,10 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
             $scope.ResetPassword = () => {
                 if (!$scope.pwReset.key.trim()) {
                     return;
-                } 
+                }
                 if ($scope.pwReset.pass1 !== $scope.pwReset.pass2) {
                     return;
-                } 
+                }
                 if ($scope.pwReset.pass1 && $scope.pwReset.pass1.length) {
                     if ($scope.pwReset.email) {
                         this.resetPassword($scope.pwReset.key, $scope.pwReset.pass1, $scope.pwReset.email);
@@ -655,7 +660,7 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
         }
     ]);
 
-    export  class Application {
+    export class Application {
         State: string;
     }
 }
