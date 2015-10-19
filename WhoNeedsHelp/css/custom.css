@@ -26,13 +26,13 @@
   .login .center {
     width: 95%; } }
 
-.everything > .ng-enter {
+.everything > .ng-enter, .everything .ng-hide-remove {
   -moz-animation: fadeIn 1s;
   -o-animation: fadeIn 1s;
   -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s; }
 
-.everything > .ng-leave {
+.everything > .ng-leave, .everything .ng-hide-add {
   -moz-animation: fadeOut 1s;
   -o-animation: fadeOut 1s;
   -webkit-animation: fadeOut 1s;
@@ -183,12 +183,21 @@ form button {
   width: 240px;
   position: fixed; }
 
-@media only screen and (max-width: 992px) {
-  main {
-    left: 0; } }
+@media screen and (max-width: 600px) {
+  .app .main {
+    left: 0; }
+  .app main {
+    padding-top: calc(56px + 1.5em); }
+  .app .helplist {
+    right: 0; }
+  .app footer form {
+    left: 0;
+    right: 0;
+    padding: 1em; } }
 
 body div input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
   background-color: white !important; }
 
 .user-managing {

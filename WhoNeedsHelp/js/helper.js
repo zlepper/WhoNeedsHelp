@@ -1,7 +1,8 @@
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var confirmNotice = null;
 var l;
@@ -32,13 +33,32 @@ var Help;
                 step: 0
             };
             $scope.newChannel = {};
-            $scope.$watch("State", function () {
+            var first = true;
+            $scope.$watch("Application", function () {
                 console.log($scope.Application.State);
                 $timeout(function () {
-                    $('.tooltipped').tooltip({ delay: 50 });
                     var collapse = $(".button-collapse");
-                    collapse.sideNav();
-                }, 1000);
+                    if (first) {
+                        collapse.sideNav();
+                        first = false;
+                    }
+                    $(".tooltipped").tooltip({ delay: 50 });
+                    if ($scope.Application.State === "help" && Object.keys($scope.Channels).length === 0 && Modernizr.mq("(max-width: 600px)")) {
+                        collapse.sideNav("show");
+                        console.log("Showing");
+                    }
+                }, 700);
+            }, true);
+            $(document).on("click", "#sidenav-overlay, .drag-target", function () {
+                $timeout(function () {
+                    var targets = "#sidenav-overlay";
+                    var ele = $(targets);
+                    console.log(ele.length);
+                    while (ele.length > 1) {
+                        ele.first().click();
+                        ele = $("#sidenav-overlay");
+                    }
+                }, 500);
             });
             // Syncronise the current data with the server every 30 second
             $interval(function () {
@@ -585,6 +605,10 @@ var Help;
             };
             this.helper.client.allUsersLoggedOut = function () {
                 _this.alert("Din bruger er blevet logget ud alle andre steder.");
+            };
+            $scope.hideSideNav = function () {
+                var b = $(".button-collapse");
+                b.sideNav("hide");
             };
         }
         HelpCtrl.$inject = ["$rootScope", "$timeout", "$cookieStore", "$interval"];

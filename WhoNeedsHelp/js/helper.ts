@@ -25,16 +25,36 @@ module Help {
                 step: 0
             }
             $scope.newChannel = {};
+            var first = true;
 
-            $scope.$watch("State", () => {
+            $scope.$watch("Application", () => {
                 console.log($scope.Application.State);
                 $timeout(() => {
-                    $('.tooltipped').tooltip(<any>{ delay: 50 });
                     var collapse: any = $(".button-collapse");
-                    collapse.sideNav();
-                }, 1000);
-            });
+                    if (first) {
+                        collapse.sideNav();
+                        first = false;
+                    }
+                    $(".tooltipped").tooltip(<any>{ delay: 50 });
+                    if ($scope.Application.State === "help" && Object.keys($scope.Channels).length === 0 && Modernizr.mq("(max-width: 600px)")) {
+                        collapse.sideNav("show");
+                        console.log("Showing");
+                    }
+                }, 700);
+            }, true);
 
+            $(document).on("click", "#sidenav-overlay, .drag-target", () => {
+                $timeout(() => {
+                    var targets = "#sidenav-overlay";
+                    var ele = $(targets);
+                    console.log(ele.length);
+                    while (ele.length > 1) {
+                        ele.first().click();
+                        ele = $("#sidenav-overlay");
+                    }
+                }, 500);
+            });
+            
             // Syncronise the current data with the server every 30 second
             $interval(() => {
                 if(Object.keys($scope.Channels)) {
@@ -589,6 +609,11 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
 
             this.helper.client.allUsersLoggedOut = () => {
                 this.alert("Din bruger er blevet logget ud alle andre steder.");
+            }
+
+            $scope.hideSideNav = () => {
+                var b = <any>$(".button-collapse");
+                b.sideNav("hide");
             }
 
         }

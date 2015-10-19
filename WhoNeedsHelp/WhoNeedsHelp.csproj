@@ -166,6 +166,7 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="templates\ask-question.html" />
     <Content Include="templates\changePasswordPopover.html" />
     <Content Include="templates\changeUsernamePopover.html" />
@@ -357,6 +358,7 @@
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\modernizr\modernizr.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
     <TypeScriptCompile Include="js\ServerActions.ts" />
     <TypeScriptCompile Include="js\SignalR.ts" />

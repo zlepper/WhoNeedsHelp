@@ -18,11 +18,11 @@
 
 
 .everything {
-    > .ng-enter {
+    > .ng-enter, .ng-hide-remove {
         @include animation(fadeIn, 1s);
     }
 
-    > .ng-leave {
+    > .ng-leave, .ng-hide-add {
         @include animation(fadeOut, 1s);
     }
 }
@@ -210,16 +210,37 @@ form {
     position: fixed;
 }
 
-@media only screen and (max-width : 992px) {
-    main {
-        left: 0;
+@media screen and (max-width : 600px) {
+    .app {
+        .main {
+            left: 0;
+        }
+
+        main {
+            padding-top: calc(56px + 1.5em);
+        }
+
+        .helplist {
+            right: 0;
+        }
+
+        footer {
+            form {
+                left: 0;
+                right: 0;
+                padding: 1em;
+            }
+        }
     }
 }
+
+
 
 body {
     div {
         input:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+            -webkit-box-shadow: 0 0 0 1000px white inset !important;
+            box-shadow: 0 0 0 1000px white inset !important;
             background-color: white !important;
         }
     }

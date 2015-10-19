@@ -1,7 +1,13 @@
-﻿<ul id="slide-out-left" class="side-nav fixed">
+﻿<nav class="hide-on-med-and-up">
+    <div class="container">
+        <a href="#" data-activates="slide-out-left" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+    </div>
+</nav>
+<ul id="slide-out-left" class="side-nav fixed">
     <li><a>Nuværende kanal ID: {{ActiveChannel}}</a></li>
     <li><a>Navn: {{Me.Name}}</a></li>
-    <li><a ng-click="$parent.Application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
+    <li class="hide-on-small-only"><a ng-click="$parent.Application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
+    <li class="hide-on-med-and-up" ng-click="hideSideNav()"><a ng-click="$parent.Application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
     <li ng-repeat="(Id, channel) in Channels" class="collection-item" href="#"
         ng-class="{'active': channel.Id === ActiveChannel}">
         <span>

@@ -108,5 +108,6 @@ module Help {
         showingTimer: boolean;
         Application: Application;
         newChannel;
+        hideSideNav: () => void;
     }
 }
