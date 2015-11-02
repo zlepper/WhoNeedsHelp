@@ -4,6 +4,7 @@ using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 using WhoNeedsHelp.Simples;
 

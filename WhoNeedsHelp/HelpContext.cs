@@ -4,11 +4,12 @@ using System.Data.Entity;
 using System.Linq;
 using MySql.Data.Entity;
 using MySql.Data;
+using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 
 namespace WhoNeedsHelp
 {
-    [DbConfigurationType(typeof(MySqlEFConfiguration))]
+    //[DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class HelpContext : DbContext
     {
         public DbSet<User> Users { get; set; }
@@ -17,9 +18,11 @@ namespace WhoNeedsHelp
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<LoginToken> LoginTokens { get; set; }
+        public DbSet<Locale> Locales { get; set; }
+        public DbSet<Locale.Translation> Translations { get; set; }
         //public DbSet<QuestionComment> QuestionComments { get; set; }
 
-        public HelpContext() : base()
+        public HelpContext() : base("name=HelpContext")
         {
             Database.SetInitializer(new MySqlInitializer());
         }
@@ -106,6 +109,24 @@ namespace WhoNeedsHelp
             modelBuilder.Entity<Connection>().HasKey(c => c.ConnectionId);
 
             modelBuilder.Entity<LoginToken>().HasKey(lk => lk.Key);
+
+            modelBuilder.Entity<Locale>()
+                .HasMany(l => l.Users)
+                .WithOptional(u => u.PreferedLocale)
+                .HasForeignKey(u => u.PreferedLocaleId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Locale>()
+                .HasMany(l => l.Translations)
+                .WithRequired(t => t.Locale)
+                .HasForeignKey(t => t.LocaleId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Locale>()
+                .HasKey(l => l.Id);
+            modelBuilder.Entity<Locale.Translation>()
+                .HasKey(t => t.Id);
+
             base.OnModelCreating(modelBuilder);
         }
     }

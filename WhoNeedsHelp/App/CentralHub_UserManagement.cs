@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 using WhoNeedsHelp.Server.Mail;
 using WhoNeedsHelp.Simples;

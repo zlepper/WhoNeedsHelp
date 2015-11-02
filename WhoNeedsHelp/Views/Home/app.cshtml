@@ -1,0 +1,52 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "Bah";
+}
+
+<!DOCTYPE html>
+<html lang="dk" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Hvem behøver hjælp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css"></script>
+    <script src="https://fonts.googleapis.com/icon?family=Material+Icons"></script>
+    @Styles.Render("~/bundles/styling");
+    @Scripts.Render("~/bundles/deps");
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js"></script>
+    @Scripts.Render("~/bundles/mainapp");
+    @Scripts.Render("~/helper");
+    <script>
+        try {
+            if (Notification !== undefined && Notification !== null)
+                Notification.requestPermission();
+        } catch (err) {
+            console.log("Fuck you IE! " + err);
+        }
+    </script>
+</head>
+<body ng-app="Help" ng-controller="HelpCtrl">
+    <div ng-show="Application.State == 'help'" class="app">
+        <nav-bar></nav-bar>
+        <div class="main">
+            <div class="helplist">
+                <questions></questions>
+
+                <ask-question></ask-question>
+            </div>
+
+            <chat></chat>
+        </div>
+        <edit-question-modal></edit-question-modal>
+        <timer></timer>
+    </div>
+    <loading></loading>
+    <div ng-show="Application.State == 'login'" class="login" login>
+
+    </div>
+    <div ng-show="Application.State == 'usermanage'" class="user-managing" usermanage>
+
+    </div>
+</body>
+</html>

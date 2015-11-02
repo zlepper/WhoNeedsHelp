@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using SendGrid;
+using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 
 namespace WhoNeedsHelp.Server.Mail

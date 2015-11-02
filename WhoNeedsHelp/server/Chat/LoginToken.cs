@@ -1,4 +1,5 @@
 ﻿using System;
+using WhoNeedsHelp.Models;
 
 namespace WhoNeedsHelp.Server.Chat
 {
