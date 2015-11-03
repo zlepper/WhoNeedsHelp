@@ -4,22 +4,22 @@ using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
 using Owin;
-using WhoNeedsHelp.App_Start;
+using WhoNeedsHelp;
 using WhoNeedsHelp.Server.Mail;
 
 [assembly: OwinStartup(typeof(Startup))]
 
-namespace WhoNeedsHelp.App_Start
+namespace WhoNeedsHelp
 {
     public class Startup
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseFileServer(new FileServerOptions()
-            {
-                RequestPath = PathString.Empty,
-                FileSystem = new PhysicalFileSystem(@".\public")
-            });
+            //app.UseFileServer(new FileServerOptions()
+            //{
+            //    RequestPath = PathString.Empty,
+            //    FileSystem = new PhysicalFileSystem(@".\public")
+            //});
 
             app.UseStaticFiles("/css");
             app.UseStaticFiles("/Content");

@@ -1,1 +1,1 @@
-{"version":3,"file":"timer.js","sourceRoot":"","sources":["timer.ts"],"names":[],"mappings":"AAAA,OAAO,CAAC,MAAM,CAAC,YAAY,CAAC;KACvB,SAAS,CAAC,OAAO,EAAE;IAChB,MAAM,CAAC;QACH,WAAW,EAAE,sBAAsB;KACtC,CAAA;AACL,CAAC,CAAC,CAAA"}
+{"version":3,"file":"timer.js","sourceRoot":"","sources":["timer.ts"],"names":[],"mappings":"AAAA,OAAO,CAAC,MAAM,CAAC,YAAY,CAAC;KACvB,SAAS,CAAC,OAAO,EAAE;IAChB,MAAM,CAAC;QACH,WAAW,EAAE,uBAAuB;KACvC,CAAA;AACL,CAAC,CAAC,CAAA"}

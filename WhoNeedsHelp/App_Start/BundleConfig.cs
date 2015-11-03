@@ -12,8 +12,6 @@ namespace WhoNeedsHelp.App_Start
                         "~/Scripts/jquery-2.1.4.min.js",
                         "~/Scripts/jquery-ui-1.11.4.min.js",
                         "~/Scripts/jquery.signalR-2.2.0.min.js",
-                        "~/signalr/hubs",
-                        "~/signalr/js",
                         "~/Scripts/pnotify.custom.min.js",
                         "~/Scripts/angular.js",
                         "~/Scripts/angular-animate.js",
@@ -24,6 +22,7 @@ namespace WhoNeedsHelp.App_Start
             bundles.Add(new ScriptBundle("~/bundles/mainapp").Include(
                         "~/js/zl-features.js",
                         "~/js/ServerActions.js",
+                        "~/js/helper.js",
                         "~/js/IHelpScope.js",
                         "~/js/SignalR.js",
                         "~/js/ICentralHubProxy.js",

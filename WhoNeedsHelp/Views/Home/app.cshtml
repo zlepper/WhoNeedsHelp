@@ -1,7 +1,6 @@
 ﻿
 @{
     Layout = null;
-    ViewBag.Title = "Bah";
 }
 
 <!DOCTYPE html>
@@ -9,14 +8,15 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Hvem behøver hjælp</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css"></script>
-    <script src="https://fonts.googleapis.com/icon?family=Material+Icons"></script>
-    @Styles.Render("~/bundles/styling");
-    @Scripts.Render("~/bundles/deps");
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+    @Styles.Render("~/bundles/styling")
+    @Scripts.Render("~/bundles/deps")
+    <script src="/signalr/js"></script>
+    <script src="/signalr/hubs"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js"></script>
-    @Scripts.Render("~/bundles/mainapp");
-    @Scripts.Render("~/helper");
+    @Scripts.Render("~/bundles/mainapp")
     <script>
         try {
             if (Notification !== undefined && Notification !== null)
