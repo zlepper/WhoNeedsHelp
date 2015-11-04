@@ -4,4 +4,3 @@ angular.module("zlFeatures")
         templateUrl: "/templates/loading.html"
     };
 });
-//# sourceMappingURL=loading.js.map

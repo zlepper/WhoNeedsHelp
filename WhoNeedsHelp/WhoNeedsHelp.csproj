@@ -998,6 +998,7 @@
     <Content Include="Areas\HelpPage\Views\Help\Error.cshtml" />
     <None Include="compilerconfig.json" />
     <Content Include="css\_main.scss" />
+    <Content Include="css\_frontpage.scss" />
     <None Include="key" />
     <Content Include="css\_timer.scss" />
     <Content Include="css\_centering.scss" />
@@ -1174,6 +1175,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Home\app.cshtml" />
+    <Content Include="Views\Home\Api.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1183,6 +1185,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="js\api.ts" />
+    <TypeScriptCompile Include="js\Application.ts" />
     <TypeScriptCompile Include="js\Channel.ts" />
     <TypeScriptCompile Include="js\ChatMessage.ts" />
     <TypeScriptCompile Include="js\directives\ask-question.ts" />

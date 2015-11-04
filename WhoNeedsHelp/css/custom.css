@@ -235,6 +235,13 @@ body div input:-webkit-autofill {
     justify-content: center;
     align-items: center; }
 
+a.btn-large {
+  font-size: 1.2em;
+  height: auto;
+  line-height: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em; }
+
 .strong {
   font-weight: bold; }
 

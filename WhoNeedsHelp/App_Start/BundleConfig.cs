@@ -22,6 +22,7 @@ namespace WhoNeedsHelp.App_Start
             bundles.Add(new ScriptBundle("~/bundles/mainapp").Include(
                         "~/js/zl-features.js",
                         "~/js/ServerActions.js",
+                        "~/js/Application.js",
                         "~/js/helper.js",
                         "~/js/IHelpScope.js",
                         "~/js/SignalR.js",

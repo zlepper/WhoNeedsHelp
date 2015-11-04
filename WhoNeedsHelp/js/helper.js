@@ -19,7 +19,7 @@ var Help;
             this.$cookieStore = $cookieStore;
             this.$interval = $interval;
             l = $scope;
-            $scope.Application = new Application();
+            $scope.Application = new Help.Application();
             $scope.Application.State = "loading";
             $scope.StartingModal = new Help.LoginOptions();
             $scope.Me = new Help.Me();
@@ -29,7 +29,7 @@ var Help;
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             try {
-                $scope.alarm = new Audio("alarm.mp3");
+                $scope.alarm = new Audio("/alarm.mp3");
             }
             catch (err) {
                 $scope.alarm = null;
@@ -650,16 +650,9 @@ var Help;
             };
         }
     ]);
-    var Application = (function () {
-        function Application() {
-        }
-        return Application;
-    })();
-    Help.Application = Application;
 })(Help || (Help = {}));
 $(document).ready(function () {
     $("body").resize(function () {
         console.log("Resized");
     });
 });
-//# sourceMappingURL=helper.js.map

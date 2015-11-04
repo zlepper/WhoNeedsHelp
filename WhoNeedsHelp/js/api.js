@@ -22,7 +22,7 @@ var Help;
             this.$interval = $interval;
             this.$route = $route;
             l = $scope;
-            $scope.Application.State = "loading";
+            $scope.Application = { State: "loading" };
             $scope.StartingModal = new Help.LoginOptions();
             $scope.Me = new Help.Me();
             $scope.Channels = {};
@@ -31,7 +31,7 @@ var Help;
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             try {
-                $scope.alarm = new Audio("alarm.mp3");
+                $scope.alarm = new Audio("/alarm.mp3");
             }
             catch (err) {
                 $scope.alarm = null;
@@ -660,4 +660,3 @@ var Help;
     })();
     Help.UrlParams = UrlParams;
 })(Help || (Help = {}));
-//# sourceMappingURL=api.js.map

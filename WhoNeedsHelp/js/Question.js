@@ -10,4 +10,3 @@ var Help;
     })();
     Help.Question = Question;
 })(Help || (Help = {}));
-//# sourceMappingURL=Question.js.map
