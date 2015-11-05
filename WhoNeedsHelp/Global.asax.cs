@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Web.Http;
+using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
-using System.Web.SessionState;
+using Newtonsoft.Json;
 using Owin;
+using System.Web.Optimization;
+using Microsoft.Ajax.Utilities;
+using WhoNeedsHelp.App_Start;
 
 namespace WhoNeedsHelp
 {
@@ -14,13 +15,22 @@ namespace WhoNeedsHelp
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.MapOwinPath("/api", app =>
-            {
-                app.Run(Startup.ApiInvoke);
-            });
-
-            RouteTable.Routes.MapOwinPath("/");
-
+            //RouteTable.Routes.MapOwinPath("/api", app =>
+            //{
+            //    app.Run(Startup.ApiInvoke);
+            //});
+            
+            //RouteTable.Routes.MapOwinPath("/");
+            AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            // Disable recursive references in json
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            // Disable xml generation
+            var formatters = GlobalConfiguration.Configuration.Formatters;
+            formatters.Remove(formatters.XmlFormatter);
         }
 
         protected void Session_Start(object sender, EventArgs e)

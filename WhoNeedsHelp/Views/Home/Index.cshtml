@@ -1,0 +1,76 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Hvem Mangler Hjælp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col s12">
+        <h4>Hvad er klassehjælp?</h4>
+        <p>Klassehjælp er et enkelt og elegant system der hjælper med at løse nogle simple opgaver i en klasse, og hjælper med at holde styr på eleverne.</p>
+        <p>Klassehjælp fungere både på computer, tablet og pc. Dette gør alle i stand til at bruge det uden besvær.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="card-panel teal">
+        <h2 class="white-text">Kom i gang med det samme!</h2>
+        @Html.ActionLink("Tryk her for at starte", "App", "Home", null, new { @class = "btn-large waves-effect waves-light" })
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <ul class="tabs z-depth-1">
+            <li class="tab col s6"><a href="#forTeachers">For lærere</a></li>
+            @*<li class="tab col s6"><a href="#forStudents">For elever</a></li>*@
+        </ul>
+    </div>
+    <div id="forTeachers" class="col s12">
+        <p>Som lærer giver klassehjælp dig nogle fantastiske værktøjer til at holde styr på din klasse. Blandt andet får du følgende:</p>
+        <ul class="collapsible" data-collapsible="accordion">
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">list</i>Hjælpeliste
+                </div>
+                <div class="collapsible-body">
+                    <p>En liste som eleverne kan skrive sig på når det har brug for hjælp. Listen sikrer at alle får deres tur, og holder forstyrrelser nede, da alle er sikre på at de er blevet set af læreren. </p>
+                </div>
+            </li>
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">timer</i>Timer
+                </div>
+                <div class="collapsible-body">
+                    <p>Timeren hjælper dig med at sikre at du, som lærer, får fordelt din tid retfærdigt mellem alle elever.<br/>
+                    Timeren er valgfri at bruge, og kan sættes til præcis den tidsmængde du mener passer.</p>
+                </div>
+            </li>
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">chat</i>Chat
+                </div>
+                <div class="collapsible-body">
+                    <p>Et chatsystem der gør klassen i stand til at kommunikere uden et stort spektakel.</p>
+                </div>
+            </li>
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">school</i>Flere klasser per lærer
+                </div>
+                <div class="collapsible-body">
+                    <p>Som lærer har du mulighed for at holde flere klasser åbne samtidig, så du næmt kan skifte fra en klasse til en anden mellem de forskellige lektioner.</p>
+                </div>
+            </li>
+            <li>
+                <div class="collapsible-header">
+                    <i class="material-icons">group</i>Flere lærere per klasse
+                </div>
+                <div class="collapsible-body">
+                    <p>Er i flere lærere der passer samme klasse har i også mulighed for det. Klassehjælp gør jer som lærere i stand til at komplimentere hindanden i det I samtidig kan se hjælpeliste fra hver jeres enhed.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    @*<div id="forStudents" class="col s12">
+        Jeg er elevindhold
+    </div>*@
+</div>

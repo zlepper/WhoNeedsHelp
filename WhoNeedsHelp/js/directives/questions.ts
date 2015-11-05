@@ -1,6 +1,6 @@
 ﻿angular.module("zlFeatures")
     .directive("questions", () => {
         return {
-            templateUrl: "templates/questions.html"
+            templateUrl: "/templates/questions.html"
         }
     })

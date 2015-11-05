@@ -14,7 +14,7 @@ module Help {
         constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any, public $route: any) {
             super();
             l = $scope;
-            $scope.Application.State = "loading";
+            $scope.Application = { State: "loading" }
 
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
@@ -24,7 +24,7 @@ module Help {
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             try {
-                $scope.alarm = new Audio("alarm.mp3");
+                $scope.alarm = new Audio("/alarm.mp3");
             } catch (err) {
                 $scope.alarm = null;
             }
@@ -669,4 +669,5 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
             return true;
         }
     }
+
 }

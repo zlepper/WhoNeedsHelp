@@ -21,7 +21,7 @@ module Help {
             $scope.lastActiveChannel = 0;
             $scope.startTime = 300;
             try {
-                $scope.alarm = new Audio("alarm.mp3");
+                $scope.alarm = new Audio("/alarm.mp3");
             } catch (err) {
                 $scope.alarm = null;
             }
@@ -660,10 +660,6 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
             };
         }
     ]);
-
-    export class Application {
-        State: string;
-    }
 }
 
 $(document).ready(() => {

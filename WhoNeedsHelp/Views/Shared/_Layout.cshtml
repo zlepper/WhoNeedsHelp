@@ -1,0 +1,41 @@
+﻿@using System.Web.Mvc.Html
+@using System.Web.Optimization
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Klassehjælp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    @Scripts.Render("~/bundles/deps")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+    @Styles.Render("~/bundles/styling")
+</head>
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <div class="container">
+                @Html.ActionLink("Klassehjælp", "Index", "Home", new { area = "" }, new { @class = "brand-logo" })
+                <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
+                    <li>@Html.ActionLink("App", "App", "Home")</li>
+                </ul>
+                <ul class="side-nav" id="mobile-menu">
+                    <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
+                    <li>@Html.ActionLink("App", "App", "Home")</li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Rasmus Hansen</p>
+        </footer>
+    </div>
+</body>
+</html>
