@@ -4,3 +4,4 @@ angular.module("zlFeatures")
         templateUrl: "/parts/chat.html"
     };
 });
+//# sourceMappingURL=chat.js.map

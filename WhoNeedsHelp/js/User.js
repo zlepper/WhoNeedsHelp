@@ -9,3 +9,4 @@ var Help;
     })();
     Help.User = User;
 })(Help || (Help = {}));
+//# sourceMappingURL=User.js.map

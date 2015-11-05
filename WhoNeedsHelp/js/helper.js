@@ -656,3 +656,4 @@ $(document).ready(function () {
         console.log("Resized");
     });
 });
+//# sourceMappingURL=helper.js.map

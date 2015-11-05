@@ -5,3 +5,4 @@ angular.module("Help")
         scope: false
     };
 });
+//# sourceMappingURL=usermanage.js.map
