@@ -999,7 +999,6 @@
     <None Include="compilerconfig.json" />
     <Content Include="css\_main.scss" />
     <Content Include="css\_frontpage.scss" />
-    <None Include="key" />
     <Content Include="css\_timer.scss" />
     <Content Include="css\_centering.scss" />
     <None Include="Properties\PublishProfiles\help.otg.dk.pubxml" />

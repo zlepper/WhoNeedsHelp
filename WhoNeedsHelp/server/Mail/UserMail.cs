@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,26 +22,8 @@ namespace WhoNeedsHelp.Server.Mail
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                ReadKey();
+                key = ConfigurationManager.AppSettings["email"];
             }
-        }
-
-        private void ReadKey(bool second = false)
-        {
-            string root = HttpContext.Current.Server.MapPath("~");
-            FileInfo file = new FileInfo(Path.Combine(root, "key"));
-            if (file.Exists)
-            {
-                key = File.ReadAllText(file.FullName);
-                return;
-            }
-            // Special attempt to steal from desktop code
-            if (!second && File.Exists(@"C:\Users\rasmus\Desktop\key"))
-            {
-                File.Copy(@"C:\Users\rasmus\Desktop\key", file.FullName, true);
-                ReadKey(true);
-            }
-            throw new KeyNotFoundException("Please add the sendgrid key to the key file!");
         }
 
         public bool SendPasswordRecovery(string email)
