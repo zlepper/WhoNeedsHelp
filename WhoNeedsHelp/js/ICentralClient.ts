@@ -17,7 +17,7 @@ interface ICentralClient {
     removeChatMessage: (messageId: number) => void;
     ipDiscover: (channelIds: number[], channelNames: string[]) => void;
     clearChat: (channelId: number) => void;
-    loginSuccess: () => void;
+    loginSuccess: (alarms: any) => void;
     loginFailed: () => void;
     showChannels: (channelIds: number[], channelNames: string[]) => void;
     userCreationFailed: (errorMessage: string) => void;

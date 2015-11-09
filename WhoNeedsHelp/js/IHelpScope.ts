@@ -109,5 +109,6 @@ module Help {
         Application: Application;
         newChannel;
         hideSideNav: () => void;
+        CleanupTimer: any;
     }
 }

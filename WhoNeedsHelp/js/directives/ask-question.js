@@ -4,4 +4,3 @@ angular.module("zlFeatures")
         templateUrl: "/templates/ask-question.html"
     };
 });
-//# sourceMappingURL=ask-question.js.map

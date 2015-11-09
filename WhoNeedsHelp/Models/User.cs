@@ -50,6 +50,8 @@ namespace WhoNeedsHelp.Models
         public int? PreferedLocaleId { get; set; }
         public virtual Locale PreferedLocale { get; set; }
 
+        public virtual ICollection<CleanupAlarm> CleanupAlarms { get; set; } 
+
         public User()
         {
             Questions = new List<Question>();

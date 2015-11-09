@@ -29,4 +29,6 @@ interface ICentralServer {
     
     loginOrCreateUserWithApi(username: string, userid: string, password: string): JQueryPromise<void>;
     joinOrCreateChannelWithApi(channelname: string, channelid: string, teacherKey: string): JQueryPromise<void>;
+
+    cleaupTime(alarmId: number): JQueryPromise<void>;
 }

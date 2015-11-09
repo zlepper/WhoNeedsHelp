@@ -13,4 +13,3 @@ var Help;
     })();
     Help.Channel = Channel;
 })(Help || (Help = {}));
-//# sourceMappingURL=Channel.js.map

@@ -7,4 +7,3 @@ var Help;
     })();
     Help.Application = Application;
 })(Help || (Help = {}));
-//# sourceMappingURL=Application.js.map

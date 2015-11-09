@@ -20,6 +20,7 @@ namespace WhoNeedsHelp
         public DbSet<LoginToken> LoginTokens { get; set; }
         public DbSet<Locale> Locales { get; set; }
         public DbSet<Locale.Translation> Translations { get; set; }
+        public DbSet<CleanupAlarm> CleanupAlarms { get; set; }
         //public DbSet<QuestionComment> QuestionComments { get; set; }
 
         public HelpContext() : base("name=HelpContext")
@@ -126,6 +127,19 @@ namespace WhoNeedsHelp
                 .HasKey(l => l.Id);
             modelBuilder.Entity<Locale.Translation>()
                 .HasKey(t => t.Id);
+
+            modelBuilder.Entity<CleanupAlarm>()
+                .HasKey(c => c.Id);
+            modelBuilder.Entity<CleanupAlarm>()
+                .HasOptional(c => c.User)
+                .WithMany(u => u.CleanupAlarms)
+                .HasForeignKey(c => c.UserId)
+                .WillCascadeOnDelete(false);
+            modelBuilder.Entity<CleanupAlarm>()
+                .HasOptional(c => c.Channel)
+                .WithMany(u => u.CleanupAlarms)
+                .HasForeignKey(c => c.ChannelId)
+                .WillCascadeOnDelete(false);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -11,7 +11,7 @@ var Help;
     var app = angular.module("Help", ["ngAnimate", "ngCookies", "zlFeatures"]);
     var HelpCtrl = (function (_super) {
         __extends(HelpCtrl, _super);
-        function HelpCtrl($scope, $timeout, $cookieStore, $interval) {
+        function HelpCtrl($scope, $timeout, $cookieStore, $interval, cleaupTimer) {
             var _this = this;
             _super.call(this);
             this.$scope = $scope;
@@ -21,6 +21,7 @@ var Help;
             l = $scope;
             $scope.Application = new Help.Application();
             $scope.Application.State = "loading";
+            $scope.CleanupTimer = cleaupTimer;
             $scope.StartingModal = new Help.LoginOptions();
             $scope.Me = new Help.Me();
             $scope.Channels = {};
@@ -490,12 +491,13 @@ var Help;
                 }
                 _this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             };
-            this.helper.client.loginSuccess = function () {
+            this.helper.client.loginSuccess = function (alarms) {
                 if ($scope.Application.State === "login") {
                     $scope.Application.State = "help";
                 }
                 $scope.Me.LoggedIn = true;
                 _this.alert("Du er nu logget ind.");
+                $scope.CleanupTimer.AddAlarms(alarms);
             };
             this.helper.client.updateOtherUsername = function (name, userid, channelid) {
                 $timeout(function () {
@@ -618,7 +620,7 @@ var Help;
                 b.sideNav("hide");
             };
         }
-        HelpCtrl.$inject = ["$rootScope", "$timeout", "$cookieStore", "$interval"];
+        HelpCtrl.$inject = ["$rootScope", "$timeout", "$cookieStore", "$interval", "cleanupTimer"];
         return HelpCtrl;
     })(Help.ServerActions);
     Help.HelpCtrl = HelpCtrl;
@@ -656,4 +658,3 @@ $(document).ready(function () {
         console.log("Resized");
     });
 });
-//# sourceMappingURL=helper.js.map

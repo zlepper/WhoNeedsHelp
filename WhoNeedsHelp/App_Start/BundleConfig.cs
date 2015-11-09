@@ -48,7 +48,8 @@ namespace WhoNeedsHelp.App_Start
                         "~/js/directives/usermanage.js",
                         "~/js/directives/login.js",
                         "~/js/countdown.js",
-                        "~/js/loading.js"
+                        "~/js/loading.js",
+                        "~/js/cleaup-timer.js"
                         ));
 
             bundles.Add(new ScriptBundle("~/helper").Include("~/js/helper.js"));

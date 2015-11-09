@@ -33,5 +33,6 @@ namespace WhoNeedsHelp.Server.Chat
         void PasswordChanged(bool success);
         void AllUsersLoggedOut();
         void SetChannel(int id);
+        void CleanupTime();
     }
 }

@@ -5,14 +5,14 @@ module Help {
 
     export class HelpCtrl extends ServerActions {
 
-        static $inject = ["$rootScope", "$timeout", "$cookieStore", "$interval"];
+        static $inject = ["$rootScope", "$timeout", "$cookieStore", "$interval", "cleanupTimer"];
 
-        constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any) {
+        constructor(public $scope: IHelpScope, public $timeout: any, public $cookieStore: any, public $interval: any, cleaupTimer: any) {
             super();
             l = $scope;
             $scope.Application = new Application();
             $scope.Application.State = "loading";
-
+            $scope.CleanupTimer = cleaupTimer;
             $scope.StartingModal = new LoginOptions();
             $scope.Me = new Me();
             $scope.Channels = {};
@@ -490,12 +490,13 @@ Til spørgsmålet er teksten: "${question.Text}"` : ""));
                 }
                 this.loginUser($scope.StartingModal.Email, $scope.StartingModal.Password, $scope.StartingModal.StayLoggedIn);
             }
-            this.helper.client.loginSuccess = () => {
+            this.helper.client.loginSuccess = (alarms: any) => {
                 if ($scope.Application.State === "login") {
                     $scope.Application.State = "help";
                 }
                 $scope.Me.LoggedIn = true;
                 this.alert("Du er nu logget ind.");
+                $scope.CleanupTimer.AddAlarms(alarms);
             }
             this.helper.client.updateOtherUsername = (name, userid, channelid) => {
                 $timeout(() => {

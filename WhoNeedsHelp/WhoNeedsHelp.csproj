@@ -198,6 +198,7 @@
     <Content Include="Global.asax">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="js\cleanup-timer.js" />
     <Content Include="js\countdown.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
@@ -1106,6 +1107,7 @@
     </Compile>
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\ChatMessage.cs" />
+    <Compile Include="Models\CleanupAlarm.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\Locale.cs" />
     <Compile Include="Models\Question.cs" />
