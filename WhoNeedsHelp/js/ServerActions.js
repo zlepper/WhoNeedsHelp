@@ -99,7 +99,7 @@ var Help;
             return this.helper.server.joinOrCreateChannelWithApi(channelname, channelid, teacherKey);
         };
         ServerActions.prototype.alert = function (text) {
-            Materialize.toast(text, 6000);
+            notify(text, "");
         };
         ServerActions.prototype.confirm = function (text, title, callback) {
             if (confirmNotice == null)

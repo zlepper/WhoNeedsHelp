@@ -159,6 +159,12 @@ function CleanupTimer() {
             $.connection.centralHub.server.cleaupTime(alarm.id);
         }
     }, 10000);
+
+    $.connection.centralHub.client.cleanupTime = function()
+    {
+        dis.audio.play();
+
+    }
 }
 
 var app = angular.module("Help");

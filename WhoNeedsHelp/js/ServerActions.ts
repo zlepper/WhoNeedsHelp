@@ -122,7 +122,7 @@ module Help {
         }
 
         alert(text: string) {
-            Materialize.toast(text, 6000);
+            notify(text, "");
         }
 
         confirm(text: string, title: string, callback: Function) {

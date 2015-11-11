@@ -42,4 +42,5 @@ interface ICentralClient {
     passwordResetResult: (success: boolean) => void;
     passwordChanged: (success: boolean) => void;
     allUsersLoggedOut: () => void;
+    cleanupTime: () => void;
 }

@@ -202,6 +202,7 @@
     <Content Include="js\countdown.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
+    <Content Include="js\notifications.js" />
     <Content Include="parts\chat.html" />
     <Content Include="parts\login.html" />
     <Content Include="parts\navbar.html" />
@@ -1230,6 +1231,7 @@
     <Folder Include="Client\" />
     <Folder Include="Content\themes\" />
     <Folder Include="fonts\bootstrap\" />
+    <Folder Include="js\oldts\" />
     <Folder Include="Scripts\typings\materializecss\" />
   </ItemGroup>
   <ItemGroup>
