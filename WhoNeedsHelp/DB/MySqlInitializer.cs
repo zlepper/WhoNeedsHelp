@@ -1,9 +1,9 @@
-﻿using System.Data.Entity;
+﻿using System.Configuration;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Configuration;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.DB
 {
     public class MySqlInitializer : IDatabaseInitializer<HelpContext>
     {

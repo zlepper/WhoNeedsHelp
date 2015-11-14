@@ -13,6 +13,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using WhoNeedsHelp.Areas.HelpPage.ModelDescriptions;
 using WhoNeedsHelp.Areas.HelpPage.Models;
+using WhoNeedsHelp.Areas.HelpPage.SampleGeneration;
 
 namespace WhoNeedsHelp.Areas.HelpPage
 {

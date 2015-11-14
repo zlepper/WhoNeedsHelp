@@ -5,6 +5,7 @@ using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
 using Owin;
 using WhoNeedsHelp;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Server.Mail;
 
 [assembly: OwinStartup(typeof(Startup))]

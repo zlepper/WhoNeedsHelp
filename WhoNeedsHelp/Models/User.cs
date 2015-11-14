@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Server.Chat;
 using WhoNeedsHelp.Simples;
 

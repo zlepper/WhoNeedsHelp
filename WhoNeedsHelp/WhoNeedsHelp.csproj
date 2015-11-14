@@ -1143,9 +1143,9 @@
       <DependentUpon>201503121633047_security.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="MySqlConfiguration.cs" />
-    <Compile Include="MySqlHistoryContext.cs" />
-    <Compile Include="MySqlInitializer.cs" />
+    <Compile Include="DB\MySqlConfiguration.cs" />
+    <Compile Include="DB\MySqlHistoryContext.cs" />
+    <Compile Include="DB\MySqlInitializer.cs" />
     <Compile Include="Server\Chat\hasher.cs" />
     <Compile Include="Server\Chat\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1157,7 +1157,7 @@
     <Compile Include="Simples\SimpleQuestion.cs" />
     <Compile Include="Simples\SimpleUser.cs" />
     <Compile Include="App_Start\Startup.cs" />
-    <Compile Include="HelpContext.cs" />
+    <Compile Include="DB\HelpContext.cs" />
     <Compile Include="UniqueKeyAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

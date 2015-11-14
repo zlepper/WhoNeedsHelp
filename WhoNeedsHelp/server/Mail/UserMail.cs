@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using SendGrid;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 

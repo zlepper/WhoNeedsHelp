@@ -1,13 +1,8 @@
-﻿using System;
-using System.Data.Common;
-using System.Data.Entity;
-using System.Linq;
-using MySql.Data.Entity;
-using MySql.Data;
+﻿using System.Data.Entity;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.DB
 {
     //[DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class HelpContext : DbContext

@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace WhoNeedsHelp.App_Start
+namespace WhoNeedsHelp
 {
     public static class WebApiConfig
     {

@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Owin;
 using System.Web.Optimization;
 using Microsoft.Ajax.Utilities;
-using WhoNeedsHelp.App_Start;
 
 namespace WhoNeedsHelp
 {

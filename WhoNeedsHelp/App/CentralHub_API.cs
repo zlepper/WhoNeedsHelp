@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 

@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.DB
 {
     public class MySqlConfiguration : DbConfiguration
     {

@@ -2,7 +2,7 @@
 using System.Data.Entity;
 using System.Data.Entity.Migrations.History;
 
-namespace WhoNeedsHelp
+namespace WhoNeedsHelp.DB
 {
     public class MySqlHistoryContext : HistoryContext
     {

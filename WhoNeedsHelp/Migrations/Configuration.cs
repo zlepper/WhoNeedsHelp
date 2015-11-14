@@ -1,4 +1,5 @@
 using MySql.Data.Entity;
+using WhoNeedsHelp.DB;
 
 namespace WhoNeedsHelp.Migrations
 {
@@ -7,7 +8,7 @@ namespace WhoNeedsHelp.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    public sealed class Configuration : DbMigrationsConfiguration<WhoNeedsHelp.HelpContext>
+    public sealed class Configuration : DbMigrationsConfiguration<HelpContext>
     {
         public Configuration()
         {
@@ -17,7 +18,7 @@ namespace WhoNeedsHelp.Migrations
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 
-        protected override void Seed(WhoNeedsHelp.HelpContext context)
+        protected override void Seed(HelpContext context)
         {
             //  This method will be called after migrating to the latest version.
 

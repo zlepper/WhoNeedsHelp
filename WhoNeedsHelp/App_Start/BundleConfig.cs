@@ -1,6 +1,6 @@
 ﻿using System.Web.Optimization;
 
-namespace WhoNeedsHelp.App_Start
+namespace WhoNeedsHelp
 {
     public class BundleConfig
     {
