@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Owin;
 using System.Web.Optimization;
 using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json.Serialization;
 
 namespace WhoNeedsHelp
 {
@@ -30,6 +31,11 @@ namespace WhoNeedsHelp
             // Disable xml generation
             var formatters = GlobalConfiguration.Configuration.Formatters;
             formatters.Remove(formatters.XmlFormatter);
+            // Fix the casing of elements
+            var jsonFormatter = formatters.JsonFormatter;
+            var settings = jsonFormatter.SerializerSettings;
+            //settings.Formatting = Formatting.Indented;
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
         protected void Session_Start(object sender, EventArgs e)

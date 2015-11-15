@@ -2,8 +2,8 @@
     <div class="chat-messages">
         <div class="card-panel hoverable" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
             <span class="strong">
-                {{message.User.Name}}
-                <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(message.Id)">
+                {{message.User.NaMe}}
+                <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(Message.Id)">
                     <i class="material-icons">close</i>
                 </button>
             </span>

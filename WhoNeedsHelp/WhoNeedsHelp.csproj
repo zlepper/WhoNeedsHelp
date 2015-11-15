@@ -198,10 +198,22 @@
     <Content Include="Global.asax">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="js\classes\application.js" />
+    <Content Include="js\classes\channel.js" />
+    <Content Include="js\classes\chat-message.js" />
+    <Content Include="js\classes\loginToken.js" />
+    <Content Include="js\classes\me.js" />
+    <Content Include="js\classes\question.js" />
+    <Content Include="js\classes\student-timer.js" />
+    <Content Include="js\classes\user.js" />
     <Content Include="js\cleanup-timer.js" />
     <Content Include="js\countdown.js" />
+    <Content Include="js\directives\ask-question.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
+    <Content Include="js\helpers.js" />
+    <Content Include="js\modules\zl-features.js" />
+    <Content Include="js\modules\zl-signalr.js" />
     <Content Include="js\notifications.js" />
     <Content Include="parts\chat.html" />
     <Content Include="parts\login.html" />
@@ -1186,30 +1198,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="js\api.ts" />
-    <TypeScriptCompile Include="js\Application.ts" />
-    <TypeScriptCompile Include="js\Channel.ts" />
-    <TypeScriptCompile Include="js\ChatMessage.ts" />
-    <TypeScriptCompile Include="js\directives\ask-question.ts" />
-    <TypeScriptCompile Include="js\directives\chat.ts" />
-    <TypeScriptCompile Include="js\directives\editQuestionModal.ts" />
-    <TypeScriptCompile Include="js\directives\loading.ts" />
-    <TypeScriptCompile Include="js\directives\questions.ts" />
-    <TypeScriptCompile Include="js\directives\timer.ts" />
-    <TypeScriptCompile Include="js\directives\usermanage.ts" />
-    <TypeScriptCompile Include="js\helper.ts" />
-    <TypeScriptCompile Include="js\helpers.ts" />
-    <TypeScriptCompile Include="js\ICentralClient.ts" />
-    <TypeScriptCompile Include="js\ICentralHubProxy.ts" />
-    <TypeScriptCompile Include="js\ICentralServer.ts" />
-    <TypeScriptCompile Include="js\IHelpScope.ts" />
-    <TypeScriptCompile Include="js\LoginOptions.ts" />
-    <TypeScriptCompile Include="js\LoginToken.ts" />
-    <TypeScriptCompile Include="js\Me.ts" />
-    <TypeScriptCompile Include="js\Question.ts" />
-    <TypeScriptCompile Include="js\QuestionState.ts" />
-    <TypeScriptCompile Include="js\User.ts" />
-    <TypeScriptCompile Include="js\zl-features.ts" />
+    <TypeScriptCompile Include="js\ts\api.ts" />
+    <Content Include="js\directives\chat.js" />
+    <Content Include="js\directives\editQuestionModal.js" />
+    <Content Include="js\directives\loading.js" />
+    <Content Include="js\directives\questions.js" />
+    <Content Include="js\directives\timer.js" />
+    <Content Include="js\directives\usermanage.js" />
+    <TypeScriptCompile Include="js\ts\helper.ts" />
+    <TypeScriptCompile Include="js\ts\ICentralClient.ts" />
+    <TypeScriptCompile Include="js\ts\ICentralHubProxy.ts" />
+    <TypeScriptCompile Include="js\ts\ICentralServer.ts" />
+    <TypeScriptCompile Include="js\ts\IHelpScope.ts" />
+    <TypeScriptCompile Include="js\ts\LoginOptions.ts" />
+    <TypeScriptCompile Include="js\ts\QuestionState.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -1223,15 +1225,14 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\modernizr\modernizr.d.ts" />
-    <TypeScriptCompile Include="js\ServerActions.ts" />
-    <TypeScriptCompile Include="js\SignalR.ts" />
+    <TypeScriptCompile Include="js\ts\ServerActions.ts" />
+    <TypeScriptCompile Include="js\ts\SignalR.ts" />
     <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Client\" />
     <Folder Include="Content\themes\" />
     <Folder Include="fonts\bootstrap\" />
-    <Folder Include="js\oldts\" />
     <Folder Include="Scripts\typings\materializecss\" />
   </ItemGroup>
   <ItemGroup>
