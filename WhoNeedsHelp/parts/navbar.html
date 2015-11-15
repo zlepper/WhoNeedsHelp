@@ -4,26 +4,26 @@
     </div>
 </nav>
 <ul id="slide-out-left" class="side-nav fixed">
-    <li><a>Nuværende kanal ID: {{ActiveChannel}}</a></li>
-    <li><a>Navn: {{Me.Name}}</a></li>
-    <li class="hide-on-small-only"><a ng-click="$parent.Application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
-    <li class="hide-on-med-and-up" ng-click="hideSideNav()"><a ng-click="$parent.Application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
-    <li ng-repeat="(Id, channel) in Channels" class="collection-item" href="#"
-        ng-class="{'active': channel.Id === ActiveChannel}">
+    <li><a>Nuværende kanal ID: {{application.ActiveChannel}}</a></li>
+    <li><a>Navn: {{application.Me.Name}}</a></li>
+    <li class="hide-on-small-only"><a ng-click="application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
+    <li class="hide-on-med-and-up" ng-click="application.hideSideNav()"><a ng-click="application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
+    <li ng-repeat="(Id, channel) in application.Channels" class="collection-item" href="#"
+        ng-class="{'active': channel.Id === application.ActiveChannel}">
         <span>
-            <button class="as-text" ng-click="setActiveChannel(channel.Id)">
+            <button class="as-text" ng-click="application.setActiveChannel(channel.Id)">
                 {{channel.ChannelName}}
             </button>
-            <button class="as-text" ng-click="exitChannel(channel.Id)">
+            <button class="as-text" ng-click="application.exitChannel(channel.Id)">
                 <i class="material-icons badge">close</i>
             </button>
         </span>
     </li>
     <li>
-        <form onsubmit="return false;" ng-submit="CreateNewChannel(newChannel.Name)">
+        <form onsubmit="return false;" ng-submit="application.createNewChannel(application.newChannel.Name)">
             <div class="input-field">
                 <label for="newChannelName">Tilslut eller Opret kanal</label>
-                <input id="newChannelName" ng-model="newChannel.Name" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" class="validate" autocomplete="off" />
+                <input id="newChannelName" ng-model="application.newChannel.Name" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" class="validate" autocomplete="off" />
             </div>
         </form>
     </li>

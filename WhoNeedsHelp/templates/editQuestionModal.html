@@ -5,14 +5,14 @@
         <form>
             <div class="row">
                 <div class="input-field">
-                    <textarea id="editQuestion" class="validate materialize-textarea" ng-model="editQuestionText.text"></textarea>
+                    <textarea id="editQuestion" class="validate materialize-textarea" ng-model="application.editQuestionText.text"></textarea>
                     <label for="editQuestion" class="active">Nyt spørgsmål</label>
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <a href="javascript:" class="modal-action waves-effect waves-green btn-flat" ng-click="UpdateQuestion()">Gem</a>
-        <a href="javascript:" class="modal-action waves-effect waves-red btn-flat" ng-click="CancelUpdateQuestion()">Annuler</a>
+        <a href="javascript:" class="modal-action waves-effect waves-green btn-flat" ng-click="application.updateQuestion()">Gem</a>
+        <a href="javascript:" class="modal-action waves-effect waves-red btn-flat" ng-click="application.cancelUpdateQuestion()">Annuler</a>
     </div>
 </div>

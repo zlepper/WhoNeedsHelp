@@ -32,10 +32,10 @@ namespace WhoNeedsHelp
             var formatters = GlobalConfiguration.Configuration.Formatters;
             formatters.Remove(formatters.XmlFormatter);
             // Fix the casing of elements
-            var jsonFormatter = formatters.JsonFormatter;
-            var settings = jsonFormatter.SerializerSettings;
-            //settings.Formatting = Formatting.Indented;
-            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            //var jsonFormatter = formatters.JsonFormatter;
+            //var settings = jsonFormatter.SerializerSettings;
+            ////settings.Formatting = Formatting.Indented;
+            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
         protected void Session_Start(object sender, EventArgs e)

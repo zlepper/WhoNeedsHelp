@@ -3,9 +3,10 @@
  * Defines a channel which containes all the helplists
  * @param {Number} id The id of the Channel on the server
  * @param {String} name The name of the Channel
+ * @param {Application} application The application that is controlling everything
  * @returns {Channel} 
  */
-function Channel(id, name) {
+function Channel(id, name, application) {
     /**
      * The id of the Channel
      * @type {Number}
@@ -64,5 +65,11 @@ function Channel(id, name) {
      * The timer used to indicate how much time if left for the next student, and which controls the time.
      * @type {StudentTimer}
      */
-    this.StudentTimer = new StudentTimer();
+    this.StudentTimer = new StudentTimer(this, angular.$interval);
+
+    /**
+     * The appliation that controls everything
+     * @type {Application}
+     */
+    this.application = application;
 }

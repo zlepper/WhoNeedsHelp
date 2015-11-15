@@ -145,84 +145,82 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("Ikke alt info er indtastet");
                 return;
             }
-            using (HelpContext db = new HelpContext())
+            //var currentUser = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con == null) return;
+            User currentUser = con.User;
+            if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
             {
-                //var currentUser = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                User currentUser = con.User;
-                if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
-                {
-                    Clients.Caller.Alert("Du er allerede logget ind");
-                    return;
-                }
-                User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
-                if (user == null)
-                {
-                    Clients.Caller.Alert("Forkert mail eller kodeord");
-                    return;
-                }
-                bool success = PasswordHash.ValidatePassword(password, user.Pw);
-                if (success)
-                {
-                    // Channels the klientuser is in
-                    List<Channel> oldChannels =
-                        currentUser.ChannelsIn.Where(channel => !user.ChannelsIn.Contains(channel)).ToList();
-                    foreach (Channel channel in oldChannels)
-                    {
-                        user.ChannelsIn.Add(channel);
-                        SimpleChannel sc = channel.ToSimpleChannel();
-                        foreach (Connection conn in user.Connections)
-                        {
-                            Clients.Client(conn.ConnectionId).AppendChannel(sc);
-                        }
-                    }
-                    Connection connection =
-                        db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
-
-                    foreach (Channel channel in user.ChannelsIn.Where(ch => !currentUser.ChannelsIn.Contains(ch)))
-                    {
-                        SimpleChannel sc = channel.ToSimpleChannel();
-                        sc.IsAdmin = channel.IsUserAdministrator(user);
-                        Clients.Caller.AppendChannel(sc);
-                    }
-                    currentUser.Connections.Remove(connection);
-                    user.Connections.Add(connection);
-                    foreach (Question question in currentUser.Questions.Where(question => user.AreUserQuestioning(question.Channel)))
-                    {
-                        RemoveQuestion(question.Id);
-                    }
-
-                    foreach (Channel channel in currentUser.ChannelsRequestingHelpIn.Where(channel => !user.ChannelsRequestingHelpIn.Contains(channel)))
-                    {
-                        user.ChannelsRequestingHelpIn.Add(channel);
-                    }
-                    foreach (Channel c in oldChannels)
-                    {
-                        ExitChannel(c, currentUser);
-                    }
-                    db.Users.Remove(currentUser);
-                    if (stayLoggedIn)
-                    {
-                        Guid key = Guid.NewGuid();
-                        Clients.Caller.SendReloginData(key.ToString(), user.Id);
-
-                        user.GenerateLoginToken(key);
-                    }
-                    user.LastLogin = DateTime.Now;
-                    db.SaveChanges();
-                    Clients.Caller.LoginSuccess();
-                    if (string.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
-                    {
-                        Clients.Caller.UpdateUsername(user.Name);
-                    }
-                    Clients.Caller.SendUserId(user.Id);
-                }
-                else
-                {
-                    Clients.Caller.Alert("Forkert mail eller kodeord");
-                }
+                Clients.Caller.Alert("Du er allerede logget ind");
+                return;
             }
+            User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            if (user == null)
+            {
+                Clients.Caller.Alert("Forkert mail eller kodeord");
+                return;
+            }
+            bool success = PasswordHash.ValidatePassword(password, user.Pw);
+            if (success)
+            {
+                // Channels the klientuser is in
+                List<Channel> oldChannels =
+                    currentUser.ChannelsIn.Where(channel => !user.ChannelsIn.Contains(channel)).ToList();
+                foreach (Channel channel in oldChannels)
+                {
+                    user.ChannelsIn.Add(channel);
+                    SimpleChannel sc = channel.ToSimpleChannel();
+                    foreach (Connection conn in user.Connections)
+                    {
+                        Clients.Client(conn.ConnectionId).AppendChannel(sc);
+                    }
+                }
+                Connection connection =
+                    db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+
+                foreach (Channel channel in user.ChannelsIn.Where(ch => !currentUser.ChannelsIn.Contains(ch)))
+                {
+                    SimpleChannel sc = channel.ToSimpleChannel();
+                    sc.IsAdmin = channel.IsUserAdministrator(user);
+                    Clients.Caller.AppendChannel(sc);
+                }
+                currentUser.Connections.Remove(connection);
+                user.Connections.Add(connection);
+                foreach (Question question in currentUser.Questions.Where(question => user.AreUserQuestioning(question.Channel)))
+                {
+                    RemoveQuestion(question.Id);
+                }
+
+                foreach (Channel channel in currentUser.ChannelsRequestingHelpIn.Where(channel => !user.ChannelsRequestingHelpIn.Contains(channel)))
+                {
+                    user.ChannelsRequestingHelpIn.Add(channel);
+                }
+                foreach (Channel c in oldChannels)
+                {
+                    ExitChannel(c, currentUser);
+                }
+                db.Users.Remove(currentUser);
+                if (stayLoggedIn)
+                {
+                    Guid key = Guid.NewGuid();
+                    Clients.Caller.SendReloginData(key.ToString(), user.Id);
+
+                    user.GenerateLoginToken(key);
+                }
+                user.LastLogin = DateTime.Now;
+                db.SaveChanges();
+                Clients.Caller.LoginSuccess();
+                if (string.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
+                {
+                    Clients.Caller.UpdateUsername(user.Name);
+                }
+                Clients.Caller.SendUserId(user.Id);
+            }
+            else
+            {
+                Clients.Caller.Alert("Forkert mail eller kodeord");
+            }
+
         }
 
         public void LogoutUser(string key)

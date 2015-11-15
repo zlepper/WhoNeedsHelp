@@ -1,105 +1,136 @@
 ﻿"use strict";
-function SignalRFactory($rootScope) {
+function SignalRFactory($rootScope, $timeout) {
     var self = $rootScope.$new();
 
     var helpHub = $.connection.centralHub;
 
     // Bind all the client events to make sure they are emited
     var client = helpHub.client;
-    
-    client.appendChannel = function() {
-        self.$emit("appendChannel", arguments);
+
+    client.appendChannel = function (channel) {
+        $timeout(function() {
+            self.$emit("appendChannel", channel);
+        });
     }
-    client.addQuestion = function() {
-        self.$emit("addQuestion", arguments);
+    client.addQuestion = function(question, channelid) {
+        self.$emit("addQuestion", question, channelid);
     }
-    client.removeQuestion = function() {
-        self.$emit("removeQuestion", arguments);
+    client.removeQuestion = function(questionid) {
+        self.$emit("removeQuestion", questionid);
+        self.$apply();
     }
-    client.exitChannel = function() {
-        self.$emit("exitChannel", arguments);
+    client.exitChannel = function(channelid) {
+        self.$emit("exitChannel", channelid);
+        self.$apply();
     }
-    client.sendQuestion = function() {
-        self.$emit("sendQuestion", arguments);
+    client.sendQuestion = function(question) {
+        self.$emit("sendQuestion", question);
+        self.$apply();
     }
-    client.updateQuestion = function() {
-        self.$emit("updateQuestion", arguments);
+    client.updateQuestion = function(questionText, questionid, channelid) {
+        self.$emit("updateQuestion", questionText, questionid, channelid);
+        self.$apply();
     }
-    client.sendChatMessage = function() {
-        self.$emit("sendChatMessage", arguments);
+    client.sendChatMessage = function(message, channelid) {
+        self.$emit("sendChatMessage", message, channelid);
+        self.$apply();
     }
-    client.checkVersion = function() {
-        self.$emit("checkVersion", arguments);
+    client.checkVersion = function(version) {
+        self.$emit("checkVersion", version);
+        self.$apply();
     }
-    client.removeChatMessage = function() {
-        self.$emit("removeChatMessage", arguments);
+    client.removeChatMessage = function(messageid) {
+        self.$emit("removeChatMessage", messageid);
+        self.$apply();
     }
-    client.clearChat = function() {
-        self.$emit("clearChat", arguments);
+    client.clearChat = function(channelid) {
+        self.$emit("clearChat", channelid);
+        self.$apply();
     }
     client.loginSuccess = function() {
-        self.$emit("loginSuccess", arguments);
+        self.$emit("loginSuccess");
+        self.$apply();
     }
     client.userCreationSuccess = function() {
-        self.$emit("userCreationSuccess", arguments);
+        self.$emit("userCreationSuccess");
+        self.$apply();
     }
     client.userLoggedOut = function() {
-        self.$emit("userLoggedOut", arguments);
+        self.$emit("userLoggedOut");
+        self.$apply();
     }
-    client.updateUsername = function() {
-        self.$emit("updateUsername", arguments);
+    client.updateUsername = function(name) {
+        self.$emit("updateUsername", name);
+        self.$apply();
     }
-    client.appendUser = function() {
-        self.$emit("appendUser", arguments);
+    client.appendUser = function(user, channelid) {
+        self.$emit("appendUser", user, channelid);
+        self.$apply();
     }
-    client.removeUser = function() {
-        self.$emit("removeUser", arguments);
+    client.removeUser = function(id, channelid) {
+        self.$emit("removeUser", id, channelid);
+        self.$apply();
     }
-    client.alert = function() {
-        self.$emit("alert", arguments);
+    client.alert = function(message) {
+        self.$emit("alert", message);
+        self.$apply();
     }
-    client.setQuestionState = function() {
-        self.$emit("setQuestionState", arguments);
+    client.setQuestionState = function(hasquestion, channelid) {
+        self.$emit("setQuestionState", hasquestion, channelid);
+        self.$apply();
     }
-    client.sendUserId = function() {
-        self.$emit("sendUserId", arguments);
+    client.sendUserId = function(id) {
+        self.$emit("sendUserId", id);
+        self.$apply();
     }
-    client.updateOtherUsername = function() {
-        self.$emit("updateOtherUsername", arguments);
+    client.updateOtherUsername = function(name, userid, channelid) {
+        self.$emit("updateOtherUsername", name, userid, channelid);
+        self.$apply();
     }
-    client.setAdminState = function() {
-        self.$emit("setAdminState", arguments);
+    client.setAdminState = function(id, isadmin) {
+        self.$emit("setAdminState", id, isadmin);
+        self.$apply();
     }
     client.clearChannels = function() {
-        self.$emit("clearChannels", arguments);
+        self.$emit("clearChannels");
+        self.$apply();
     }
-    client.sendReloginData = function() {
-        self.$emit("sendReloginData", arguments);
+    client.sendReloginData = function(key, id) {
+        self.$emit("sendReloginData", key, id);
+        self.$apply();
     }
     client.tokenLoginFailed = function() {
-        self.$emit("tokenLoginFailed", arguments);
+        self.$emit("tokenLoginFailed");
+        self.$apply();
     }
-    client.passwordResetRequestResult = function() {
-        self.$emit("passwordResetRequestResult", arguments);
+    client.passwordResetRequestResult = function(success) {
+        self.$emit("passwordResetRequestResult", success);
+        self.$apply();
     }
-    client.passwordResetResult = function() {
-        self.$emit("passwordResetResult", arguments);
+    client.passwordResetResult = function(success) {
+        self.$emit("passwordResetResult", success);
+        self.$apply();
     }
-    client.passwordChanged = function() {
-        self.$emit("passwordChanged", arguments);
+    client.passwordChanged = function(success) {
+        self.$emit("passwordChanged", success);
+        self.$apply();
     }
     client.allUsersLoggedOut = function() {
-        self.$emit("allUsersLoggedOut", arguments);
+        self.$emit("allUsersLoggedOut");
+        self.$apply();
     }
-    client.setChannel = function() {
-        self.$emit("setChannel", arguments);
+    client.setChannel = function(id) {
+        self.$emit("setChannel", id);
+        self.$apply();
     }
     client.cleanupTime = function() {
-        self.$emit("cleanupTime", arguments);
+        self.$emit("cleanupTime");
+        self.$apply();
     }
 
     $.connection.hub.start().done(function() {
         self.$emit("connectionStarted");
+        self.$apply();
     });
 
     // Bind the server to the signalr service
@@ -109,4 +140,4 @@ function SignalRFactory($rootScope) {
 }
 
 angular.module("zlSignalR", [])
-    .factory("SignalR", ["$rootScope", SignalRFactory]);
+    .factory("SignalR", ["$rootScope", "$timeout", SignalRFactory]);

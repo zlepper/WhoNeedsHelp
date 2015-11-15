@@ -16,16 +16,9 @@ namespace WhoNeedsHelp
     {
         public void Configuration(IAppBuilder app)
         {
-            //app.UseFileServer(new FileServerOptions()
-            //{
-            //    RequestPath = PathString.Empty,
-            //    FileSystem = new PhysicalFileSystem(@".\public")
-            //});
-
             app.UseStaticFiles("/css");
             app.UseStaticFiles("/Content");
             app.UseStaticFiles("/parts");
-            app.UseStaticFiles("/public");
             app.UseStaticFiles("/Scripts");
             app.UseStaticFiles("/templates");
 
@@ -36,13 +29,6 @@ namespace WhoNeedsHelp
             
             app.MapSignalR();
             var m = new UserMail();
-        }
-
-        public static Task ApiInvoke(IOwinContext context)
-        {
-            
-            context.Response.ContentType = "text/html";
-            return context.Response.SendFileAsync(@"~\public\api.html");
         }
     }
 

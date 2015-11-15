@@ -4,7 +4,7 @@
  * @returns {}
  * @class 
  */
-function StudentTimer(channel) {
+function StudentTimer(channel, $interval) {
 
     /**
      * The channel this timer is attached to.
@@ -56,7 +56,7 @@ function StudentTimer(channel) {
     /**
      * The angular interval service
      */
-    this.$interval;
+    this.$interval = $interval;
 }
 
 /**
@@ -135,15 +135,15 @@ StudentTimer.prototype.countDown = function() {
  * @param {} The angular interval service. Has to be injected from the caller. 
  * @returns {} 
  */
-StudentTimer.prototype.startTimer = function($interval) {
+StudentTimer.prototype.startTimer = function() {
     this.timing = true;
     this.counting = true;
     this.timeLeft = this.defaultCountdownTime;
     this.outOfTime = false;
 
     if (this.intervalCont) {
-        $interval.cancel(this.intervalCont);
+        this.$interval.cancel(this.intervalCont);
     }
 
-    this.intervalCont = $interval(this.countDown, this.defaultCountdownTime);
+    this.intervalCont = this.$interval(this.countDown, this.defaultCountdownTime);
 }
