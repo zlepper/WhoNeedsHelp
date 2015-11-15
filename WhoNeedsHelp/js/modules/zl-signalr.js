@@ -8,7 +8,7 @@ function SignalRFactory($rootScope, $timeout) {
     var client = helpHub.client;
 
 
-    var methods = ["appendChannel", "addQuestion", "removeQuestion", "exitChannel", "updateQuestion", "sendChatMessage", "checkVersion", "removeChatMessage", "clearChat", "loginSuccess", "userCreationSuccess", "userLoggedOut", "updateUsername", "appendUser", "removeUser", "alert", "setQuestionState", "sendUserId", "updateOtherUsername", "setAdminState", "clearChannels", "sendReloginData", "tokenLoginFailed", "passwordResetRequestResult", "passwordResetResult", "passwordChanged", "allUsersLoggedOut", "setChannel", "cleanupTime"];
+    var methods = ["appendChannel", "addQuestion", "removeQuestion", "exitChannel", "sendQuestion", "updateQuestion", "sendChatMessage", "checkVersion", "removeChatMessage", "clearChat", "loginSuccess", "userCreationSuccess", "userLoggedOut", "updateUsername", "appendUser", "removeUser", "alert", "setQuestionState", "sendUserId", "updateOtherUsername", "setAdminState", "clearChannels", "sendReloginData", "tokenLoginFailed", "passwordResetRequestResult", "passwordResetResult", "passwordChanged", "allUsersLoggedOut", "setChannel", "cleanupTime"];
 
     for (var i = 0; i < methods.length; i++) {
         var m = methods[i];
