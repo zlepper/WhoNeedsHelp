@@ -16,126 +16,116 @@ namespace WhoNeedsHelp.App
     {
         public void SetUsername(string name)
         {
-            using (HelpContext db = new HelpContext())
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con == null) return;
+            User user = con.User;
+            if (user == null)
             {
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                User user = con.User;
-                if (user == null)
+                user = new User
                 {
-                    user = new User
-                    {
-                        Name = name,
-                    };
-                    user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
-                    db.Users.Add(user);
-                }
-                else
-                {
-                    user.Name = name;
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).UpdateUsername(name);
-                    }
-                    foreach (Channel channel in user.ChannelsIn)
-                    {
-                        Clients.Clients(
-                            channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList())
-                            .UpdateOtherUsername(name, user.Id, channel.Id);
-                    }
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).SendUserId(user.Id);
-                    }
-                }
-                db.SaveChanges();
+                    Name = name,
+                };
+                user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
+                db.Users.Add(user);
             }
+            else
+            {
+                user.Name = name;
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).UpdateUsername(name);
+                }
+                foreach (Channel channel in user.ChannelsIn)
+                {
+                    Clients.Clients(
+                        channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList())
+                        .UpdateOtherUsername(name, user.Id, channel.Id);
+                }
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).SendUserId(user.Id);
+                }
+            }
+            db.SaveChanges();
         }
 
         public void CreateNewUser(string username, string email, string pw, bool stayLoggedIn)
         {
-            Debug.WriteLine("Here");
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(pw))
             {
                 Clients.Caller.Alert("En af værdier er ikke blevet sat.");
                 return;
             }
-            using (HelpContext db = new HelpContext())
+            User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            if (user != null)
             {
-                User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
-                if (user != null)
-                {
-                    Clients.Caller.Alert("Emailadressen er allerede i brug.");
-                    return;
-                }
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                user = con.User;
-                if (user == null) return;
-                if (!string.IsNullOrWhiteSpace(user.Pw) || !string.IsNullOrWhiteSpace(user.EmailAddress))
-                {
-                    Clients.Caller.Alert("Du er allerede logget ind.");
-                    return;
-                }
-                string pass = PasswordHash.CreateHash(pw);
-                user.Pw = pass;
-                user.EmailAddress = email;
-
-                if (stayLoggedIn)
-                {
-                    Guid key = Guid.NewGuid();
-                    Clients.Caller.SendReloginData(key.ToString(), user.Id);
-
-                    user.GenerateLoginToken(key);
-                }
-
-
-                user.LastLogin = DateTime.Now;
-                db.SaveChanges();
-                Clients.Caller.UserCreationSuccess();
+                Clients.Caller.Alert("Emailadressen er allerede i brug.");
+                return;
             }
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con == null) return;
+            user = con.User;
+            if (user == null) return;
+            if (!string.IsNullOrWhiteSpace(user.Pw) || !string.IsNullOrWhiteSpace(user.EmailAddress))
+            {
+                Clients.Caller.Alert("Du er allerede logget ind.");
+                return;
+            }
+            string pass = PasswordHash.CreateHash(pw);
+            user.Pw = pass;
+            user.EmailAddress = email;
+
+            if (stayLoggedIn)
+            {
+                Guid key = Guid.NewGuid();
+                Clients.Caller.SendReloginData(key.ToString(), user.Id);
+
+                user.GenerateLoginToken(key);
+            }
+
+
+            user.LastLogin = DateTime.Now;
+            db.SaveChanges();
+            Clients.Caller.UserCreationSuccess();
         }
 
         public void LoginWithToken(int userId, string tokenKey)
         {
-            using (HelpContext db = new HelpContext())
+            var user = db.Users.Find(userId);
+            LoginToken lt = null;
+            if ((lt = user.CheckLoginToken(tokenKey)) != null)
             {
-                var user = db.Users.Find(userId);
-                LoginToken lt = null;
-                if ((lt = user.CheckLoginToken(tokenKey)) != null)
+                Clients.Caller.SendUserId(user.Id);
+                Clients.Caller.UpdateUsername(user.Name);
+                foreach (Channel channel in user.ChannelsIn)
                 {
-                    Clients.Caller.SendUserId(user.Id);
-                    Clients.Caller.UpdateUsername(user.Name);
-                    foreach (Channel channel in user.ChannelsIn)
-                    {
-                        var sc = channel.ToSimpleChannel();
-                        sc.IsAdmin = channel.IsUserAdministrator(user);
-                        Clients.Caller.AppendChannel(sc);
-                    }
-                    Guid newKey = Guid.NewGuid();
-                    Clients.Caller.SendReloginData(newKey.ToString(), user.Id);
-                    user.GenerateLoginToken(newKey);
-                    db.LoginTokens.Remove(lt);
-                    user.LastLogin = DateTime.Now;
-                    Connection connection =
-                        db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
-                    var u = connection?.User;
-                    u?.Connections.Remove(connection);
-                    user.Connections.Add(connection);
-                    db.Users.Remove(u);
-                    db.SaveChanges();
+                    var sc = channel.ToSimpleChannel();
+                    sc.IsAdmin = channel.IsUserAdministrator(user);
+                    Clients.Caller.AppendChannel(sc);
                 }
-                else
-                {
-                    foreach (Connection connection in user.Connections)
-                    {
-                        Clients.Client(connection.ConnectionId).UserLoggedOut();
-                    }
-                    db.LoginTokens.RemoveRange(user.LoginTokens);
-                    Clients.Caller.TokenLoginFailed();
-                }
+                Guid newKey = Guid.NewGuid();
+                Clients.Caller.SendReloginData(newKey.ToString(), user.Id);
+                user.GenerateLoginToken(newKey);
+                db.LoginTokens.Remove(lt);
+                user.LastLogin = DateTime.Now;
+                Connection connection =
+                    db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+                var u = connection?.User;
+                u?.Connections.Remove(connection);
+                user.Connections.Add(connection);
+                db.Users.Remove(u);
                 db.SaveChanges();
             }
+            else
+            {
+                foreach (Connection connection in user.Connections)
+                {
+                    Clients.Client(connection.ConnectionId).UserLoggedOut();
+                }
+                db.LoginTokens.RemoveRange(user.LoginTokens);
+                Clients.Caller.TokenLoginFailed();
+            }
+            db.SaveChanges();
         }
 
         public void LoginUser(string email, string password, bool stayLoggedIn)
@@ -225,37 +215,34 @@ namespace WhoNeedsHelp.App
 
         public void LogoutUser(string key)
         {
-            using (HelpContext db = new HelpContext())
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con == null) return;
+            User user = con.User;
+            if (user == null)
             {
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return;
-                User user = con.User;
-                if (user == null)
-                {
-                    Clients.Caller.UserLoggedOut();
-                    return;
-                }
-                user.Connections.Remove(con);
-                db.Connections.Remove(con);
-                User newUser = new User()
-                {
-                    Name = user.Name,
-                    Ip = user.Ip
-                };
-                newUser.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
-                db.Users.Add(newUser);
-                if (!string.IsNullOrWhiteSpace(key))
-                {
-                    LoginToken lt = user.CheckLoginToken(key);
-                    if (lt != null)
-                    {
-                        db.LoginTokens.Remove(lt);
-                    }
-                }
-                db.SaveChanges();
                 Clients.Caller.UserLoggedOut();
-                Clients.Caller.SendUserId(newUser.Id);
+                return;
             }
+            user.Connections.Remove(con);
+            db.Connections.Remove(con);
+            User newUser = new User()
+            {
+                Name = user.Name,
+                Ip = user.Ip
+            };
+            newUser.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
+            db.Users.Add(newUser);
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                LoginToken lt = user.CheckLoginToken(key);
+                if (lt != null)
+                {
+                    db.LoginTokens.Remove(lt);
+                }
+            }
+            db.SaveChanges();
+            Clients.Caller.UserLoggedOut();
+            Clients.Caller.SendUserId(newUser.Id);
         }
 
         public void RequestPasswordReset(string email)
@@ -267,91 +254,80 @@ namespace WhoNeedsHelp.App
         public void ResetPassword(string key, string password, string email)
         {
             key = key.Trim();
-            using (HelpContext db = new HelpContext())
+            var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            if (user == null)
             {
-                var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
-                if (user == null)
-                {
-                    Clients.Caller.PasswordResetResult(false);
-                    return;
-                }
-                if (user.CanPasswordBeReset(key))
-                {
-                    user.Pw = PasswordHash.CreateHash(password);
-                    Clients.Caller.PasswordResetResult(true);
-                    user.ResetExpiresAt = DateTime.Now;
-                    user.ResetKey = null;
-                    db.SaveChanges();
-                    LoginUser(email, password, false);
-                }
-                else
-                {
-                    Clients.Caller.PasswordResetResult(false);
-                }
+                Clients.Caller.PasswordResetResult(false);
+                return;
+            }
+            if (user.CanPasswordBeReset(key))
+            {
+                user.Pw = PasswordHash.CreateHash(password);
+                Clients.Caller.PasswordResetResult(true);
+                user.ResetExpiresAt = DateTime.Now;
+                user.ResetKey = null;
+                db.SaveChanges();
+                LoginUser(email, password, false);
+            }
+            else
+            {
+                Clients.Caller.PasswordResetResult(false);
             }
         }
 
         public void ChangePassword(string oldpass, string newpass)
         {
-            using (HelpContext db = new HelpContext())
+            var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+            if (con == null) return;
+            var user = con.User;
+            if (user == null) return;
+            if (string.IsNullOrWhiteSpace(user.EmailAddress))
             {
-                var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
-                if (con == null) return;
-                var user = con.User;
-                if (user == null) return;
-                if (string.IsNullOrWhiteSpace(user.EmailAddress))
-                {
-                    Clients.Caller.UserLoggedOut();
-                    return;
-                }
-                if (PasswordHash.ValidatePassword(oldpass, user.Pw))
-                {
-                    user.Pw = PasswordHash.CreateHash(newpass);
-                    db.SaveChanges();
-                    Clients.Caller.PasswordChanged(true);
-                    return;
-                }
-                Clients.Caller.PasswordChanged(false);
-
+                Clients.Caller.UserLoggedOut();
+                return;
             }
+            if (PasswordHash.ValidatePassword(oldpass, user.Pw))
+            {
+                user.Pw = PasswordHash.CreateHash(newpass);
+                db.SaveChanges();
+                Clients.Caller.PasswordChanged(true);
+                return;
+            }
+            Clients.Caller.PasswordChanged(false);
+
+
         }
 
         public void LogoutAll()
         {
-            using (HelpContext db = new HelpContext())
+            var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+            if (con == null) return;
+            var user = con.User;
+            if (user == null) return;
+            foreach (Connection connection in user.Connections.Where(c => !c.ConnectionId.Equals(Context.ConnectionId)))
             {
-                var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
-                if (con == null) return;
-                var user = con.User;
-                if (user == null) return;
-                foreach (Connection connection in user.Connections.Where(c => !c.ConnectionId.Equals(Context.ConnectionId)))
-                {
-                    Clients.Client(connection.ConnectionId).UserLoggedOut();
-                }
-                db.LoginTokens.RemoveRange(user.LoginTokens);
-                Clients.Caller.AllUsersLoggedOut();
-                db.SaveChanges();
+                Clients.Client(connection.ConnectionId).UserLoggedOut();
             }
+            db.LoginTokens.RemoveRange(user.LoginTokens);
+            Clients.Caller.AllUsersLoggedOut();
+            db.SaveChanges();
         }
         private void ExitChannel(Channel channel, User user)
         {
-            using (HelpContext db = new HelpContext())
+            user = db.Users.Find(user.Id);
+            if (user == null) return;
+            channel = db.Channels.Find(channel.Id);
+            if (channel == null) return;
+            foreach (Connection con in channel.Users.SelectMany(u => u.Connections))
             {
-                user = db.Users.Find(user.Id);
-                if (user == null) return;
-                channel = db.Channels.Find(channel.Id);
-                if (channel == null) return;
-                foreach (Connection con in channel.Users.SelectMany(u => u.Connections))
-                {
-                    Clients.Client(con.ConnectionId).RemoveUser(user.Id, channel.Id);
-                }
-                foreach (Connection con in user.Connections)
-                {
-                    Clients.Client(con.ConnectionId).ExitChannel(channel.Id);
-                }
-                channel.RemoveUser(user);
-                db.SaveChanges();
+                Clients.Client(con.ConnectionId).RemoveUser(user.Id, channel.Id);
             }
+            foreach (Connection con in user.Connections)
+            {
+                Clients.Client(con.ConnectionId).ExitChannel(channel.Id);
+            }
+            channel.RemoveUser(user);
+            db.SaveChanges();
         }
     }
 }

@@ -48,62 +48,55 @@ namespace WhoNeedsHelp.App
 
         public override Task OnConnected()
         {
-            using (HelpContext db = new HelpContext())
-            {
-                //var user =
-                //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
+            //var user =
+            //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
 
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con != null) return base.OnConnected();
-                User user = new User
-                {
-                    Ip = GetIpAddress()
-                };
-                user.Connections.Add(new Connection(user) { ConnectionId = Context.ConnectionId });
-                db.Users.Add(user);
-                db.SaveChanges();
-            }
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con != null) return base.OnConnected();
+            User user = new User
+            {
+                Ip = GetIpAddress()
+            };
+            user.Connections.Add(new Connection(user) { ConnectionId = Context.ConnectionId });
+            db.Users.Add(user);
+            db.SaveChanges();
+
 
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            using (HelpContext db = new HelpContext())
+            //var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+            Connection con = db.Connections.Find(Context.ConnectionId);
+            if (con == null) return base.OnDisconnected(stopCalled);
+            User user = con.User;
+            if (user == null) return base.OnDisconnected(stopCalled);
+            if (string.IsNullOrWhiteSpace(user.Pw))
             {
-                //var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-                Connection con = db.Connections.Find(Context.ConnectionId);
-                if (con == null) return base.OnDisconnected(stopCalled);
-                User user = con.User;
-                if (user == null) return base.OnDisconnected(stopCalled);
-                if (string.IsNullOrWhiteSpace(user.Pw))
+                foreach (Channel c in user.ChannelsIn)
                 {
-                    foreach (Channel c in user.ChannelsIn)
-                    {
-                        ExitChannel(c.Id);
-                    }
-                    RemoveUser(user.Id);
+                    ExitChannel(c.Id);
                 }
-                else
-                {
-                    user.Connections.Remove(con);
-                }
+                RemoveUser(user.Id);
             }
+            else
+            {
+                user.Connections.Remove(con);
+            }
+
             return base.OnDisconnected(stopCalled);
         }
 
         public override Task OnReconnected()
         {
-            using (HelpContext db = new HelpContext())
+            User user = db.Connections.Find(Context.ConnectionId).User;
+            Clients.Caller.ClearChannels();
+            foreach (Channel channel in user.ChannelsIn)
             {
-                User user = db.Connections.Find(Context.ConnectionId).User;
-                Clients.Caller.ClearChannels();
-                foreach (Channel channel in user.ChannelsIn)
-                {
-                    var sc = channel.ToSimpleChannel();
-                    sc.IsAdmin = channel.IsUserAdministrator(user);
-                    Clients.Caller.AppendChannel(sc);
-                }
+                var sc = channel.ToSimpleChannel();
+                sc.IsAdmin = channel.IsUserAdministrator(user);
+                Clients.Caller.AppendChannel(sc);
             }
 
             return base.OnReconnected();
