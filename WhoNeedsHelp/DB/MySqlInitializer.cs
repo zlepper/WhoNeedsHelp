@@ -1,7 +1,10 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Migrations;
 using System.Linq;
+using Configuration = WhoNeedsHelp.Migrations.Configuration;
 
 namespace WhoNeedsHelp.DB
 {
@@ -28,6 +31,14 @@ namespace WhoNeedsHelp.DB
                     context.Database.Delete();
                     context.Database.Create();
                 }
+
+                var config = new Configuration();
+
+                var migratror = new DbMigrator(config);
+                var pending = migratror.GetPendingMigrations();
+                Console.WriteLine(pending.Count());
+                migratror.Update();
+
             }
         }
     }

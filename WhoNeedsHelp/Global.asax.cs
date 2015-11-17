@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -7,6 +8,8 @@ using Owin;
 using System.Web.Optimization;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Serialization;
+using WhoNeedsHelp.DB;
+using WhoNeedsHelp.Migrations;
 
 namespace WhoNeedsHelp
 {
@@ -19,7 +22,7 @@ namespace WhoNeedsHelp
             //{
             //    app.Run(Startup.ApiInvoke);
             //});
-            
+
             //RouteTable.Routes.MapOwinPath("/");
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
