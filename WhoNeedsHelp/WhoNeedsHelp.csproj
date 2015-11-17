@@ -224,6 +224,7 @@
     <Content Include="parts\login.html" />
     <Content Include="parts\navbar.html" />
     <Content Include="parts\usermanage.html" />
+    <Content Include="js\templates.js" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-cookies.js" />
