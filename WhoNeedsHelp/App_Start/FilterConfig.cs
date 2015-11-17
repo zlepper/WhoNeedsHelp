@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace WhoNeedsHelp.App_Start
+namespace WhoNeedsHelp
 {
     public class FilterConfig
     {

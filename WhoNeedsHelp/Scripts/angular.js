@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license AngularJS v1.4.7
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
@@ -5133,7 +5133,7 @@ var $AnimateProvider = ['$provide', function($provide) {
        * @kind function
        * @description Associates the provided element with a host parent element to allow the element to be animated even if it exists
        *    outside of the DOM structure of the Angular application. By doing so, any animation triggered via `$animate` can be issued on the
-       *    element despite being outside the realm of the application or within another application. Say for example if the application
+       *    element despite being outside the realm of the application or within another Application. Say for example if the Application
        *    was bootstrapped on an element that is somewhere inside of the `<body>` tag, but we wanted to allow for an element to be situated
        *    as a direct child of `document.body`, then this can be achieved by pinning the element via `$animate.pin(element)`. Keep in mind
        *    that calling `$animate.pin(element, parentElement)` will not actually insert into the DOM anywhere; it will just create the association.
@@ -22149,7 +22149,7 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
            </div>
          </form>
          <hr>
-         <tt>user = {{user}}</tt><br/>
+         <tt>user = {{User}}</tt><br/>
          <tt>myForm.userName.$valid = {{myForm.userName.$valid}}</tt><br/>
          <tt>myForm.userName.$error = {{myForm.userName.$error}}</tt><br/>
          <tt>myForm.lastName.$valid = {{myForm.lastName.$valid}}</tt><br/>
@@ -22161,7 +22161,7 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
        </div>
       </file>
       <file name="protractor.js" type="protractor">
-        var user = element(by.exactBinding('user'));
+        var user = element(by.exactBinding('User'));
         var userNameValid = element(by.binding('myForm.userName.$valid'));
         var lastNameValid = element(by.binding('myForm.lastName.$valid'));
         var lastNameError = element(by.binding('myForm.lastName.$error'));
@@ -25578,7 +25578,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
                     ng-model-options="{ getterSetter: true }" />
            </label>
          </form>
-         <pre>user.name = <span ng-bind="user.name()"></span></pre>
+         <pre>user.name = <span ng-bind="User.name()"></span></pre>
        </div>
      </file>
      <file name="app.js">
@@ -25719,7 +25719,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
             <input type="text" ng-model="user.data" />
           </label><br />
         </form>
-        <pre>user.name = <span ng-bind="user.name"></span></pre>
+        <pre>user.name = <span ng-bind="User.name"></span></pre>
       </div>
     </file>
     <file name="app.js">
@@ -25773,7 +25773,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
           <button ng-click="userForm.userName.$rollbackViewValue(); user.name=''">Clear</button>
           <br />
         </form>
-        <pre>user.name = <span ng-bind="user.name"></span></pre>
+        <pre>user.name = <span ng-bind="User.name"></span></pre>
       </div>
     </file>
     <file name="app.js">
@@ -25796,7 +25796,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
                    ng-model-options="{ getterSetter: true }" />
           </label>
         </form>
-        <pre>user.name = <span ng-bind="user.name()"></span></pre>
+        <pre>user.name = <span ng-bind="User.name()"></span></pre>
       </div>
     </file>
     <file name="app.js">

@@ -1,7 +1,6 @@
-angular.module("zlFeatures")
-    .directive("chat", function () {
-    return {
-        templateUrl: "/parts/chat.html"
-    };
-});
-//# sourceMappingURL=chat.js.map
+﻿angular.module("zlFeatures")
+    .directive("chat", function() {
+        return {
+            templateUrl: "/parts/chat.html"
+        }
+    })

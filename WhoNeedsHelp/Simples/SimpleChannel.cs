@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
 

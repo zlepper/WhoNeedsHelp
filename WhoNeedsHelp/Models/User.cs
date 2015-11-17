@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Server.Chat;
 using WhoNeedsHelp.Simples;
 
@@ -49,6 +50,8 @@ namespace WhoNeedsHelp.Models
 
         public int? PreferedLocaleId { get; set; }
         public virtual Locale PreferedLocale { get; set; }
+
+        public virtual ICollection<CleanupAlarm> CleanupAlarms { get; set; } 
 
         public User()
         {

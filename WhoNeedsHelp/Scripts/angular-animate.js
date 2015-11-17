@@ -3812,7 +3812,7 @@ var $$AnimationProvider = ['$animateProvider', function($animateProvider) {
  *
  * ## Using $animate in your directive code
  *
- * So far we've explored how to feed in animations into an Angular application, but how do we trigger animations within our own directives in our application?
+ * So far we've explored how to feed in animations into an Angular application, but how do we trigger animations within our own directives in our Application?
  * By injecting the `$animate` service into our directive code, we can trigger structural and class-based hooks which can then be consumed by animations. Let's
  * imagine we have a greeting box that shows and hides itself when the data changes
  *

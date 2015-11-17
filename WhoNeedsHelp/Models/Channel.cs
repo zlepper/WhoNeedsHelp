@@ -36,6 +36,8 @@ namespace WhoNeedsHelp.Models
 
         public string PasswordHash { get; set; }
         public string AdminHash { get; set; }
+        
+        public virtual ICollection<CleanupAlarm> CleanupAlarms { get; set; }
 
         public Channel()
         {

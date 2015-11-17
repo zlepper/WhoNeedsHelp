@@ -1,7 +1,6 @@
-angular.module("zlFeatures")
-    .directive("askQuestion", function () {
-    return {
-        templateUrl: "/templates/ask-question.html"
-    };
-});
-//# sourceMappingURL=ask-question.js.map
+﻿angular.module("zlFeatures")
+    .directive("askQuestion", function()  {
+        return {
+            templateUrl: "/templates/ask-question.html"
+        }
+    })

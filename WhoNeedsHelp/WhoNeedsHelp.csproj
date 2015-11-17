@@ -198,14 +198,32 @@
     <Content Include="Global.asax">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="js\classes\application.js" />
+    <Content Include="js\classes\channel.js" />
+    <Content Include="js\classes\chat-message.js" />
+    <Content Include="js\classes\login-option.js" />
+    <Content Include="js\classes\login-token.js" />
+    <Content Include="js\classes\me.js" />
+    <Content Include="js\classes\question.js" />
+    <Content Include="js\classes\student-timer.js" />
+    <Content Include="js\classes\urlparams.js" />
+    <Content Include="js\classes\user.js" />
+    <Content Include="js\cleanup-timer.js" />
+    <Content Include="js\controllers\apictrl.js" />
+    <Content Include="js\controllers\helpctrl.js" />
     <Content Include="js\countdown.js" />
+    <Content Include="js\directives\ask-question.js" />
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
+    <Content Include="js\helpers.js" />
+    <Content Include="js\modules\zl-features.js" />
+    <Content Include="js\modules\zl-help.js" />
+    <Content Include="js\modules\zl-signalr.js" />
+    <Content Include="js\notifications.js" />
     <Content Include="parts\chat.html" />
     <Content Include="parts\login.html" />
     <Content Include="parts\navbar.html" />
     <Content Include="parts\usermanage.html" />
-    <Content Include="public\api.html" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-cookies.js" />
@@ -962,12 +980,8 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="templates\ask-question.html" />
-    <Content Include="templates\changePasswordPopover.html" />
-    <Content Include="templates\changeUsernamePopover.html" />
-    <Content Include="templates\createUserPopover.html" />
     <Content Include="templates\editQuestionModal.html" />
     <Content Include="css\loading.css" />
-    <Content Include="js\loading.js" />
     <Content Include="Scripts\analytics.js" />
     <Content Include="css\custom.scss" />
     <Content Include="css\custom.css.map">
@@ -1014,13 +1028,10 @@
     <Content Include="Scripts\pnotify.custom.min.js" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Properties\PublishProfiles\hjalp.zlepper.dk.pubxml" />
-    <Content Include="public\index.html" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
     <Content Include="templates\loading.html" />
-    <Content Include="templates\loginPopover.html" />
     <Content Include="templates\questions.html" />
-    <Content Include="templates\startModal.html" />
     <Content Include="templates\timer.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -1104,8 +1115,13 @@
     <Compile Include="Migrations\201510211312007_AddLocaleTranslations.Designer.cs">
       <DependentUpon>201510211312007_AddLocaleTranslations.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511171839172_AddCreatedAtToLoginToken.cs" />
+    <Compile Include="Migrations\201511171839172_AddCreatedAtToLoginToken.Designer.cs">
+      <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\ChatMessage.cs" />
+    <Compile Include="Models\CleanupAlarm.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\Locale.cs" />
     <Compile Include="Models\Question.cs" />
@@ -1140,13 +1156,13 @@
       <DependentUpon>201503121633047_security.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="MySqlConfiguration.cs" />
-    <Compile Include="MySqlHistoryContext.cs" />
-    <Compile Include="MySqlInitializer.cs" />
+    <Compile Include="DB\MySqlConfiguration.cs" />
+    <Compile Include="DB\MySqlHistoryContext.cs" />
+    <Compile Include="DB\MySqlInitializer.cs" />
     <Compile Include="Server\Chat\hasher.cs" />
     <Compile Include="Server\Chat\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\Chat\LoginToken.cs" />
+    <Compile Include="Models\LoginToken.cs" />
     <Compile Include="Server\Mail\UserMail.cs" />
     <Compile Include="Simples\ChannelSync.cs" />
     <Compile Include="Simples\SimpleChannel.cs" />
@@ -1154,8 +1170,7 @@
     <Compile Include="Simples\SimpleQuestion.cs" />
     <Compile Include="Simples\SimpleUser.cs" />
     <Compile Include="App_Start\Startup.cs" />
-    <Compile Include="HelpContext.cs" />
-    <Compile Include="UniqueKeyAttribute.cs" />
+    <Compile Include="DB\HelpContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -1183,46 +1198,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="js\api.ts" />
-    <TypeScriptCompile Include="js\Application.ts" />
-    <TypeScriptCompile Include="js\Channel.ts" />
-    <TypeScriptCompile Include="js\ChatMessage.ts" />
-    <TypeScriptCompile Include="js\directives\ask-question.ts" />
-    <TypeScriptCompile Include="js\directives\chat.ts" />
-    <TypeScriptCompile Include="js\directives\editQuestionModal.ts" />
-    <TypeScriptCompile Include="js\directives\loading.ts" />
-    <TypeScriptCompile Include="js\directives\questions.ts" />
-    <TypeScriptCompile Include="js\directives\timer.ts" />
-    <TypeScriptCompile Include="js\directives\usermanage.ts" />
-    <TypeScriptCompile Include="js\helper.ts" />
-    <TypeScriptCompile Include="js\helpers.ts" />
-    <TypeScriptCompile Include="js\ICentralClient.ts" />
-    <TypeScriptCompile Include="js\ICentralHubProxy.ts" />
-    <TypeScriptCompile Include="js\ICentralServer.ts" />
-    <TypeScriptCompile Include="js\IHelpScope.ts" />
-    <TypeScriptCompile Include="js\LoginOptions.ts" />
-    <TypeScriptCompile Include="js\LoginToken.ts" />
-    <TypeScriptCompile Include="js\Me.ts" />
-    <TypeScriptCompile Include="js\Question.ts" />
-    <TypeScriptCompile Include="js\QuestionState.ts" />
-    <TypeScriptCompile Include="js\User.ts" />
-    <TypeScriptCompile Include="js\zl-features.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.pnotify\jquery.pnotify.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <Content Include="js\directives\chat.js" />
+    <Content Include="js\directives\editQuestionModal.js" />
+    <Content Include="js\directives\loading.js" />
+    <Content Include="js\directives\questions.js" />
+    <Content Include="js\directives\timer.js" />
+    <Content Include="js\directives\usermanage.js" />
     <TypeScriptCompile Include="Scripts\typings\mathjax\mathjax.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\modernizr\modernizr.d.ts" />
-    <TypeScriptCompile Include="js\ServerActions.ts" />
-    <TypeScriptCompile Include="js\SignalR.ts" />
-    <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Client\" />
@@ -1275,6 +1257,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201510211312007_AddLocaleTranslations.resx">
       <DependentUpon>201510211312007_AddLocaleTranslations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511171839172_AddCreatedAtToLoginToken.resx">
+      <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

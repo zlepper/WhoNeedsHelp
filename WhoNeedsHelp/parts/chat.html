@@ -1,19 +1,19 @@
 ﻿<div class="chat hide-on-small-only">
     <div class="chat-messages">
-        <div class="card-panel hoverable" ng-repeat="message in Channels[ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
+        <div class="card-panel hoverable" ng-repeat="message in application.Channels[application.ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
             <span class="strong">
                 {{message.User.Name}}
-                <button class="as-text right" ng-if="Channels[ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="RemoveChatMessage(message.Id)">
+                <button class="as-text right" ng-if="application.Channels[application.ActiveChannel].IsAdmin || message.User.Id == application.Me.Id" ng-click="application.removeChatMessage(message.Id)">
                     <i class="material-icons">close</i>
                 </button>
             </span>
             <p>{{message.Text}}</p>
         </div>
     </div>
-    <form onsubmit="return false" ng-submit="Chat()" ng-show="ActiveChannel">
+    <form onsubmit="return false" ng-submit="application.chat()" ng-show="application.ActiveChannel">
         <div class="input-field">
             <label for="newChatMessage">Chat</label>
-            <input id="newChatMessage" type="text" ng-model="Channels[ActiveChannel].MessageText" />
+            <input id="newChatMessage" type="text" ng-model="application.Channels[application.ActiveChannel].MessageText" />
         </div>
     </form>
 </div>

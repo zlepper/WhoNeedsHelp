@@ -1,4 +1,4 @@
-// Type definitions for MathJax
+﻿// Type definitions for MathJax
 // Project: https://github.com/mathjax/MathJax
 // Definitions by: Roland Zwaga <https://github.com/rolandzwaga>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -747,7 +747,7 @@ declare module jax {
          * */
         showFontMenu?:boolean;
         /*This controls whether the “Language” item will be displayed in the MathJax contextual menu. This submenu allows
-        * the user to select the language to use for the MathJax user interface, including the contextual menu, the about
+        * the user to select the language to use for the MathJax User interface, including the contextual menu, the about
         * and help dialogs, the message box at the lower left, and any warning messages produced by MathJax. Set this to
         * false to prevent this menu item from showing. This will force the user to use the language you have set for
         * MathJax.
@@ -769,7 +769,7 @@ declare module jax {
         /*These are the settings for the Annotation submenu of the “Show Math As” menu. If the <math> root element has a
         * <semantics> child that contains one of the following annotation formats, the source will be available via the
         * “Show Math As” menu. Each format has a list of possible encodings. For example, "TeX": ["TeX", "LaTeX",
-        * "application/x-tex"] will map an annotation with an encoding of "TeX", "LaTeX", or "application/x-tex" to the
+        * "application/x-tex"] will map an annotation with an encoding of "TeX", "LaTeX", or "Application/x-tex" to the
         * "TeX" menu.
         */
         semanticsAnnotations?:any;

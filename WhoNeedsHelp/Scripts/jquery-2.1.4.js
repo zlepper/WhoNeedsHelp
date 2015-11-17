@@ -8651,7 +8651,7 @@ jQuery.ajaxTransport(function( options ) {
 // Install script dataType
 jQuery.ajaxSetup({
 	accepts: {
-		script: "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"
+		script: "text/javascript, application/javascript, Application/ecmascript, Application/x-ecmascript"
 	},
 	contents: {
 		script: /(?:java|ecma)script/

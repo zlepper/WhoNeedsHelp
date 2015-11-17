@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -6,7 +7,9 @@ using Newtonsoft.Json;
 using Owin;
 using System.Web.Optimization;
 using Microsoft.Ajax.Utilities;
-using WhoNeedsHelp.App_Start;
+using Newtonsoft.Json.Serialization;
+using WhoNeedsHelp.DB;
+using WhoNeedsHelp.Migrations;
 
 namespace WhoNeedsHelp
 {
@@ -19,7 +22,7 @@ namespace WhoNeedsHelp
             //{
             //    app.Run(Startup.ApiInvoke);
             //});
-            
+
             //RouteTable.Routes.MapOwinPath("/");
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -31,6 +34,11 @@ namespace WhoNeedsHelp
             // Disable xml generation
             var formatters = GlobalConfiguration.Configuration.Formatters;
             formatters.Remove(formatters.XmlFormatter);
+            // Fix the casing of elements
+            //var jsonFormatter = formatters.JsonFormatter;
+            //var settings = jsonFormatter.SerializerSettings;
+            ////settings.Formatting = Formatting.Indented;
+            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
         protected void Session_Start(object sender, EventArgs e)

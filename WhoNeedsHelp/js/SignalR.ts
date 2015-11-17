@@ -1,3 +1,0 @@
-interface SignalR {
-    centralHub: ICentralHubProxy;
-}

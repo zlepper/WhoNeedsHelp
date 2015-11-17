@@ -16,32 +16,34 @@
     <script src="/signalr/hubs"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js"></script>
-    @Scripts.Render("~/bundles/mainapp")
+    @Scripts.Render("~/bundles/classes")
+    @Scripts.Render("~/helper")
     <script>
         if (window.Notification) Notification.requestPermission();
     </script>
+    <base href="/"/>
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
-    <div ng-show="Application.State == 'help'" class="app">
-        <nav-bar></nav-bar>
-        <div class="main">
-            <div class="helplist">
-                <questions></questions>
+<div ng-show="application.State == 'help'" class="app">
+    <nav-bar></nav-bar>
+    <div class="main">
+        <div class="helplist">
+            <questions></Questions>
 
-                <ask-question></ask-question>
-            </div>
-
-            <chat></chat>
+            <ask-question></ask-Question>
         </div>
-        <edit-question-modal></edit-question-modal>
-        <timer></timer>
-    </div>
-    <loading></loading>
-    <div ng-show="Application.State == 'login'" class="login" login>
 
+        <chat></chat>
     </div>
-    <div ng-show="Application.State == 'usermanage'" class="user-managing" usermanage>
+    <edit-question-modal></edit-Question-modal>
+    <timer></timer>
+</div>
+<loading></loading>
+<div ng-show="application.State == 'login'" class="login" login>
 
-    </div>
+</div>
+<div ng-show="application.State == 'usermanage'" class="user-managing" Usermanage>
+
+</div>
 </body>
 </html>

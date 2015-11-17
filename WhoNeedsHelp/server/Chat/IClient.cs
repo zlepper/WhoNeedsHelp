@@ -26,12 +26,13 @@ namespace WhoNeedsHelp.Server.Chat
         void UpdateOtherUsername(string name, int userid, int channelid);
         void SetAdminState(int id, bool isAdmin);
         void ClearChannels();
-        void SendReloginData(string loginKey, int userId);
+        void SendReloginData(string loginKey, int userId, bool longer);
         void TokenLoginFailed();
         void PasswordResetRequestResult(bool success);
         void PasswordResetResult(bool success);
         void PasswordChanged(bool success);
         void AllUsersLoggedOut();
         void SetChannel(int id);
+        void CleanupTime();
     }
 }
