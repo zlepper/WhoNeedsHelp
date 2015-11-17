@@ -313,9 +313,6 @@ function Application(signalR, $cookieStore) {
         that.$cookieStore.putObject("token", token, long ? { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) } : {expires: new Date(Date.now() + 1000 * 60 * 60 * 4)});
         if (that.Me.Name && that.Me.Id) {
             that.State = "help";
-        } else {
-            that.$cookieStore.remove("token");
-            location.reload(true);
         }
     });
 

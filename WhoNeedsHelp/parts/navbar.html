@@ -4,7 +4,8 @@
     </div>
 </nav>
 <ul id="slide-out-left" class="side-nav fixed">
-    <li><a>Nuværende kanal ID: {{application.ActiveChannel}}</a></li>
+    <li ng-show="application.ActiveChannel"><a>Nuværende kanal ID: {{application.ActiveChannel}}</a></li>
+    <li ng-hide="application.ActiveChannel"><a>Du er ikke i nogen kanal</a></li>
     <li><a>Navn: {{application.Me.Name}}</a></li>
     <li class="hide-on-small-only"><a ng-click="application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
     <li class="hide-on-med-and-up" ng-click="application.hideSideNav()"><a ng-click="application.State = 'usermanage'" href="javascript:void(0);" class="waves-effect waves-light">Rediger bruger</a></li>
