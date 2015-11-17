@@ -15,13 +15,13 @@ namespace WhoNeedsHelp.App
     {
         public void JoinChannel(int channelId)
         {
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null)
             {
                 Clients.Caller.Alert("Kanalen med id \"" + channelId + "\" blev ikke fundet.");
                 return;
             }
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
             if (channel.GetUsers().Contains(user))
             {
@@ -29,7 +29,7 @@ namespace WhoNeedsHelp.App
                 return;
             }
             channel.AddUser(user);
-            db.SaveChanges();
+            DB.SaveChanges();
             SimpleChannel sc = channel.ToSimpleChannel();
             foreach (Connection connection in user.Connections)
             {
@@ -47,12 +47,12 @@ namespace WhoNeedsHelp.App
         {
             if (channelId == 0) return;
 
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User user = con.User;
             if (user != null)
             {
-                Channel channel = db.Channels.Find(channelId);
+                Channel channel = DB.Channels.Find(channelId);
                 if (channel != null)
                 {
                     if (channel.IsUserAdministrator(user))
@@ -64,12 +64,12 @@ namespace WhoNeedsHelp.App
                             {
                                 Clients.Client(connection.ConnectionId).ExitChannel(channelId);
                             }
-                            db.Channels.Remove(channel);
+                            DB.Channels.Remove(channel);
                         }
                         else
                         {
                             channel.RemoveAdministrator(user);
-                            db.SaveChanges();
+                            DB.SaveChanges();
                             ExitChannel(channelId);
                         }
                     }
@@ -101,14 +101,14 @@ namespace WhoNeedsHelp.App
                     Clients.Caller.Alert("Kanalen blev ikke funder");
                 }
             }
-            db.SaveChanges();
+            DB.SaveChanges();
 
         }
 
         public void CreateNewChannel(string channelName)
         {
-            //var user = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            //var user = DB.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User user = con.User;
             if (user == null) return;
@@ -119,9 +119,9 @@ namespace WhoNeedsHelp.App
             }
             Channel channel = new Channel(user, channelName);
             channel.AddUser(user);
-            db.Users.AddOrUpdate(user);
-            db.Channels.Add(channel);
-            db.SaveChanges();
+            DB.Users.AddOrUpdate(user);
+            DB.Channels.Add(channel);
+            DB.SaveChanges();
             SimpleChannel sc = channel.ToSimpleChannel();
             sc.IsAdmin = true;
             foreach (Connection connection in user.Connections)
@@ -134,10 +134,10 @@ namespace WhoNeedsHelp.App
         public void RemoveUserFromChannel(int id, int channelId)
         {
             if (id == 0) return;
-            User user = db.Users.Find(id);
-            User callingUser = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Users.Find(id);
+            User callingUser = DB.Connections.Find(Context.ConnectionId).User;
             if (callingUser == null) return;
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null) return;
             if (user == null)
             {
@@ -158,14 +158,14 @@ namespace WhoNeedsHelp.App
 
         private void RemoveUser(int id)
         {
-            User user = db.Users.Find(id);
+            User user = DB.Users.Find(id);
             if (user == null) return;
             foreach (Channel c in user.ChannelsIn)
             {
                 ExitChannel(c, user);
             }
-            db.Users.Remove(user);
-            db.SaveChanges();
+            DB.Users.Remove(user);
+            DB.SaveChanges();
         }
     }
 }

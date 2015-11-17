@@ -16,7 +16,7 @@ namespace WhoNeedsHelp.App
     {
         public void SetUsername(string name)
         {
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User user = con.User;
             if (user == null)
@@ -26,7 +26,7 @@ namespace WhoNeedsHelp.App
                     Name = name,
                 };
                 user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
-                db.Users.Add(user);
+                DB.Users.Add(user);
             }
             else
             {
@@ -47,7 +47,7 @@ namespace WhoNeedsHelp.App
                     Clients.Client(connection.ConnectionId).SendUserId(user.Id);
                 }
             }
-            db.SaveChanges();
+            DB.SaveChanges();
         }
 
         public void CreateNewUser(string username, string email, string pw, bool stayLoggedIn)
@@ -57,13 +57,13 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("En af værdier er ikke blevet sat.");
                 return;
             }
-            User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            User user = DB.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
             if (user != null)
             {
                 Clients.Caller.Alert("Emailadressen er allerede i brug.");
                 return;
             }
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             user = con.User;
             if (user == null) return;
@@ -83,7 +83,7 @@ namespace WhoNeedsHelp.App
 
 
             user.LastLogin = DateTime.Now;
-            db.SaveChanges();
+            DB.SaveChanges();
             Clients.Caller.UserCreationSuccess();
         }
 
@@ -92,13 +92,13 @@ namespace WhoNeedsHelp.App
             User user;
             if (userId == -1)
             {
-                user = db.Connections.Find(Context.ConnectionId).User;
+                user = DB.Connections.Find(Context.ConnectionId).User;
                 var key = Guid.NewGuid();
                 user.GenerateLoginToken(key);
                 Clients.Caller.SendReloginData(key.ToString(), user.Id, longer);
                 return;
             }
-            user = db.Users.Find(userId);
+            user = DB.Users.Find(userId);
             LoginToken lt = null;
             if ((lt = user.CheckLoginToken(tokenKey)) != null)
             {
@@ -115,15 +115,15 @@ namespace WhoNeedsHelp.App
                 Guid newKey = Guid.NewGuid();
                 Clients.Caller.SendReloginData(newKey.ToString(), user.Id, longer);
                 user.GenerateLoginToken(newKey);
-                db.LoginTokens.Remove(lt);
+                DB.LoginTokens.Remove(lt);
                 user.LastLogin = DateTime.Now;
                 Connection connection =
-                    db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+                    DB.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
                 var u = connection?.User;
                 u?.Connections.Remove(connection);
                 user.Connections.Add(connection);
-                db.Users.Remove(u);
-                db.SaveChanges();
+                DB.Users.Remove(u);
+                DB.SaveChanges();
             }
             else
             {
@@ -131,10 +131,10 @@ namespace WhoNeedsHelp.App
                 {
                     Clients.Client(connection.ConnectionId).UserLoggedOut();
                 }
-                db.LoginTokens.RemoveRange(user.LoginTokens);
+                DB.LoginTokens.RemoveRange(user.LoginTokens);
                 Clients.Caller.TokenLoginFailed();
             }
-            db.SaveChanges();
+            DB.SaveChanges();
         }
 
         public void LoginUser(string email, string password, bool stayLoggedIn)
@@ -144,8 +144,8 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("Ikke alt info er indtastet");
                 return;
             }
-            //var currentUser = db.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            //var currentUser = DB.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User currentUser = con.User;
             if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
@@ -153,7 +153,7 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("Du er allerede logget ind");
                 return;
             }
-            User user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            User user = DB.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
             if (user == null)
             {
                 Clients.Caller.Alert("Forkert mail eller kodeord");
@@ -175,7 +175,7 @@ namespace WhoNeedsHelp.App
                     }
                 }
                 Connection connection =
-                    db.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
+                    DB.Connections.SingleOrDefault(conn => conn.ConnectionId.Equals(Context.ConnectionId));
 
                 foreach (Channel channel in user.ChannelsIn.Where(ch => !currentUser.ChannelsIn.Contains(ch)))
                 {
@@ -198,13 +198,13 @@ namespace WhoNeedsHelp.App
                 {
                     ExitChannel(c, currentUser);
                 }
-                db.Users.Remove(currentUser);
+                DB.Users.Remove(currentUser);
                 Guid key = Guid.NewGuid();
                 Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);
 
                 user.GenerateLoginToken(key);
                 user.LastLogin = DateTime.Now;
-                db.SaveChanges();
+                DB.SaveChanges();
                 Clients.Caller.LoginSuccess();
                 if (string.IsNullOrWhiteSpace(currentUser.Name) || !currentUser.Name.Equals(user.Name))
                 {
@@ -221,7 +221,7 @@ namespace WhoNeedsHelp.App
 
         public void LogoutUser(string key)
         {
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User user = con.User;
             if (user == null)
@@ -230,23 +230,23 @@ namespace WhoNeedsHelp.App
                 return;
             }
             user.Connections.Remove(con);
-            db.Connections.Remove(con);
+            DB.Connections.Remove(con);
             User newUser = new User()
             {
                 Name = user.Name,
                 Ip = user.Ip
             };
             newUser.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
-            db.Users.Add(newUser);
+            DB.Users.Add(newUser);
             if (!string.IsNullOrWhiteSpace(key))
             {
                 LoginToken lt = user.CheckLoginToken(key);
                 if (lt != null)
                 {
-                    db.LoginTokens.Remove(lt);
+                    DB.LoginTokens.Remove(lt);
                 }
             }
-            db.SaveChanges();
+            DB.SaveChanges();
             Clients.Caller.UserLoggedOut();
             Clients.Caller.SendUserId(newUser.Id);
         }
@@ -260,7 +260,7 @@ namespace WhoNeedsHelp.App
         public void ResetPassword(string key, string password, string email)
         {
             key = key.Trim();
-            var user = db.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
+            var user = DB.Users.SingleOrDefault(u => u.EmailAddress.Equals(email));
             if (user == null)
             {
                 Clients.Caller.PasswordResetResult(false);
@@ -272,7 +272,7 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.PasswordResetResult(true);
                 user.ResetExpiresAt = DateTime.Now;
                 user.ResetKey = null;
-                db.SaveChanges();
+                DB.SaveChanges();
                 LoginUser(email, password, false);
             }
             else
@@ -283,7 +283,7 @@ namespace WhoNeedsHelp.App
 
         public void ChangePassword(string oldpass, string newpass)
         {
-            var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+            var con = DB.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
             if (con == null) return;
             var user = con.User;
             if (user == null) return;
@@ -295,7 +295,7 @@ namespace WhoNeedsHelp.App
             if (PasswordHash.ValidatePassword(oldpass, user.Pw))
             {
                 user.Pw = PasswordHash.CreateHash(newpass);
-                db.SaveChanges();
+                DB.SaveChanges();
                 Clients.Caller.PasswordChanged(true);
                 return;
             }
@@ -306,7 +306,7 @@ namespace WhoNeedsHelp.App
 
         public void LogoutAll()
         {
-            var con = db.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
+            var con = DB.Connections.SingleOrDefault(c => c.ConnectionId.Equals(Context.ConnectionId));
             if (con == null) return;
             var user = con.User;
             if (user == null) return;
@@ -314,15 +314,15 @@ namespace WhoNeedsHelp.App
             {
                 Clients.Client(connection.ConnectionId).UserLoggedOut();
             }
-            db.LoginTokens.RemoveRange(user.LoginTokens);
+            DB.LoginTokens.RemoveRange(user.LoginTokens);
             Clients.Caller.AllUsersLoggedOut();
-            db.SaveChanges();
+            DB.SaveChanges();
         }
         private void ExitChannel(Channel channel, User user)
         {
-            user = db.Users.Find(user.Id);
+            user = DB.Users.Find(user.Id);
             if (user == null) return;
-            channel = db.Channels.Find(channel.Id);
+            channel = DB.Channels.Find(channel.Id);
             if (channel == null) return;
             foreach (Connection con in channel.Users.SelectMany(u => u.Connections))
             {
@@ -333,7 +333,7 @@ namespace WhoNeedsHelp.App
                 Clients.Client(con.ConnectionId).ExitChannel(channel.Id);
             }
             channel.RemoveUser(user);
-            db.SaveChanges();
+            DB.SaveChanges();
         }
     }
 }

@@ -5,7 +5,7 @@ using WhoNeedsHelp.Server.Chat;
 namespace WhoNeedsHelp.DB
 {
     //[DbConfigurationType(typeof(MySqlEFConfiguration))]
-    public class HelpContext : DbContext
+    public class HelpContext : DbContext, IHelpContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Connection> Connections { get; set; }
@@ -16,6 +16,22 @@ namespace WhoNeedsHelp.DB
         public DbSet<Locale> Locales { get; set; }
         public DbSet<Locale.Translation> Translations { get; set; }
         public DbSet<CleanupAlarm> CleanupAlarms { get; set; }
+
+        public User GetUserByConnectionId(int id)
+        {
+            return Users.Find(id);
+        }
+
+        public User GetUserByConnection(string connection)
+        {
+            return Connections.Find(connection)?.User;
+        }
+
+        public Channel GetChannelById(int id)
+        {
+            return Channels.Find(id);
+        }
+
         //public DbSet<QuestionComment> QuestionComments { get; set; }
 
         public HelpContext() : base("name=HelpContext")

@@ -20,8 +20,12 @@ namespace WhoNeedsHelp.App
 {
     public partial class CentralHub : Hub<IClient>
     {
+        public CentralHub(IHelpContext context = null)
+        {
+            DB = context ?? new HelpContext();
+        }
 
-        public HelpContext db = new HelpContext();
+        public IHelpContext DB;
 
         private string GetIpAddress()
         {
@@ -49,17 +53,17 @@ namespace WhoNeedsHelp.App
         public override Task OnConnected()
         {
             //var user =
-            //    db.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
+            //    DB.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
 
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con != null) return base.OnConnected();
             User user = new User
             {
                 Ip = GetIpAddress()
             };
             user.Connections.Add(new Connection(user) { ConnectionId = Context.ConnectionId });
-            db.Users.Add(user);
-            db.SaveChanges();
+            DB.Users.Add(user);
+            DB.SaveChanges();
             Clients.Caller.SendUserId(user.Id);
 
             return base.OnConnected();
@@ -67,9 +71,9 @@ namespace WhoNeedsHelp.App
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return base.OnDisconnected(stopCalled);
-            db.Connections.Remove(con);
+            DB.Connections.Remove(con);
 
 
             return base.OnDisconnected(stopCalled);
@@ -77,7 +81,7 @@ namespace WhoNeedsHelp.App
 
         public override Task OnReconnected()
         {
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.GetUserByConnection(Context.ConnectionId);
             Clients.Caller.ClearChannels();
             foreach (Channel channel in user.ChannelsIn)
             {
@@ -91,11 +95,8 @@ namespace WhoNeedsHelp.App
 
         public void SendCountdownTime(int timeLeft, int channelId)
         {
-            Connection con = db.Connections.Find(Context.ConnectionId);
-            User user = con?.User;
-            if (user == null) return;
-
-            Channel channel = db.Channels.Find(channelId);
+            User user = DB.GetUserByConnection(Context.ConnectionId);
+            Channel channel = DB.GetChannelById(channelId);
             if (channel.IsUserAdministrator(user))
             {
                 channel.TimeLeft = timeLeft;
@@ -104,10 +105,10 @@ namespace WhoNeedsHelp.App
 
         public void CleaupTime(int id)
         {
-            User user = db.Connections.Find(Context.ConnectionId)?.User;
+            User user = DB.GetUserByConnection(Context.ConnectionId);
             if (user == null) return;
 
-            var timer = db.CleanupAlarms.Find(id);
+            var timer = DB.CleanupAlarms.Find(id);
             if (timer == null) return;
 
             if (timer.Channel == null)
@@ -118,7 +119,7 @@ namespace WhoNeedsHelp.App
 
                 // Tell all the users in the administrators administrating channels to cleanup
                 Clients.Clients(
-                    db.Users.Find(user.Id).AreAdministratorIn
+                    DB.Users.Find(user.Id).AreAdministratorIn
                         .SelectMany(channel => channel.Users)
                         .SelectMany(u => u.Connections)
                         .Select(c => c.ConnectionId)
@@ -139,8 +140,8 @@ namespace WhoNeedsHelp.App
 
         protected override void Dispose(bool disposing)
         {
-            db.SaveChanges();
-            db.Dispose();
+            DB.SaveChanges();
+            DB.Dispose();
             base.Dispose(disposing);
         }
     }

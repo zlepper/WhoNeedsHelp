@@ -15,9 +15,9 @@ namespace WhoNeedsHelp.App
     {
         public void ChangeQuestion(string question, int channelId)
         {
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null) return;
             Question q = user.UpdateQuestion(channel, question);
             if (q == null) return;
@@ -25,13 +25,13 @@ namespace WhoNeedsHelp.App
             {
                 Clients.Client(connection.ConnectionId).UpdateQuestion(string.IsNullOrWhiteSpace(q.Text) ? "" : question, q.Id, channelId);
             }
-            db.SaveChanges();
+            DB.SaveChanges();
 
         }
 
         public void EditOwnQuestion(int channelId)
         {
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             Channel channel = user.GetChannel(channelId);
             if (channel == null) return;
             Question question = user.GetQuestion(channel);
@@ -46,9 +46,9 @@ namespace WhoNeedsHelp.App
 
         public void RemoveOwnQuestion(int channelId)
         {
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null) return;
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
             Question question = user.GetQuestion(channel);
             if (user.AreUserQuestioning(channel))
@@ -62,8 +62,8 @@ namespace WhoNeedsHelp.App
                 {
                     Clients.Client(connection.ConnectionId).SetQuestionState(false, channel.Id);
                 }
-                db.Questions.Remove(question);
-                db.SaveChanges();
+                DB.Questions.Remove(question);
+                DB.SaveChanges();
             }
             else
             {
@@ -77,13 +77,13 @@ namespace WhoNeedsHelp.App
             {
                 return;
             }
-            Question q = db.Questions.Include(qu => qu.User).Include(qu => qu.Channel).SingleOrDefault(qu => qu.Id.Equals(questionId));
+            Question q = DB.Questions.Include(qu => qu.User).Include(qu => qu.Channel).SingleOrDefault(qu => qu.Id.Equals(questionId));
             if (q == null)
             {
                 Clients.Caller.RemoveQuestion(questionId);
                 return;
             }
-            User callingUser = db.Connections.Find(Context.ConnectionId).User;
+            User callingUser = DB.Connections.Find(Context.ConnectionId).User;
             User user = q.User;
             Channel channel = q.Channel;
             if (channel == null || user == null || !channel.IsUserAdministrator(callingUser))
@@ -99,21 +99,21 @@ namespace WhoNeedsHelp.App
             {
                 Clients.Client(connection.ConnectionId).SetQuestionState(false, channel.Id);
             }
-            db.Questions.Remove(q);
-            db.SaveChanges();
+            DB.Questions.Remove(q);
+            DB.SaveChanges();
         }
 
         public void RequestHelp(string question, int channelid)
         {
             if (string.IsNullOrWhiteSpace(question)) question = "";
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User userFromDb = con.User;
             if (userFromDb == null)
             {
                 return;
             }
-            Channel channel = db.Channels.Find(channelid);
+            Channel channel = DB.Channels.Find(channelid);
             if (userFromDb.AreUserQuestioning(channel))
             {
                 Clients.Caller.SetQuestionState(true, channelid);
@@ -121,8 +121,8 @@ namespace WhoNeedsHelp.App
             }
             Question q = userFromDb.RequestHelp(channel, question);
             if (q == null) return;
-            db.Questions.Add(q);
-            db.SaveChanges();
+            DB.Questions.Add(q);
+            DB.SaveChanges();
             SimpleQuestion sq = q.ToSimpleQuestion();
             foreach (Connection connection in channel.Users.SelectMany(user => user.Connections))
             {
@@ -138,7 +138,7 @@ namespace WhoNeedsHelp.App
         {
             foreach (KeyValuePair<int, int[]> c in chs)
             {
-                Channel channel = db.Channels.Find(c.Key);
+                Channel channel = DB.Channels.Find(c.Key);
                 if (channel == null) continue;
                 List<Question> l = channel.Questions.ToList();
                 int[] questions = new int[l.Count];

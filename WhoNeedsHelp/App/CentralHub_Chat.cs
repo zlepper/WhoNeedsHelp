@@ -15,9 +15,9 @@ namespace WhoNeedsHelp.App
         public void RemoveChatMessage(int messageId)
         {
             if (messageId == 0) return;
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
-            ChatMessage message = db.ChatMessages.Find(messageId);
+            ChatMessage message = DB.ChatMessages.Find(messageId);
             if (message == null)
             {
                 return;
@@ -27,16 +27,16 @@ namespace WhoNeedsHelp.App
             if (!c.IsUserAdministrator(user) && !message.User.Equals(user))
                 return;
             Clients.Clients(c.Users.SelectMany(u => u.Connections).Select(co => co.ConnectionId).ToList()).RemoveChatMessage(message.Id);
-            db.ChatMessages.Remove(message);
-            db.SaveChanges();
+            DB.ChatMessages.Remove(message);
+            DB.SaveChanges();
         }
 
         public void Chat(string message, int channelId)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
-            User user = db.Connections.Find(Context.ConnectionId).User;
+            User user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null)
             {
                 Clients.Caller.Alert("Something went odd");
@@ -65,29 +65,29 @@ namespace WhoNeedsHelp.App
                 ChatMessage chatMessage = channel.AddChatMessage(user, message);
                 if (chatMessage != null)
                 {
-                    db.ChatMessages.Add(chatMessage);
-                    db.SaveChanges();
+                    DB.ChatMessages.Add(chatMessage);
+                    DB.SaveChanges();
                     SimpleChatMessage scm = chatMessage.ToSimpleChatMessage();
                     Clients.Clients(channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList()).SendChatMessage(scm, channelId);
                 }
             }
 
-            db.SaveChanges();
+            DB.SaveChanges();
 
         }
 
         public void ClearChat(int channelId)
         {
-            Connection con = db.Connections.Find(Context.ConnectionId);
+            Connection con = DB.Connections.Find(Context.ConnectionId);
             if (con == null) return;
             User user = con.User;
             if (user == null) return;
-            Channel channel = db.Channels.Find(channelId);
+            Channel channel = DB.Channels.Find(channelId);
             if (channel == null) return;
             if (channel.IsUserAdministrator(user))
             {
-                db.ChatMessages.RemoveRange(channel.ChatMessages);
-                db.SaveChanges();
+                DB.ChatMessages.RemoveRange(channel.ChatMessages);
+                DB.SaveChanges();
                 foreach (Connection connection in channel.Users.SelectMany(u => u.Connections))
                 {
                     Clients.Client(connection.ConnectionId).ClearChat(channelId);
@@ -105,8 +105,8 @@ namespace WhoNeedsHelp.App
 
         private void PromoteToAdmin(string[] parts, int channelId)
         {
-            User callingUser = db.Connections.Find(Context.ConnectionId).User;
-            Channel channel = db.Channels.Find(channelId);
+            User callingUser = DB.Connections.Find(Context.ConnectionId).User;
+            Channel channel = DB.Channels.Find(channelId);
             if (!channel.IsUserAdministrator(callingUser))
             {
                 Clients.Caller.Alert("Du skal være administrator i kanalen for at kunne bruge denne command.");
@@ -123,7 +123,7 @@ namespace WhoNeedsHelp.App
                 if (s.Contains("@"))
                 {
                     string mail = s;
-                    User user = db.Users.First(u => u.EmailAddress.Equals(mail, StringComparison.OrdinalIgnoreCase));
+                    User user = DB.Users.First(u => u.EmailAddress.Equals(mail, StringComparison.OrdinalIgnoreCase));
                     if (user == null)
                     {
                         Clients.Caller.Alert("Ingen bruger fundet med email \"" + mail + "\"");
@@ -135,7 +135,7 @@ namespace WhoNeedsHelp.App
                         continue;
                     }
                     channel.AddAdministrator(user);
-                    db.SaveChanges();
+                    DB.SaveChanges();
                     foreach (Connection con in user.Connections)
                     {
                         Clients.Client(con.ConnectionId)

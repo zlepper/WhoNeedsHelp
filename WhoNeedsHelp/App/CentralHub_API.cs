@@ -20,11 +20,11 @@ namespace WhoNeedsHelp.App
             if (string.IsNullOrWhiteSpace(userid)) return;
 
             // Find the connecting user as we need to delete this
-            var userConnection = db.Connections.Find(Context.ConnectionId).User;
-            db.Users.Remove(userConnection);
-            db.SaveChanges();
+            var userConnection = DB.Connections.Find(Context.ConnectionId).User;
+            DB.Users.Remove(userConnection);
+            DB.SaveChanges();
             // Get the user from the database
-            var user = db.Users.FirstOrDefault(u => u.VirtualId.Equals(userid));
+            var user = DB.Users.FirstOrDefault(u => u.VirtualId.Equals(userid));
 
             // Check if the user has connected before
             if (user == null)
@@ -39,8 +39,8 @@ namespace WhoNeedsHelp.App
                 user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
 
                 // Save the user to the DB
-                db.Users.Add(user);
-                db.SaveChanges();
+                DB.Users.Add(user);
+                DB.SaveChanges();
                 // Inform the client that it can proceed
                 Clients.Caller.SendUserId(user.Id);
             }
@@ -54,7 +54,7 @@ namespace WhoNeedsHelp.App
                 {
                     // Save this connection so we can find it later
                     user.Connections.Add(new Connection() { ConnectionId = Context.ConnectionId });
-                    db.SaveChanges();
+                    DB.SaveChanges();
                     // Inform the client that it can proceed
                     Clients.Caller.SendUserId(user.Id);
 
@@ -70,7 +70,7 @@ namespace WhoNeedsHelp.App
                 }
             }
 
-            db.SaveChanges();
+            DB.SaveChanges();
 
         }
 
@@ -81,11 +81,11 @@ namespace WhoNeedsHelp.App
             if (string.IsNullOrWhiteSpace(channelid)) return;
 
             // Find the connecting user
-            var user = db.Connections.Find(Context.ConnectionId).User;
+            var user = DB.Connections.Find(Context.ConnectionId).User;
             if (user == null) return;
 
             // Find the channel the user wants to connect to
-            var channel = db.Channels.FirstOrDefault(c => c.VirtualId.Equals(channelid));
+            var channel = DB.Channels.FirstOrDefault(c => c.VirtualId.Equals(channelid));
 
             // Check if the channel has already been created
             if (channel == null)
@@ -108,8 +108,8 @@ namespace WhoNeedsHelp.App
                     channel.AddAdministrator(user);
 
                     // Add the channel to the database
-                    db.Channels.Add(channel);
-                    db.SaveChanges();
+                    DB.Channels.Add(channel);
+                    DB.SaveChanges();
 
                     // Send the channel to the connecting user
                     var sch = channel.ToSimpleChannel();
@@ -137,7 +137,7 @@ namespace WhoNeedsHelp.App
                     {
                         // It's a student that is trying to connect
                         channel.AddUser(user);
-                        db.SaveChanges();
+                        DB.SaveChanges();
                         var sch = channel.ToSimpleChannel();
                         sch.IsAdmin = channel.IsUserAdministrator(user);
                         var su = user.ToSimpleUser();
@@ -177,7 +177,7 @@ namespace WhoNeedsHelp.App
                     }
                 }
             }
-            db.SaveChanges();
+            DB.SaveChanges();
             if (channel != null)
             {
                 Clients.Caller.SetChannel(channel.Id);
