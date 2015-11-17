@@ -41,7 +41,7 @@ namespace WhoNeedsHelp.App
                         channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList())
                         .UpdateOtherUsername(name, user.Id, channel.Id);
                 }
-                
+
                 foreach (Connection connection in user.Connections)
                 {
                     Clients.Client(connection.ConnectionId).SendUserId(user.Id);
@@ -75,11 +75,11 @@ namespace WhoNeedsHelp.App
             string pass = PasswordHash.CreateHash(pw);
             user.Pw = pass;
             user.EmailAddress = email;
-            
+
             Guid key = Guid.NewGuid();
             Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);
             user.GenerateLoginToken(key);
-            
+
 
 
             user.LastLogin = DateTime.Now;
@@ -95,7 +95,7 @@ namespace WhoNeedsHelp.App
                 user = db.Connections.Find(Context.ConnectionId).User;
                 var key = Guid.NewGuid();
                 user.GenerateLoginToken(key);
-                Clients.Caller.SendReloginData(tokenKey, userId, longer);
+                Clients.Caller.SendReloginData(key.ToString(), user.Id, longer);
                 return;
             }
             user = db.Users.Find(userId);
@@ -104,6 +104,8 @@ namespace WhoNeedsHelp.App
             {
                 Clients.Caller.SendUserId(user.Id);
                 Clients.Caller.UpdateUsername(user.Name);
+                if (!string.IsNullOrWhiteSpace(user.EmailAddress))
+                    Clients.Caller.LoginSuccess();
                 foreach (Channel channel in user.ChannelsIn)
                 {
                     var sc = channel.ToSimpleChannel();

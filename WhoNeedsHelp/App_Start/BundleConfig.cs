@@ -49,7 +49,10 @@ namespace WhoNeedsHelp
                         ));
 
             bundles.Add(new ScriptBundle("~/helper").Include("~/js/controllers/helpctrl.js"));
-            bundles.Add(new ScriptBundle("~/apihelper").Include("~/js/controllers/apictrl.js"));
+            bundles.Add(new ScriptBundle("~/apihelper").Include(
+                "~/js/classes/urlparams.js",
+                "~/js/controllers/apictrl.js"
+                ));
 
             bundles.Add(new StyleBundle("~/bundles/styling").Include(
                         "~/Content/animate.min.css",

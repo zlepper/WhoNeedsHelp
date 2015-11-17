@@ -107,8 +107,9 @@ function Application(signalR, $cookieStore) {
     });
 
     signalR.$on("updateUsername", function (event, name) {
+        if (that.Me.Name)
+            notify("Dit navn er blevet ændret til \"" + name + "\"");
         that.Me.Name = name;
-        notify("Dit navn er blevet ændret til \"" + name + "\"");
     });
 
     signalR.$on("sendUserId", function (event, id) {
@@ -283,7 +284,7 @@ function Application(signalR, $cookieStore) {
     });
 
     signalR.$on("loginSuccess", function (event, alarms) {
-        if (that.State === "login") {
+        if (that.State === "login" || that.State === "loading") {
             that.State = "help";
         }
         that.Me.LoggedIn = true;
@@ -309,10 +310,12 @@ function Application(signalR, $cookieStore) {
 
     signalR.$on("sendReloginData", function (event, key, id, long) {
         var token = new LoginToken(id, key, long);
-        that.$cookieStore.putObject("token", token, long ? { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) } : {});
+        that.$cookieStore.putObject("token", token, long ? { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) } : {expires: new Date(Date.now() + 1000 * 60 * 60 * 4)});
         if (that.Me.Name && that.Me.Id) {
-            that.Me.LoggedIn = true;
             that.State = "help";
+        } else {
+            that.$cookieStore.remove("token");
+            location.reload(true);
         }
     });
 
