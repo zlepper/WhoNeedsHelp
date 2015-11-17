@@ -6,7 +6,7 @@
  * @returns {} 
  * @class
  */
-function LoginToken(id, key) {
+function LoginToken(id, key, longer) {
     /**
      * The id of the token
      * @type {Number}
@@ -18,4 +18,9 @@ function LoginToken(id, key) {
      * @type {Number}
      */
     this.key = key;
+
+    /**
+     * Indicates if the user should stay logged in for a longer period of time
+     */
+    this.longer = longer;
 }

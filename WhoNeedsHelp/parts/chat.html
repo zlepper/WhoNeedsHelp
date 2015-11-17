@@ -3,7 +3,7 @@
         <div class="card-panel hoverable" ng-repeat="message in application.Channels[application.ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
             <span class="strong">
                 {{message.User.Name}}
-                <button class="as-text right" ng-if="application.Channels[application.ActiveChannel].IsAdmin || message.User.Id == Me.Id" ng-click="application.removeChatMessage(Message.Id)">
+                <button class="as-text right" ng-if="application.Channels[application.ActiveChannel].IsAdmin || message.User.Id == application.Me.Id" ng-click="application.removeChatMessage(message.Id)">
                     <i class="material-icons">close</i>
                 </button>
             </span>

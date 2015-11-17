@@ -60,30 +60,17 @@ namespace WhoNeedsHelp.App
             user.Connections.Add(new Connection(user) { ConnectionId = Context.ConnectionId });
             db.Users.Add(user);
             db.SaveChanges();
-
+            Clients.Caller.SendUserId(user.Id);
 
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            //var user = db.Users.Include(u => u.ChannelsIn).SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
             Connection con = db.Connections.Find(Context.ConnectionId);
             if (con == null) return base.OnDisconnected(stopCalled);
-            User user = con.User;
-            if (user == null) return base.OnDisconnected(stopCalled);
-            if (string.IsNullOrWhiteSpace(user.Pw))
-            {
-                foreach (Channel c in user.ChannelsIn)
-                {
-                    ExitChannel(c.Id);
-                }
-                RemoveUser(user.Id);
-            }
-            else
-            {
-                user.Connections.Remove(con);
-            }
+            db.Connections.Remove(con);
+
 
             return base.OnDisconnected(stopCalled);
         }

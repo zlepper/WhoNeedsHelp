@@ -166,6 +166,16 @@
             .card-panel {
                 margin-bottom: 20px;
             }
+
+            .ng-enter, .ng-hide-remove {
+                @include animation(fadeInDown, 1s);
+                @include stagger();
+            }
+
+            .ng-leave, .ng-hide-add {
+                @include animation(zoomOut, 1s);
+                @include stagger();
+            }
         }
 
         form {

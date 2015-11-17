@@ -21,9 +21,9 @@
     <script>
         if (window.Notification) Notification.requestPermission();
     </script>
+    <base href="/"/>
 </head>
 <body ng-app="Help" ng-controller="HelpCtrl">
-{{application.State}}
 <div ng-show="application.State == 'help'" class="app">
     <nav-bar></nav-bar>
     <div class="main">

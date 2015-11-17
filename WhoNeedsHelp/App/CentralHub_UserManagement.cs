@@ -41,6 +41,7 @@ namespace WhoNeedsHelp.App
                         channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList())
                         .UpdateOtherUsername(name, user.Id, channel.Id);
                 }
+                
                 foreach (Connection connection in user.Connections)
                 {
                     Clients.Client(connection.ConnectionId).SendUserId(user.Id);
@@ -74,14 +75,11 @@ namespace WhoNeedsHelp.App
             string pass = PasswordHash.CreateHash(pw);
             user.Pw = pass;
             user.EmailAddress = email;
-
-            if (stayLoggedIn)
-            {
-                Guid key = Guid.NewGuid();
-                Clients.Caller.SendReloginData(key.ToString(), user.Id);
-
-                user.GenerateLoginToken(key);
-            }
+            
+            Guid key = Guid.NewGuid();
+            Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);
+            user.GenerateLoginToken(key);
+            
 
 
             user.LastLogin = DateTime.Now;
@@ -89,9 +87,18 @@ namespace WhoNeedsHelp.App
             Clients.Caller.UserCreationSuccess();
         }
 
-        public void LoginWithToken(int userId, string tokenKey)
+        public void LoginWithToken(int userId, string tokenKey, bool longer)
         {
-            var user = db.Users.Find(userId);
+            User user;
+            if (userId == -1)
+            {
+                user = db.Connections.Find(Context.ConnectionId).User;
+                var key = Guid.NewGuid();
+                user.GenerateLoginToken(key);
+                Clients.Caller.SendReloginData(tokenKey, userId, longer);
+                return;
+            }
+            user = db.Users.Find(userId);
             LoginToken lt = null;
             if ((lt = user.CheckLoginToken(tokenKey)) != null)
             {
@@ -104,7 +111,7 @@ namespace WhoNeedsHelp.App
                     Clients.Caller.AppendChannel(sc);
                 }
                 Guid newKey = Guid.NewGuid();
-                Clients.Caller.SendReloginData(newKey.ToString(), user.Id);
+                Clients.Caller.SendReloginData(newKey.ToString(), user.Id, longer);
                 user.GenerateLoginToken(newKey);
                 db.LoginTokens.Remove(lt);
                 user.LastLogin = DateTime.Now;
@@ -190,13 +197,10 @@ namespace WhoNeedsHelp.App
                     ExitChannel(c, currentUser);
                 }
                 db.Users.Remove(currentUser);
-                if (stayLoggedIn)
-                {
-                    Guid key = Guid.NewGuid();
-                    Clients.Caller.SendReloginData(key.ToString(), user.Id);
+                Guid key = Guid.NewGuid();
+                Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);
 
-                    user.GenerateLoginToken(key);
-                }
+                user.GenerateLoginToken(key);
                 user.LastLogin = DateTime.Now;
                 db.SaveChanges();
                 Clients.Caller.LoginSuccess();

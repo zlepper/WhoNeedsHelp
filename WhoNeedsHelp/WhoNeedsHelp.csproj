@@ -202,7 +202,7 @@
     <Content Include="js\classes\channel.js" />
     <Content Include="js\classes\chat-message.js" />
     <Content Include="js\classes\login-option.js" />
-    <Content Include="js\classes\loginToken.js" />
+    <Content Include="js\classes\login-token.js" />
     <Content Include="js\classes\me.js" />
     <Content Include="js\classes\question.js" />
     <Content Include="js\classes\student-timer.js" />
@@ -1009,6 +1009,7 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\Error.cshtml" />
     <None Include="compilerconfig.json" />
     <Content Include="css\_main.scss" />
     <Content Include="css\_frontpage.scss" />

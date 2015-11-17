@@ -154,6 +154,26 @@
       overflow-y: auto; }
       .app .chat .chat-messages .card-panel {
         margin-bottom: 20px; }
+      .app .chat .chat-messages .ng-enter, .app .chat .chat-messages .ng-hide-remove {
+        -moz-animation: fadeInDown 1s;
+        -o-animation: fadeInDown 1s;
+        -webkit-animation: fadeInDown 1s;
+        animation: fadeInDown 1s; }
+        .app .chat .chat-messages .ng-enter-stagger, .app .chat .chat-messages .ng-hide-remove-stagger {
+          -moz-animation-delay: 0.2s;
+          -o-animation-delay: 0.2s;
+          -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+      .app .chat .chat-messages .ng-leave, .app .chat .chat-messages .ng-hide-add {
+        -moz-animation: zoomOut 1s;
+        -o-animation: zoomOut 1s;
+        -webkit-animation: zoomOut 1s;
+        animation: zoomOut 1s; }
+        .app .chat .chat-messages .ng-leave-stagger, .app .chat .chat-messages .ng-hide-add-stagger {
+          -moz-animation-delay: 0.2s;
+          -o-animation-delay: 0.2s;
+          -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
     .app .chat form {
       position: absolute;
       left: 0;

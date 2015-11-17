@@ -85,9 +85,11 @@ function Application(signalR, $cookieStore) {
             // Request a login at the server
             that.signalR.server.loginOrCreateUserWithApi(params.uname, params.uid, params.upass);
         } else {
-            var token = $cookieStore.get("token");
+            var token = $cookieStore.getObject("token");
             if (token) {
-                signalR.server.loginWithToken(token.id, token.key);
+                signalR.server.loginWithToken(token.id, token.key, token.longer);
+            } else {
+                signalR.server.loginWithToken(-1, "", false);
             }
             that.State = "login";
             console.log(that);
@@ -305,11 +307,13 @@ function Application(signalR, $cookieStore) {
         }
     });
 
-    signalR.$on("sendReloginData", function (event, key, id) {
-        var token = new LoginToken(id, key);
-        that.$cookieStore.put("token", token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
-        that.Me.LoggedIn = true;
-        that.State = "help";
+    signalR.$on("sendReloginData", function (event, key, id, long) {
+        var token = new LoginToken(id, key, long);
+        that.$cookieStore.putObject("token", token, long ? { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) } : {});
+        if (that.Me.Name && that.Me.Id) {
+            that.Me.LoggedIn = true;
+            that.State = "help";
+        }
     });
 
     signalR.$on("passwordResetRequestResult", function (event, success) {
@@ -516,7 +520,7 @@ Application.prototype.createUser = function () {
 }
 
 Application.prototype.logout = function () {
-    var token = $cookieStore.get("token");
+    var token = this.$cookieStore.getObject("token");
     if (!token)
         this.signalR.server.logoutUser(null);
     else
@@ -596,6 +600,6 @@ Application.prototype.hideSideNav = function () {
 }
 
 angular.module("Help")
-    .factory("zlApplication", ["$cookieStore", "SignalR", function ($cookieStore, signalR) {
+    .factory("zlApplication", ["$cookies", "SignalR", function ($cookieStore, signalR) {
         return new Application(signalR, $cookieStore);
     }])
