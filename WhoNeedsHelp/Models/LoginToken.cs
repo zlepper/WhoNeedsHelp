@@ -1,7 +1,7 @@
 ﻿using System;
-using WhoNeedsHelp.Models;
+using WhoNeedsHelp.Server.Chat;
 
-namespace WhoNeedsHelp.Server.Chat
+namespace WhoNeedsHelp.Models
 {
     public class LoginToken
     {
@@ -12,11 +12,13 @@ namespace WhoNeedsHelp.Server.Chat
         public string Key { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public LoginToken() { }
 
         public LoginToken(User user, Guid keyGuid)
         {
+            CreatedAt = DateTime.Now;
             User = user;
             Key = PasswordHash.CreateHash(keyGuid.ToString());
         }

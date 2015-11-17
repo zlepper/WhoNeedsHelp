@@ -1115,6 +1115,10 @@
     <Compile Include="Migrations\201510211312007_AddLocaleTranslations.Designer.cs">
       <DependentUpon>201510211312007_AddLocaleTranslations.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511171839172_AddCreatedAtToLoginToken.cs" />
+    <Compile Include="Migrations\201511171839172_AddCreatedAtToLoginToken.Designer.cs">
+      <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\CleanupAlarm.cs" />
@@ -1158,7 +1162,7 @@
     <Compile Include="Server\Chat\hasher.cs" />
     <Compile Include="Server\Chat\IClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\Chat\LoginToken.cs" />
+    <Compile Include="Models\LoginToken.cs" />
     <Compile Include="Server\Mail\UserMail.cs" />
     <Compile Include="Simples\ChannelSync.cs" />
     <Compile Include="Simples\SimpleChannel.cs" />
@@ -1253,6 +1257,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201510211312007_AddLocaleTranslations.resx">
       <DependentUpon>201510211312007_AddLocaleTranslations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511171839172_AddCreatedAtToLoginToken.resx">
+      <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
