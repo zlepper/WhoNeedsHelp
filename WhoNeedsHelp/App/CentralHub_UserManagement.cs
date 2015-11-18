@@ -16,9 +16,7 @@ namespace WhoNeedsHelp.App
     {
         public void SetUsername(string name)
         {
-            Connection con = DB.Connections.Find(Context.ConnectionId);
-            if (con == null) return;
-            User user = con.User;
+            User user = DB.GetUserByConnection(Context.ConnectionId);
             if (user == null)
             {
                 user = new User
