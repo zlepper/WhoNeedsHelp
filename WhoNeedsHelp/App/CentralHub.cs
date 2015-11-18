@@ -20,12 +20,7 @@ namespace WhoNeedsHelp.App
 {
     public partial class CentralHub : Hub<IClient>
     {
-        public CentralHub(IHelpContext context = null)
-        {
-            DB = context ?? new HelpContext();
-        }
-
-        public IHelpContext DB;
+        public IHelpContext DB = new HelpContext();
 
         private string GetIpAddress()
         {
