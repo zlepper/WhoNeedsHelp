@@ -25,7 +25,7 @@ namespace WhoNeedsHelp.DB
         /// </summary>
         /// <param name="id">The id of the user</param>
         /// <returns>A user with the specified id, or null</returns>
-        User GetUserByConnectionId(int id);
+        User GetUserById(int id);
 
         /// <summary>
         /// Gets a user by their connection context

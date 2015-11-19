@@ -16,9 +16,7 @@ namespace WhoNeedsHelp.App
     {
         public void SetUsername(string name)
         {
-            Connection con = DB.Connections.Find(Context.ConnectionId);
-            if (con == null) return;
-            User user = con.User;
+            User user = DB.GetUserByConnection(Context.ConnectionId);
             if (user == null)
             {
                 user = new User
@@ -31,21 +29,16 @@ namespace WhoNeedsHelp.App
             else
             {
                 user.Name = name;
-                foreach (Connection connection in user.Connections)
-                {
-                    Clients.Client(connection.ConnectionId).UpdateUsername(name);
-                }
+                Clients.Clients(user.Connections.Select(c => c.ConnectionId).ToList()).UpdateUsername(name);
+
                 foreach (Channel channel in user.ChannelsIn)
                 {
                     Clients.Clients(
                         channel.Users.SelectMany(u => u.Connections).Select(c => c.ConnectionId).ToList())
                         .UpdateOtherUsername(name, user.Id, channel.Id);
                 }
-
-                foreach (Connection connection in user.Connections)
-                {
-                    Clients.Client(connection.ConnectionId).SendUserId(user.Id);
-                }
+                
+                Clients.Clients(user.Connections.Select(c => c.ConnectionId).ToList()).SendUserId(user.Id);
             }
             DB.SaveChanges();
         }
@@ -63,9 +56,7 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("Emailadressen er allerede i brug.");
                 return;
             }
-            Connection con = DB.Connections.Find(Context.ConnectionId);
-            if (con == null) return;
-            user = con.User;
+            user = DB.GetUserByConnection(Context.ConnectionId);
             if (user == null) return;
             if (!string.IsNullOrWhiteSpace(user.Pw) || !string.IsNullOrWhiteSpace(user.EmailAddress))
             {
@@ -79,8 +70,6 @@ namespace WhoNeedsHelp.App
             Guid key = Guid.NewGuid();
             Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);
             user.GenerateLoginToken(key);
-
-
 
             user.LastLogin = DateTime.Now;
             DB.SaveChanges();
@@ -127,10 +116,7 @@ namespace WhoNeedsHelp.App
             }
             else
             {
-                foreach (Connection connection in user.Connections)
-                {
-                    Clients.Client(connection.ConnectionId).UserLoggedOut();
-                }
+                Clients.Clients(user.Connections.Select(c => c.ConnectionId).ToList()).UserLoggedOut();
                 DB.LoginTokens.RemoveRange(user.LoginTokens);
                 Clients.Caller.TokenLoginFailed();
             }
@@ -144,10 +130,7 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.Alert("Ikke alt info er indtastet");
                 return;
             }
-            //var currentUser = DB.Users.SingleOrDefault(u => u.ConnectionId.Equals(Context.ConnectionId));
-            Connection con = DB.Connections.Find(Context.ConnectionId);
-            if (con == null) return;
-            User currentUser = con.User;
+            User currentUser = DB.GetUserByConnection(Context.ConnectionId);
             if (currentUser == null || !string.IsNullOrWhiteSpace(currentUser.EmailAddress) || !string.IsNullOrWhiteSpace(currentUser.Pw))
             {
                 Clients.Caller.Alert("Du er allerede logget ind");

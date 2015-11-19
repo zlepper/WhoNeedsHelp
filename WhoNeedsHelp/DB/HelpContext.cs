@@ -17,7 +17,7 @@ namespace WhoNeedsHelp.DB
         public DbSet<Locale.Translation> Translations { get; set; }
         public DbSet<CleanupAlarm> CleanupAlarms { get; set; }
 
-        public User GetUserByConnectionId(int id)
+        public User GetUserById(int id)
         {
             return Users.Find(id);
         }
