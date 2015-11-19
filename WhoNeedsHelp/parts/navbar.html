@@ -1,6 +1,6 @@
 ﻿<nav class="hide-on-med-and-up">
     <div class="container">
-        <a href="#" data-activates="slide-out-left" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+        <a href="javascript:void(0);" data-activates="slide-out-left" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
     </div>
 </nav>
 <ul id="slide-out-left" class="side-nav fixed">
@@ -24,8 +24,13 @@
         <form onsubmit="return false;" ng-submit="application.createNewChannel(application.newChannel.Name)">
             <div class="input-field">
                 <label for="newChannelName">Tilslut eller Opret kanal</label>
-                <input id="newChannelName" ng-model="application.newChannel.Name" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" class="validate" autocomplete="off" />
+                <input id="newChannelName" ng-model="application.newChannel.Name" pattern="[\wæøåöäÆØÅÖÄ\.0-9 ]+" type="text" class="validate" autocomplete="off"/>
             </div>
         </form>
     </li>
 </ul>
+<script>
+    $(document).ready(function() {
+        $(".button-collapse").sideNav();
+    });
+</script>
