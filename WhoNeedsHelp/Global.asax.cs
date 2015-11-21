@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Owin;
 using System.Web.Optimization;
+using System.Web.Security;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Serialization;
 using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Migrations;
+using WhoNeedsHelp.Models;
 
 namespace WhoNeedsHelp
 {
@@ -18,12 +21,6 @@ namespace WhoNeedsHelp
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            //RouteTable.Routes.MapOwinPath("/api", app =>
-            //{
-            //    app.Run(Startup.ApiInvoke);
-            //});
-
-            //RouteTable.Routes.MapOwinPath("/");
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -34,11 +31,7 @@ namespace WhoNeedsHelp
             // Disable xml generation
             var formatters = GlobalConfiguration.Configuration.Formatters;
             formatters.Remove(formatters.XmlFormatter);
-            // Fix the casing of elements
-            //var jsonFormatter = formatters.JsonFormatter;
-            //var settings = jsonFormatter.SerializerSettings;
-            ////settings.Formatting = Formatting.Indented;
-            //settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
         }
 
         protected void Session_Start(object sender, EventArgs e)
@@ -53,6 +46,24 @@ namespace WhoNeedsHelp
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
         {
+
+        }
+
+        protected void Application_PostAuthenticateRequest(Object sender, EventArgs e)
+        {
+            HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+            if (authCookie != null)
+            {
+
+                FormsAuthenticationTicket authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+
+                var serializeModel = JsonConvert.DeserializeObject<PrincipalSerializeModel>(authTicket.UserData);
+                using (HelpContext db = new HelpContext())
+                {
+                    HttpContext.Current.User = db.Users.Find(serializeModel.UserId);
+                }
+
+            }
 
         }
 

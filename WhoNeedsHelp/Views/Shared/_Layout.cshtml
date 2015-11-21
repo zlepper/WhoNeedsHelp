@@ -1,15 +1,16 @@
 ﻿@using System.Web.Mvc.Html
 @using System.Web.Optimization
+@using WhoNeedsHelp.Models
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Klassehjælp</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     @Scripts.Render("~/bundles/deps")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
     <script>
         $(document).ready(function() {
             $(".button-collapse").sideNav();
@@ -27,13 +28,39 @@
             <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul class="right hide-on-med-and-down">
                 <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
-                <li>@Html.ActionLink("Brugerinstillinger", "Index", "User")</li>
                 <li>@Html.ActionLink("App", "App", "Home")</li>
+                @if (User != null && User.Identity.IsAuthenticated)
+                {
+                    <li>@Html.ActionLink("Bruger", "Index", "User")</li>
+                    if (User.IsInRole(Role.AdminRole))
+                    {
+                        <li>@Html.ActionLink("Administration", "Index", "Admin")</li>
+                    }
+                    <li>@Html.ActionLink("Log ud", "Logout", "Account")</li>
+                    
+                }
+                else
+                {
+                    <li>@Html.ActionLink("Login", "Index", "Account")</li>
+                }
             </ul>
             <ul class="side-nav" id="mobile-menu">
                 <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
-                <li>@Html.ActionLink("Brugerinstillinger", "Index", "User")</li>
                 <li>@Html.ActionLink("App", "App", "Home")</li>
+                @if (User != null && User.Identity.IsAuthenticated)
+                {
+                    <li>@Html.ActionLink("Bruger", "Index", "User")</li>
+                    if (User.IsInRole(Role.AdminRole))
+                    {
+                        <li>@Html.ActionLink("Administration", "Index", "Admin")</li>
+                    }
+                    <li>@Html.ActionLink("Log ud", "Logout", "Account")</li>
+                    
+                }
+                else
+                {
+                    <li>@Html.ActionLink("Login", "Index", "Account")</li>
+                }
             </ul>
         </div>
     </div>
@@ -44,7 +71,7 @@
     <hr/>
     <footer>
         <p>&copy; @DateTime.Now.Year - Rasmus Hansen</p>
-        @* TODO Add administration link here! *@
+        
     </footer>
 </div>
 </body>

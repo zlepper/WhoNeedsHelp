@@ -1,0 +1,71 @@
+﻿@model WhoNeedsHelp.Models.SignupViewModel
+
+@using (Html.BeginForm("Signup", "Account", FormMethod.Post))
+{
+    <h4>Opret ny bruger</h4>
+    @Html.AntiForgeryToken()
+    @Html.ValidationMessage("signup")
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.Name, new { @class = "validate" })
+                @Html.LabelFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.Email, new { @class = "validate" })
+                @Html.LabelFor(model => model.Email, new { data_error = "Ikke en emailadresse!", data_success = "Ser ud til at være i orden." })
+                @Html.ValidationMessageFor(model => model.Email)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.RepeatEmail, new { @class = "validate" })
+                @Html.LabelFor(model => model.RepeatEmail, new { data_error = "Ikke en emailadresse!", data_success = "Ser ud til at være i orden." })
+                @Html.ValidationMessageFor(model => model.RepeatEmail)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.Password, new { @class = "validate" })
+                @Html.LabelFor(model => model.Password)
+                @Html.ValidationMessageFor(model => model.Password)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.RepeatPassword, new { @class = "validate" })
+                @Html.LabelFor(model => model.RepeatPassword)
+                @Html.ValidationMessageFor(model => model.RepeatPassword)
+            </div>
+        </div>
+    </div>
+
+    <p>
+        <input type="checkbox" name="RememberMe" id="RememberMe" />
+        @Html.LabelFor(model => model.RememberMe)
+        @Html.ValidationMessageFor(model => model.RememberMe)
+    </p>
+
+    <div class="row">
+        <div class="col s12">
+            <button type="submit" class="btn waves-effect waves-light">Opret bruger</button>
+        </div>
+    </div>
+}

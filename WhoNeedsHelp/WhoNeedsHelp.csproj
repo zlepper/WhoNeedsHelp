@@ -1080,11 +1080,11 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Controllers\AdministratorController.cs" />
-    <Compile Include="Controllers\ChannelsController.cs" />
+    <Compile Include="Attributes\AuhorizeAttribute.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\LocalesController.cs" />
-    <Compile Include="Controllers\UserApiController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="DB\IHelpContext.cs" />
     <Compile Include="Global.asax.cs">
@@ -1127,13 +1127,19 @@
     <Compile Include="Migrations\201511171839172_AddCreatedAtToLoginToken.Designer.cs">
       <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511212141217_AddRoles.cs" />
+    <Compile Include="Migrations\201511212141217_AddRoles.Designer.cs">
+      <DependentUpon>201511212141217_AddRoles.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\CleanupAlarm.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\Locale.cs" />
+    <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\QuestionComment.cs" />
+    <Compile Include="Models\Role.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Migrations\201503051130379_initinal.cs" />
     <Compile Include="Migrations\201503051130379_initinal.Designer.cs">
@@ -1179,6 +1185,7 @@
     <Compile Include="Simples\SimpleUser.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="DB\HelpContext.cs" />
+    <Compile Include="Views\BaseViewPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -1198,8 +1205,11 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Home\app.cshtml" />
     <Content Include="Views\Home\Api.cshtml" />
-    <Content Include="Views\Administrator\Index.cshtml" />
+    <Content Include="Views\Account\Index.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\Account\_LoginForm.cshtml" />
+    <Content Include="Views\Account\_SignupForm.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1243,6 +1253,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503121633047_security.resx">
       <DependentUpon>201503121633047_security.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503141119032_multipleConnections.resx">
       <DependentUpon>201503141119032_multipleConnections.cs</DependentUpon>
@@ -1270,6 +1281,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201511171839172_AddCreatedAtToLoginToken.resx">
       <DependentUpon>201511171839172_AddCreatedAtToLoginToken.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511212141217_AddRoles.resx">
+      <DependentUpon>201511212141217_AddRoles.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

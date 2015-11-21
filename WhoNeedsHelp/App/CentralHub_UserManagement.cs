@@ -66,6 +66,7 @@ namespace WhoNeedsHelp.App
             string pass = PasswordHash.CreateHash(pw);
             user.Pw = pass;
             user.EmailAddress = email;
+            user.Roles = new[] {Role.UserRole};
 
             Guid key = Guid.NewGuid();
             Clients.Caller.SendReloginData(key.ToString(), user.Id, stayLoggedIn);

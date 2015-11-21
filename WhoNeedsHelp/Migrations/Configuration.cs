@@ -1,5 +1,6 @@
 using MySql.Data.Entity;
 using WhoNeedsHelp.DB;
+using WhoNeedsHelp.Models;
 
 namespace WhoNeedsHelp.Migrations
 {
@@ -13,8 +14,8 @@ namespace WhoNeedsHelp.Migrations
         public Configuration()
         {
             CodeGenerator = new MySqlMigrationCodeGenerator();
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
+            //AutomaticMigrationsEnabled = true;
+            //AutomaticMigrationDataLossAllowed = true;
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 

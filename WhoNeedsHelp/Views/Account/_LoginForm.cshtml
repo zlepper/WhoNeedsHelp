@@ -1,0 +1,40 @@
+﻿@model WhoNeedsHelp.Models.LoginViewModel
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+{
+    <h4>Login</h4>
+    @Html.AntiForgeryToken()
+    @Html.ValidationMessage("login")
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.EditorFor(model => model.Email, new {@class = "validate"})
+                @Html.LabelFor(model => model.Email, new { data_error = "Ikke en emailadresse!", data_success = "Ser ud til at være i orden."})
+                @Html.ValidationMessageFor(model => model.Email)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field">
+                @Html.LabelFor(model => model.Password, new { @class = "validate" })
+                @Html.EditorFor(model => model.Password)
+                @Html.ValidationMessageFor(model => model.Password)
+            </div>
+        </div>
+    </div>
+    <p>
+        <input type="checkbox" name="RememberMe" id="RememberMe" />
+        @Html.LabelFor(model => model.RememberMe)
+        @Html.ValidationMessageFor(model => model.RememberMe)
+    </p>
+
+    <div class="row">
+        <div class="col s12">
+            <button type="submit" class="btn waves-effect waves-light">Login</button>
+        </div>
+    </div>
+}

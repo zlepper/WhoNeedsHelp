@@ -132,8 +132,8 @@ namespace WhoNeedsHelp.Models
         /// <summary>
         /// Adds the chat message to the channel
         /// </summary>
-        /// <param name="author">The Guid of the author user</param>
-        /// <param name="text">The text in the message</param>
+        /// <param Name="author">The Guid of the author user</param>
+        /// <param Name="text">The text in the message</param>
         /// <returns>The Guid of the new message</returns>
         public ChatMessage AddChatMessage(User author, string text)
         {

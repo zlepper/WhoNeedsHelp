@@ -1,0 +1,15 @@
+﻿@model WhoNeedsHelp.Models.AuthViewModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col s12 m6">
+        @Html.Partial("_LoginForm", Model.LoginViewModel)
+    </div>
+    <div class="col s12 m6">
+        @Html.Partial("_SignupForm", Model.SignupViewModel)
+    </div>
+</div>

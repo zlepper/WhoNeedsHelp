@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Server.Chat;
 using WhoNeedsHelp.Simples;
 
 namespace WhoNeedsHelp.Models
 {
-    public class User
+    public class User : IPrincipal
     {
         protected bool Equals(User other)
         {
@@ -51,6 +52,15 @@ namespace WhoNeedsHelp.Models
         public int? PreferedLocaleId { get; set; }
         public virtual Locale PreferedLocale { get; set; }
 
+        public string SerializedRoles { get; set; }
+
+        public string[] Roles
+        {
+            get { return SerializedRoles.Split(','); }
+            set { SerializedRoles = string.Join(",", value); }
+        }
+
+
         public virtual ICollection<CleanupAlarm> CleanupAlarms { get; set; } 
 
         public User()
@@ -91,8 +101,8 @@ namespace WhoNeedsHelp.Models
         /// <summary>
         /// Updates the question for the selected channel
         /// </summary>
-        /// <param name="c">The channel Guid to change question in</param>
-        /// <param name="question">The question to change to</param>
+        /// <param Name="c">The channel Guid to change question in</param>
+        /// <param Name="question">The question to change to</param>
         /// <returns>Returns the question if it was edited</returns>
         public Question UpdateQuestion(Channel c, string question)
         {
@@ -144,6 +154,23 @@ namespace WhoNeedsHelp.Models
         public bool CanPasswordBeReset(string key)
         {
             return ResetExpiresAt > DateTime.Now && PasswordHash.ValidatePassword(key, ResetKey);
+        }
+
+        public bool IsInRole(string role)
+        {
+            return Roles.Contains(role);
+        }
+
+        private IIdentity IdentityCache { get; set; }
+
+        public IIdentity Identity
+        {
+            get
+            {
+                if(IdentityCache != null) return IdentityCache;
+                IdentityCache = new GenericIdentity(EmailAddress);
+                return Identity;
+            }
         }
     }
 }
