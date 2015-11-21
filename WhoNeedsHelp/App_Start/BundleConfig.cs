@@ -48,6 +48,8 @@ namespace WhoNeedsHelp
                         "~/js/directives/chat.js"
                         ));
 
+            bundles.Add(new ScriptBundle("~/bundles/usersettings").IncludeDirectory("~/js/usersettings", "*.js", true));
+
             bundles.Add(new ScriptBundle("~/helper").Include("~/js/controllers/helpctrl.js"));
             bundles.Add(new ScriptBundle("~/apihelper").Include(
                 "~/js/classes/urlparams.js",

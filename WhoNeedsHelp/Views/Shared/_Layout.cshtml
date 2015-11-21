@@ -13,34 +13,39 @@
     <script>
         $(document).ready(function() {
             $(".button-collapse").sideNav();
+            $(".dropdown-button").dropdown();
         });
     </script>
     @Styles.Render("~/bundles/styling")
 </head>
 <body>
-    <nav>
-        <div class="nav-wrapper">
-            <div class="container">
-                @Html.ActionLink("Klassehjælp", "Index", "Home", new { area = "" }, new { @class = "brand-logo" })
-                <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
-                <ul class="right hide-on-med-and-down">
-                    <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
-                    <li>@Html.ActionLink("App", "App", "Home")</li>
-                </ul>
-                <ul class="side-nav" id="mobile-menu">
-                    <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
-                    <li>@Html.ActionLink("App", "App", "Home")</li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Rasmus Hansen</p>
-        </footer>
+<nav>
+    <div class="nav-wrapper">
+        <div class="container">
+            @Html.ActionLink("Klassehjælp", "Index", "Home", new {area = ""}, new {@class = "brand-logo"})
+            <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
+                <li>@Html.ActionLink("Brugerinstillinger", "Index", "User")</li>
+                <li>@Html.ActionLink("App", "App", "Home")</li>
+            </ul>
+            <ul class="side-nav" id="mobile-menu">
+                <li>@Html.ActionLink("Hjem", "Index", "Home")</li>
+                <li>@Html.ActionLink("Brugerinstillinger", "Index", "User")</li>
+                <li>@Html.ActionLink("App", "App", "Home")</li>
+            </ul>
+        </div>
     </div>
+</nav>
+
+<div class="container">
+    @RenderBody()
+    <hr/>
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Rasmus Hansen</p>
+        @* TODO Add administration link here! *@
+    </footer>
+</div>
 </body>
 </html>

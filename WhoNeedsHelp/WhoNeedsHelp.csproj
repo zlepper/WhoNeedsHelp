@@ -220,6 +220,7 @@
     <Content Include="js\modules\zl-help.js" />
     <Content Include="js\modules\zl-signalr.js" />
     <Content Include="js\notifications.js" />
+    <Content Include="js\usersettings\modules\main.js" />
     <Content Include="parts\chat.html" />
     <Content Include="parts\login.html" />
     <Content Include="parts\navbar.html" />
@@ -232,6 +233,8 @@
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
     <Content Include="Scripts\angular-route.min.js" />
+    <Content Include="Scripts\angular-ui-router.js" />
+    <Content Include="Scripts\angular-ui-router.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\i18n\angular-locale_aa-dj.js" />
@@ -1077,9 +1080,12 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\AdministratorController.cs" />
     <Compile Include="Controllers\ChannelsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LocalesController.cs" />
+    <Compile Include="Controllers\UserApiController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="DB\IHelpContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -1192,6 +1198,8 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Home\app.cshtml" />
     <Content Include="Views\Home\Api.cshtml" />
+    <Content Include="Views\Administrator\Index.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -65,7 +65,7 @@ function Channel(id, name, application) {
      * The timer used to indicate how much time if left for the next student, and which controls the time.
      * @type {StudentTimer}
      */
-    this.StudentTimer = new StudentTimer(this, angular.$interval);
+    this.StudentTimer = null;
 
     /**
      * The appliation that controls everything

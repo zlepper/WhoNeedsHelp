@@ -4,7 +4,7 @@
  * @returns {}
  * @class 
  */
-function Application(signalR, $cookieStore) {
+function Application(signalR, $cookieStore, $interval) {
     var that = this;
     /**
      * Descripes the state the application is currently in
@@ -69,6 +69,8 @@ function Application(signalR, $cookieStore) {
      * Indicates any url parameters attached to the application
      */
     this.params = null;
+
+    this.$interval = $interval;
 
     // Happens when the connection is ready and the page can be shown
     signalR.$on("connectionStarted", function () {
@@ -143,7 +145,7 @@ function Application(signalR, $cookieStore) {
         that.Channels[channel.Id] = channel;
 
         // Load the channel timer
-        channel.StudentTimer = new StudentTimer(channel);
+        channel.StudentTimer = new StudentTimer(channel, $interval);
         if (channel.timeLeft) {
             channel.StudentTimer.timeLeft = channel.timeLeft;
             channel.StudentTimer.startTimer();
@@ -600,6 +602,6 @@ Application.prototype.hideSideNav = function () {
 }
 
 angular.module("Help")
-    .factory("zlApplication", ["$cookies", "SignalR", function ($cookieStore, signalR) {
-        return new Application(signalR, $cookieStore);
+    .factory("zlApplication", ["$cookies", "SignalR", "$interval", function ($cookieStore, signalR, $interval) {
+        return new Application(signalR, $cookieStore, $interval);
     }])

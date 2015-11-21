@@ -68,7 +68,7 @@ StudentTimer.defaultCountdownTime = 300;
  * Toggles the visible clock
  * @returns {} 
  */
-StudentTimer.prototype.ToggleShowClock = function() {
+StudentTimer.prototype.toggleShowClock = function () {
     if (this.showingTimer) {
         jQuery("#timerClock").stop().removeClass("active", 1000);
     } else {
@@ -81,7 +81,7 @@ StudentTimer.prototype.ToggleShowClock = function() {
  * Temporary pauses the timer
  * @returns {} 
  */
-StudentTimer.prototype.haltTimer = function() {
+StudentTimer.prototype.haltTimer = function () {
     this.$interval.cancel(this.intervalCont);
     this.counting = false;
 }
@@ -90,7 +90,7 @@ StudentTimer.prototype.haltTimer = function() {
  * Stops the timer completely
  * @returns {} 
  */
-StudentTimer.prototype.stopTimer = function() {
+StudentTimer.prototype.stopTimer = function () {
     this.haltTimer();
     this.timing = false;
     this.outOfTime = false;
@@ -101,7 +101,7 @@ StudentTimer.prototype.stopTimer = function() {
  * Prompts the user for the new time the timer should be set to
  * @returns {} 
  */
-StudentTimer.prototype.editTimer = function() {
+StudentTimer.prototype.editTimer = function () {
     var n = prompt("Hvad skal den nye tid være? \n Tal i sekunder");
     var m = Number(n);
     if (m === NaN) {
@@ -109,7 +109,7 @@ StudentTimer.prototype.editTimer = function() {
     } else if (m <= 0) {
         notify("Tiden kan ikke være mindre end 1 sekund!");
     } else {
-        this.defaultCountdownTime = m;
+        StudentTimer.defaultCountdownTime = m;
     }
 }
 
@@ -118,32 +118,33 @@ StudentTimer.prototype.editTimer = function() {
  * Should be called about every second if the timer is active. 
  * @returns {} 
  */
-StudentTimer.prototype.countDown = function() {
-    this.timeLeft--;
-    if (this.timeLeft % 10 === 0) {
+StudentTimer.prototype.countDown = function (that) {
+    console.log("here");
+    console.log(this);
+    that.timeLeft = that.timeLeft - 1;
+    if (that.timeLeft % 10 === 0) {
         // TODO Send countdown time to server, somehow
     }
-    if (this.timeLeft <= 0) {
-        this.outOfTime = true;
-        if (this.alarm) this.alarm.play();
-        this.haltTimer();
+    if (that.timeLeft <= 0) {
+        that.outOfTime = true;
+        if (that.alarm) that.alarm.play();
+        that.haltTimer();
     }
 }
 
 /**
  * Starts the timer
- * @param {} The angular interval service. Has to be injected from the caller. 
  * @returns {} 
  */
-StudentTimer.prototype.startTimer = function() {
+StudentTimer.prototype.startTimer = function () {
     this.timing = true;
     this.counting = true;
-    this.timeLeft = this.defaultCountdownTime;
+    this.timeLeft = StudentTimer.defaultCountdownTime;
     this.outOfTime = false;
 
     if (this.intervalCont) {
         this.$interval.cancel(this.intervalCont);
     }
 
-    this.intervalCont = this.$interval(this.countDown, this.defaultCountdownTime);
+    this.intervalCont = this.$interval(this.countDown, 1000, 0, true, this);
 }
