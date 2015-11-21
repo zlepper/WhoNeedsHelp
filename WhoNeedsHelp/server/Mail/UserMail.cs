@@ -52,7 +52,7 @@ namespace WhoNeedsHelp.Server.Mail
 
                 message.AddTo(email);
 
-                Web transportWeb = new Web(key);
+                Web transportWeb = new Web(apiKey:key);
                 transportWeb.DeliverAsync(message).Wait();
             }
             return true;
