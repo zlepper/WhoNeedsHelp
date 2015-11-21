@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -11,13 +13,40 @@ using System.Web.Security;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json.Serialization;
 using WhoNeedsHelp.DB;
-using WhoNeedsHelp.Migrations;
 using WhoNeedsHelp.Models;
 
 namespace WhoNeedsHelp
 {
     public class Global : System.Web.HttpApplication
     {
+        private static void Cleanup()
+        {
+            using (HelpContext db = new HelpContext())
+            {
+                foreach (User user in db.Users.Where(u => u.SerializedRoles == "" || u.SerializedRoles == null))
+                {
+                    var roles = user.Roles.ToList();
+                    roles.Add(Role.UserRole);
+                    user.Roles = roles.ToArray();
+                }
+                var usersToRemove = new List<User>();
+                foreach (User user in db.Users.Where(u => u.EmailAddress == "" || u.EmailAddress == null).ToList())
+                {
+                    if (string.IsNullOrWhiteSpace(user.VirtualId))
+                    {
+                        bool shouldDelete = user.LoginTokens.Any(loginToken => loginToken.CreatedAt.AddDays(31) < DateTime.Now);
+                        if (shouldDelete)
+                        {
+                            usersToRemove.Add(user);
+                        }
+                    }
+                }
+                db.Users.RemoveRange(usersToRemove);
+
+                db.Channels.RemoveRange(db.Channels.Where(c => !c.Users.Any()));
+            }
+
+        }
 
         protected void Application_Start(object sender, EventArgs e)
         {
@@ -32,6 +61,7 @@ namespace WhoNeedsHelp
             var formatters = GlobalConfiguration.Configuration.Formatters;
             formatters.Remove(formatters.XmlFormatter);
 
+            Cleanup();
         }
 
         protected void Session_Start(object sender, EventArgs e)

@@ -86,6 +86,7 @@ namespace WhoNeedsHelp.App
                 var key = Guid.NewGuid();
                 user.GenerateLoginToken(key);
                 Clients.Caller.SendReloginData(key.ToString(), user.Id, longer);
+                DB.SaveChanges();
                 return;
             }
             user = DB.Users.Find(userId);

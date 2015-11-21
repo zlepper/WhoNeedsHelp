@@ -56,7 +56,12 @@ namespace WhoNeedsHelp.Models
 
         public string[] Roles
         {
-            get { return SerializedRoles.Split(','); }
+            get
+            {
+                if (string.IsNullOrWhiteSpace(SerializedRoles))
+                    SerializedRoles = "";
+                return SerializedRoles.Split(',');
+            }
             set { SerializedRoles = string.Join(",", value); }
         }
 

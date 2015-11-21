@@ -8,7 +8,7 @@ using WhoNeedsHelp.Models;
 
 namespace WhoNeedsHelp.DB
 {
-    public interface IHelpContext
+    public interface IHelpContext : IDisposable
     {
         DbSet<User> Users { get; set; }
         DbSet<Connection> Connections { get; set; }
@@ -43,6 +43,5 @@ namespace WhoNeedsHelp.DB
 
 
         int SaveChanges();
-        void Dispose();
     }
 }

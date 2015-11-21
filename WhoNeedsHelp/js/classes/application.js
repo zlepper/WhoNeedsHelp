@@ -101,6 +101,7 @@ function Application(signalR, $cookieStore, $interval) {
     // Happens whenever a cookie login fails
     signalR.$on("tokenLoginFailed", function () {
         notify("Kunne ikke login med småkage, log venligst ind manuelt", "Login problem");
+        $cookieStore.remove("token");
     });
 
     signalR.$on("setQuestionState", function (event, hasQuestion, channelid) {
