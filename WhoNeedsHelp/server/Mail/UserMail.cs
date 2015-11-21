@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using SendGrid;
 using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
-using WhoNeedsHelp.Server.Chat;
 
 namespace WhoNeedsHelp.Server.Mail
 {
@@ -52,9 +45,10 @@ namespace WhoNeedsHelp.Server.Mail
 
                 message.AddTo(email);
 
-                Web transportWeb = new Web(apiKey:key);
+                Web transportWeb = new Web(key);
                 transportWeb.DeliverAsync(message).Wait();
             }
+
             return true;
         }
     }
