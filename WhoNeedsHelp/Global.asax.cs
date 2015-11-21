@@ -23,11 +23,13 @@ namespace WhoNeedsHelp
         {
             using (HelpContext db = new HelpContext())
             {
-                foreach (User user in db.Users.Where(u => u.SerializedRoles == "" || u.SerializedRoles == null))
+                foreach (User user in db.Users.Where(u => u.SerializedRoles == "" || u.SerializedRoles == null || u.SerializedRoles.StartsWith(",")))
                 {
                     var roles = user.Roles.ToList();
-                    roles.Add(Role.UserRole);
-                    user.Roles = roles.ToArray();
+                    if (!roles.Contains(Role.UserRole))
+                        roles.Add(Role.UserRole);
+                    roles.Remove("");
+                    user.Roles = roles.Distinct().ToArray();
                 }
                 var usersToRemove = new List<User>();
                 foreach (User user in db.Users.Where(u => u.EmailAddress == "" || u.EmailAddress == null).ToList())
@@ -44,6 +46,7 @@ namespace WhoNeedsHelp
                 db.Users.RemoveRange(usersToRemove);
 
                 db.Channels.RemoveRange(db.Channels.Where(c => !c.Users.Any()));
+                db.SaveChanges();
             }
 
         }

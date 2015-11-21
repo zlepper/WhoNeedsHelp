@@ -90,6 +90,11 @@ namespace WhoNeedsHelp.App
                 return;
             }
             user = DB.Users.Find(userId);
+            if (user == null)
+            {
+                Clients.Caller.TokenLoginFailed();
+                return;
+            }
             LoginToken lt = null;
             if ((lt = user.CheckLoginToken(tokenKey)) != null)
             {
