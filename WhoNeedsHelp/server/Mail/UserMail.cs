@@ -53,7 +53,7 @@ namespace WhoNeedsHelp.Server.Mail
                 message.AddTo(email);
 
                 Web transportWeb = new Web(key);
-                transportWeb.DeliverAsync(message);
+                transportWeb.DeliverAsync(message).Wait();
             }
             return true;
         }
