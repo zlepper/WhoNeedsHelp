@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
+using System.Web.UI.WebControls;
 
 namespace WhoNeedsHelp.Models
 {
@@ -35,7 +37,7 @@ namespace WhoNeedsHelp.Models
         [DataType(DataType.EmailAddress, ErrorMessage = "Det indtastede var ikke en emailaddresse.")]
         public string Email { get; set; }
 
-        [Compare("Email", ErrorMessage = "Emailadresser stemmer ikke overens.")]
+        [System.ComponentModel.DataAnnotations.Compare("Email", ErrorMessage = "Emailadresser stemmer ikke overens.")]
         [Display(Name = "Bekræft email")]
         public string RepeatEmail { get; set; }
 
@@ -45,7 +47,7 @@ namespace WhoNeedsHelp.Models
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Du skal gentage dit kodeord, så du er sikker på at have tastet det rigtigt. ")]
-        [Compare("Password", ErrorMessage = "Kodeord stemmer ikke overens.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "Kodeord stemmer ikke overens.")]
         [Display(Name = "Bekræft kodeord")]
         [DataType(DataType.Password)]
         public string RepeatPassword { get; set; }
@@ -59,6 +61,35 @@ namespace WhoNeedsHelp.Models
         public LoginViewModel LoginViewModel { get; set; }
         public SignupViewModel SignupViewModel { get; set; }
 
+    }
+
+    public class ResetPasswordViewModel
+    {
+        [Required(ErrorMessage = "Du skal indtaste en emailadresse")]
+        [Display(Name = "Email")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Den indtastede værdi er ikke en emailadresse. ")]
+        public string Email { get; set; }
+    }
+
+    public class ResetPasswordViewModel2
+    {
+        [HiddenInput]
+        public string ResetKey { get; set; }
+
+
+        [Required(ErrorMessage = "Du skal indtaste et kodeord.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Kodeord")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Du skal gentage dit kodeord, så du er sikker på at have tastet det rigtigt. ")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "Kodeord stemmer ikke overens.")]
+        [Display(Name = "Bekræft kodeord")]
+        [DataType(DataType.Password)]
+        public string RepeatPassword { get; set; }
+
+        [HiddenInput]
+        public string Email { get; set; }
     }
 
     public class PrincipalSerializeModel

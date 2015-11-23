@@ -4,6 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Security;
+using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
@@ -79,6 +83,7 @@ namespace WhoNeedsHelp.App
 
         public void LoginWithToken(int userId, string tokenKey, bool longer)
         {
+            if (Context.User is User) return;
             User user;
             if (userId == -1)
             {
@@ -201,6 +206,20 @@ namespace WhoNeedsHelp.App
                     Clients.Caller.UpdateUsername(user.Name);
                 }
                 Clients.Caller.SendUserId(user.Id);
+
+                //var roles = user.Roles;
+                //var serializeModel = new PrincipalSerializeModel()
+                //{
+                //    UserId = user.Id,
+                //    Roles = roles
+                //};
+
+                //string userData = JsonConvert.SerializeObject(serializeModel);
+                //FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, user.EmailAddress, DateTime.Now, DateTime.Now.AddMinutes(15), stayLoggedIn, userData);
+                //string encTicket = FormsAuthentication.Encrypt(authTicket);
+                //HttpCookie faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
+                ////HttpContext.Current.Response.Cookies.Add(faCookie);
+                //Context.Request.GetHttpContext().Response.Cookies.Add(faCookie);
             }
             else
             {
@@ -239,6 +258,7 @@ namespace WhoNeedsHelp.App
             DB.SaveChanges();
             Clients.Caller.UserLoggedOut();
             Clients.Caller.SendUserId(newUser.Id);
+            FormsAuthentication.SignOut();
         }
 
         public void RequestPasswordReset(string email)

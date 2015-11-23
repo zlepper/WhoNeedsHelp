@@ -10,8 +10,8 @@
     <div class="row">
         <div class="col s12">
             <div class="input-field">
-                @Html.EditorFor(model => model.Email, new {@class = "validate"})
-                @Html.LabelFor(model => model.Email, new { data_error = "Ikke en emailadresse!", data_success = "Ser ud til at være i orden."})
+                @Html.EditorFor(model => model.Email, new { @class = "validate" })
+                @Html.LabelFor(model => model.Email, new { data_error = "Ikke en emailadresse!", data_success = "Ser ud til at være i orden." })
                 @Html.ValidationMessageFor(model => model.Email)
             </div>
         </div>
@@ -38,3 +38,9 @@
         </div>
     </div>
 }
+
+<div class="row">
+    <div class="col s12">
+        @Html.ActionLink("Glemt kodeord", "ResetPassword", "Account", new { @class = "btn waves-effect waves-light" })
+    </div>
+</div>

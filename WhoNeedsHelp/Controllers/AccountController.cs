@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using WhoNeedsHelp.DB;
 using WhoNeedsHelp.Models;
 using WhoNeedsHelp.Server.Chat;
+using WhoNeedsHelp.Server.Mail;
 
 namespace WhoNeedsHelp.Controllers
 {
@@ -17,6 +18,7 @@ namespace WhoNeedsHelp.Controllers
         // GET: Account
         public ActionResult Index()
         {
+            ViewBag.message = TempData["message"];
             var model = new AuthViewModel
             {
                 LoginViewModel = new LoginViewModel(),
@@ -26,6 +28,7 @@ namespace WhoNeedsHelp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Login(LoginViewModel model, string returnUrl = "")
         {
             if (ModelState.IsValid)
@@ -68,8 +71,11 @@ namespace WhoNeedsHelp.Controllers
             return View("Index", m);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Signup(SignupViewModel model, string returnUrl = "")
         {
+            
             if (ModelState.IsValid)
             {
                 if (context.Users.Any(u => u.EmailAddress.Equals(model.Email)))
@@ -128,6 +134,92 @@ namespace WhoNeedsHelp.Controllers
             context.SaveChanges();
             context.Dispose();
             base.Dispose(disposing);
+        }
+
+        [HttpGet]
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken()]
+        public ActionResult ResetPassword1(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User u = context.Users.FirstOrDefault(us => us.EmailAddress.Equals(model.Email));
+                if (u == null)
+                {
+                    ModelState.AddModelError("email", "Email addresse blev ikke fundet.");
+                }
+                else
+                {
+                    UserMail um = new UserMail();
+                    um.SendPasswordRecovery(model.Email);
+                    return View("PasswordResetRequested");
+                }
+            }
+            return View("ResetPassword", model);
+        }
+        
+        public ActionResult ResetPassword2(string key, string email)
+        {
+            // Validate that the user exists
+            User u = context.Users.FirstOrDefault(us => us.EmailAddress.Equals(email));
+            if (u == null) return RedirectToAction("Index", "Account");
+
+            // Make sure the link is not expired
+            if (u.ResetExpiresAt < DateTime.Now)
+            {
+                ModelState.AddModelError("expired", "Denne nøgle er udløbet.");
+                return RedirectToAction("ResetPassword1", "Account");
+            }
+
+            if (!PasswordHash.ValidatePassword(key, u.ResetKey))
+            {
+                ModelState.AddModelError("expired", "Ugyldig nøgle er udløbet.");
+                return RedirectToAction("ResetPassword1", "Account");
+            }
+            ResetPasswordViewModel2 vm = new ResetPasswordViewModel2()
+            {
+                ResetKey = key,
+                Email = email
+            };
+
+            return View("ResetPasswordStep1", vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken()]
+        public ActionResult ResetPassword(ResetPasswordViewModel2 model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Validate that the user exists
+                User u = context.Users.FirstOrDefault(us => us.EmailAddress.Equals(model.Email));
+                if (u == null) return RedirectToAction("Index", "Account");
+
+                // Make sure the link is not expired
+                if (u.ResetExpiresAt < DateTime.Now)
+                {
+                    ModelState.AddModelError("expired", "Denne nøgle er udløbet.");
+                    return RedirectToAction("ResetPassword1", "Account");
+                }
+
+                if (!PasswordHash.ValidatePassword(model.ResetKey, u.ResetKey))
+                {
+                    ModelState.AddModelError("illegalKey", "Ugyldig nøgle.");
+                    return RedirectToAction("ResetPassword1", "Account");
+                }
+                u.ResetExpiresAt = DateTime.Now;
+                u.ResetKey = null;
+                u.Pw = PasswordHash.CreateHash(model.Password);
+                TempData["message"] = "Log ind med dit nye kodeord.";
+                return RedirectToAction("Index", "Account");
+
+            }
+            return View("ResetPasswordStep1", model);
         }
     }
 }

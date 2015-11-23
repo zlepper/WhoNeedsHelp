@@ -57,19 +57,34 @@ namespace WhoNeedsHelp.App
 
         public override Task OnConnected()
         {
-            //var user =
-            //    DB.Users.SingleOrDefault(u => u.ConnectionId == Context.ConnectionId);
-
-            Connection con = DB.Connections.Find(Context.ConnectionId);
-            if (con != null) return base.OnConnected();
-            User user = new User
+            User user = Context.User as User;
+            if (user != null)
             {
-                Ip = GetIpAddress()
-            };
-            user.Connections.Add(new Connection(user) { ConnectionId = Context.ConnectionId });
-            DB.Users.Add(user);
-            DB.SaveChanges();
-            Clients.Caller.SendUserId(user.Id);
+                // Get a db instance instead
+                user = DB.GetUserById(user.Id);
+                Clients.Caller.UpdateUsername(user.Name);
+                Clients.Caller.SendUserId(user.Id);
+                Clients.Caller.LoginSuccess();
+                foreach (Channel channel in user.ChannelsIn)
+                {
+                    Clients.Caller.AppendChannel(channel.ToSimpleChannel());
+                }
+                user.Connections.Add(new Connection() {ConnectionId = Context.ConnectionId});
+            }
+            else
+            {
+
+                Connection con = DB.Connections.Find(Context.ConnectionId);
+                if (con != null) return base.OnConnected();
+                user = new User
+                {
+                    Ip = GetIpAddress()
+                };
+                user.Connections.Add(new Connection(user) {ConnectionId = Context.ConnectionId});
+                DB.Users.Add(user);
+                DB.SaveChanges();
+                Clients.Caller.SendUserId(user.Id);
+            }
 
             return base.OnConnected();
         }

@@ -4,7 +4,10 @@
     ViewBag.Title = "Login";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@if (!string.IsNullOrWhiteSpace(ViewBag.Message))
+{
+    <h3>@ViewBag.Message</h3>
+}
 <div class="row">
     <div class="col s12 m6">
         @Html.Partial("_LoginForm", Model.LoginViewModel)
