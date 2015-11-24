@@ -152,6 +152,10 @@ function Application(signalR, $cookieStore, $interval) {
             channel.StudentTimer.startTimer();
             delete channel.timeLeft;
         }
+
+        setTimeout(function() {
+            $(".collapsible").collapsible();
+        }, 100);
     });
 
     signalR.$on("exitChannel", function (event, channelId) {
