@@ -67,7 +67,7 @@ namespace WhoNeedsHelp.App
                 Clients.Caller.LoginSuccess();
                 foreach (Channel channel in user.ChannelsIn)
                 {
-                    Clients.Caller.AppendChannel(channel.ToSimpleChannel());
+                    Clients.Caller.AppendChannel(channel.ToSimpleChannel(channel.IsUserAdministrator(user)));
                 }
                 user.Connections.Add(new Connection() {ConnectionId = Context.ConnectionId});
             }

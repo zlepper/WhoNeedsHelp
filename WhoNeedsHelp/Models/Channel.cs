@@ -157,9 +157,9 @@ namespace WhoNeedsHelp.Models
             return o.GetType() == GetType() && Equals((Channel) o);
         }
 
-        public SimpleChannel ToSimpleChannel()
+        public SimpleChannel ToSimpleChannel(bool admin = false)
         {
-            return new SimpleChannel(Id);
+            return new SimpleChannel(Id, admin);
         }
     }
 }

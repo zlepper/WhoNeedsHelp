@@ -175,9 +175,11 @@ function Application(signalR, $cookieStore, $interval) {
     });
 
     signalR.$on("addQuestion", function (event, question, channelid) {
-        if (that.Channels[channelid].timing) {
-            if (Object.keys(that.Channels[channelid].Questions).length === 0) {
-                that.StartTimer(that.Channels[channelid]);
+        console.log(channelid);
+        if (that.Channels[channelid].StudentTimer.timing) {
+            if (Object.keys(that.Channels[channelid].Questions).length !== 0) {
+                console.log("Starting timer");
+                that.Channels[channelid].StudentTimer.startTimer();
             }
         }
         question.User = that.Channels[channelid].Users[question.User.Id];
@@ -199,11 +201,12 @@ function Application(signalR, $cookieStore, $interval) {
             if (that.Channels.hasOwnProperty(channelid)) {
                 if (that.Channels[channelid].Questions[questionid] != null) {
                     delete that.Channels[channelid].Questions[questionid];
-                    if (that.Channels[channelid].timing) {
+                    console.log(that.Channels[channelid].StudentTimer.timing);
+                    if (that.Channels[channelid].StudentTimer.timing) {
                         if (Object.keys(that.Channels[channelid].Questions).length === 0)
-                            that.HaltTimer(that.Channels[channelid]);
+                            that.Channels[channelid].StudentTimer.haltTimer();
                         else {
-                            that.StartTimer(that.Channels[channelid]);
+                            that.Channels[channelid].StudentTimer.startTimer();
                         }
                     }
                 }
