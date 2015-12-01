@@ -1,4 +1,4 @@
-﻿<footer>
+﻿<footer ng-hide="application.Channels[application.ActiveChannel].IsAdmin">
     <form class="row" onsubmit=" return false; " ng-if="application.ActiveChannel && !application.Channels[application.ActiveChannel].HaveQuestion" ng-submit="application.requestHelp()">
         <div class="input-field col m9 s12">
             <label for="question">Spørgsmål - er valgtfrit</label>
