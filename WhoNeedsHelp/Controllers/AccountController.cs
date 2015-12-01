@@ -16,8 +16,9 @@ namespace WhoNeedsHelp.Controllers
     {
         readonly IHelpContext context = new HelpContext();
         // GET: Account
-        public ActionResult Index()
+        public ActionResult Index(string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             ViewBag.message = TempData["message"];
             var model = new AuthViewModel
             {
@@ -29,7 +30,7 @@ namespace WhoNeedsHelp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken()]
-        public ActionResult Login(LoginViewModel model, string returnUrl = "")
+        public ActionResult Login(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +74,7 @@ namespace WhoNeedsHelp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken()]
-        public ActionResult Signup(SignupViewModel model, string returnUrl = "")
+        public ActionResult Signup(SignupViewModel model, string returnUrl)
         {
             
             if (ModelState.IsValid)
@@ -105,7 +106,8 @@ namespace WhoNeedsHelp.Controllers
                     string encTicket = FormsAuthentication.Encrypt(authTicket);
                     HttpCookie faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
                     Response.Cookies.Add(faCookie);
-                    if (!string.IsNullOrWhiteSpace(returnUrl))
+                    bool whitespace = !string.IsNullOrWhiteSpace(returnUrl);
+                    if (whitespace)
                     {
                         return Redirect(returnUrl);
                     }

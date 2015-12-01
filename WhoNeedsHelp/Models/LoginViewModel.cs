@@ -23,6 +23,8 @@ namespace WhoNeedsHelp.Models
         
         [Display(Name = "Husk mig")]
         public bool RememberMe { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 
     public class SignupViewModel
@@ -54,6 +56,8 @@ namespace WhoNeedsHelp.Models
         
         [Display(Name = "Husk mig")]
         public bool RememberMe { get; set; }
+
+        public string ReturnUrl { get; set; }
     }
 
     public class AuthViewModel

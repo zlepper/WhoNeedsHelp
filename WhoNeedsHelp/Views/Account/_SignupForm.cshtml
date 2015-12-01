@@ -1,6 +1,6 @@
 ﻿@model WhoNeedsHelp.Models.SignupViewModel
 
-@using (Html.BeginForm("Signup", "Account", FormMethod.Post))
+@using (Html.BeginForm("Signup", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
 {
     <h4>Opret ny bruger</h4>
     @Html.AntiForgeryToken()
