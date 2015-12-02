@@ -22,7 +22,7 @@ namespace WhoNeedsHelp.Models
         public string Password { get; set; }
         
         [Display(Name = "Husk mig")]
-        public bool RememberMe { get; set; }
+        public string RememberMe { get; set; }
 
         public string ReturnUrl { get; set; }
     }
@@ -55,7 +55,7 @@ namespace WhoNeedsHelp.Models
         public string RepeatPassword { get; set; }
         
         [Display(Name = "Husk mig")]
-        public bool RememberMe { get; set; }
+        public string RememberMeSignup { get; set; }
 
         public string ReturnUrl { get; set; }
     }

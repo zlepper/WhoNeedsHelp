@@ -45,7 +45,7 @@ namespace WhoNeedsHelp.Controllers
                     };
 
                     string userData = JsonConvert.SerializeObject(serializeModel);
-                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, u.EmailAddress, DateTime.Now, DateTime.Now.AddMinutes(15), model.RememberMe, userData);
+                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, u.EmailAddress, DateTime.Now, DateTime.Now.AddMinutes(15), !string.IsNullOrWhiteSpace(model.RememberMe), userData);
                     string encTicket = FormsAuthentication.Encrypt(authTicket);
                     HttpCookie faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
                     Response.Cookies.Add(faCookie);
@@ -102,7 +102,7 @@ namespace WhoNeedsHelp.Controllers
                     };
 
                     string userData = JsonConvert.SerializeObject(serializeModel);
-                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, u.EmailAddress, DateTime.Now, DateTime.Now.AddMinutes(15), model.RememberMe, userData);
+                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, u.EmailAddress, DateTime.Now, DateTime.Now.AddMinutes(15), !string.IsNullOrWhiteSpace(model.RememberMeSignup), userData);
                     string encTicket = FormsAuthentication.Encrypt(authTicket);
                     HttpCookie faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
                     Response.Cookies.Add(faCookie);
