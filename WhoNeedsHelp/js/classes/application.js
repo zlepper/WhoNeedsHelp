@@ -192,6 +192,11 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
             c.collapsible();
         }, 50);
 
+        var timer = that.Channels[channelid].StudentTimer;
+        if (timer.timing) {
+            timer.startTimer();
+        }
+
         if (that.Channels[channelid].IsAdmin) {
             if (document.hidden) {
                 notify(question.User.Name + " har brug for hjælp." + (question.Text ? question.Text : ""));
