@@ -1,4 +1,4 @@
-﻿<main>
+﻿<main keypress-events>
     <ul class="collapsible popout" data-collapsible="expandable">
         <li ng-repeat="(id, question) in application.Channels[application.ActiveChannel].Questions | orderBy:Id"
             ng-class="{'out-of-time': application.Channels[application.ActiveChannel].outOfTime && $first}">

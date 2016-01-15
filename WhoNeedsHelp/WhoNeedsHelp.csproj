@@ -220,6 +220,7 @@
     <Content Include="js\directives\login.js" />
     <Content Include="js\directives\navbar.js" />
     <Content Include="js\helpers.js" />
+    <Content Include="js\modules\keypress.js" />
     <Content Include="js\modules\zl-features.js" />
     <Content Include="js\modules\zl-help.js" />
     <Content Include="js\modules\zl-signalr.js" />

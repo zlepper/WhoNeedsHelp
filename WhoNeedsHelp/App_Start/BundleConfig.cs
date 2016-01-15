@@ -23,6 +23,7 @@ namespace WhoNeedsHelp
                         ));
 
             bundles.Add(new ScriptBundle("~/bundles/classes").Include(
+                        "~/js/modules/keypress.js",
                         "~/js/modules/zl-features.js",
                         "~/js/modules/zl-signalr.js",
                         "~/js/modules/zl-help.js",

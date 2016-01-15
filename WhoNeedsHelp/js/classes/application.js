@@ -4,7 +4,10 @@
  * @returns {}
  * @class 
  */
-function Application(signalR, $cookieStore, $interval) {
+function Application(signalR, $cookieStore, $interval, $rootScope) {
+    this.$rootScope = $rootScope;
+
+
     var that = this;
     /**
      * Descripes the state the application is currently in
@@ -355,6 +358,19 @@ function Application(signalR, $cookieStore, $interval) {
     signalR.$on("allUsersLoggedOut", function () {
         notify("Din bruger er blevet logged ud alle andre steder.");
     });
+
+    $rootScope.$on("keypress", function (a, e, key) {
+        if (key == 39) {
+            if (that.Channels[that.ActiveChannel].IsAdmin) {
+                var questions = that.Channels[that.ActiveChannel].Questions;
+                var keys = Object.keys(questions);
+                if (keys.length > 0) {
+                    var id = Math.min(keys);
+                    that.removeQuestion(id);
+                }
+            }
+        }
+    });
 }
 
 /**
@@ -610,6 +626,6 @@ Application.prototype.hideSideNav = function () {
 }
 
 angular.module("Help")
-    .factory("zlApplication", ["$cookies", "SignalR", "$interval", function ($cookieStore, signalR, $interval) {
-        return new Application(signalR, $cookieStore, $interval);
+    .factory("zlApplication", ["$cookies", "SignalR", "$interval", "$rootScope", function ($cookieStore, signalR, $interval, $rootScope) {
+        return new Application(signalR, $cookieStore, $interval, $rootScope);
     }])

@@ -1,4 +1,6 @@
-﻿var app = angular.module("Help", ["ngAnimate", "ngCookies", "zlFeatures", "zlSignalR"]);
+﻿/// <reference path="/Scripts/angular.js"/>
+
+var app = angular.module("Help", ["ngAnimate", "ngCookies", "zlFeatures", "zlSignalR", "keypress"]);
 app.filter("keylength", function () {
     return function (input) {
         if (!angular.isObject(input)) {
