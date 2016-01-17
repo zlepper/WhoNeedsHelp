@@ -369,8 +369,12 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
             if (that.Channels[that.ActiveChannel].IsAdmin) {
                 var questions = that.Channels[that.ActiveChannel].Questions;
                 var keys = Object.keys(questions);
-                if (keys.length > 0) {
-                    var id = Math.min(keys);
+                var k = [];
+                for (var i = 0; i < keys.length; i++) {
+                    k.push(Number(keys[i]));
+                }
+                if (k.length > 0) {
+                    var id = Math.min.apply(Math, k);
                     that.removeQuestion(id);
                 }
             }

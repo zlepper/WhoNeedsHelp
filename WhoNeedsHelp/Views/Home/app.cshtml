@@ -21,29 +21,29 @@
     <script>
         if (window.Notification) Notification.requestPermission();
     </script>
-    <base href="/"/>
+    <base href="/" />
 </head>
-<body ng-app="Help" ng-controller="HelpCtrl">
-<div ng-show="application.State == 'help'" class="app">
-    <nav-bar></nav-bar>
-    <div class="main">
-        <div class="helplist">
-            <questions></Questions>
+<body ng-app="Help" ng-controller="HelpCtrl" keypress-events>
+    <div ng-show="application.State == 'help'" class="app">
+        <nav-bar></nav-bar>
+        <div class="main">
+            <div class="helplist">
+                <questions></questions>
 
-            <ask-question></ask-Question>
+                <ask-question></ask-question>
+            </div>
+
+            <chat></chat>
         </div>
-
-        <chat></chat>
+        <edit-question-modal></edit-question-modal>
+        <timer></timer>
     </div>
-    <edit-question-modal></edit-Question-modal>
-    <timer></timer>
-</div>
-<loading></loading>
-<div ng-show="application.State == 'login'" class="login" login>
+    <loading></loading>
+    <div ng-show="application.State == 'login'" class="login" login>
 
-</div>
-<div ng-show="application.State == 'usermanage'" class="user-managing" Usermanage>
+    </div>
+    <div ng-show="application.State == 'usermanage'" class="user-managing" Usermanage>
 
-</div>
+    </div>
 </body>
 </html>
