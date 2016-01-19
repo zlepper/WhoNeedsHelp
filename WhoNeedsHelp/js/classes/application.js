@@ -365,7 +365,7 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
     });
 
     $rootScope.$on("keypress", function (a, e, key) {
-        if (key == 39) {
+        if (key == 39 || key == 34) {
             if (that.Channels[that.ActiveChannel].IsAdmin) {
                 var questions = that.Channels[that.ActiveChannel].Questions;
                 var keys = Object.keys(questions);
