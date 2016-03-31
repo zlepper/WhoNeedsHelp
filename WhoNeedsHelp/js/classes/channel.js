@@ -72,4 +72,12 @@ function Channel(id, name, application) {
      * @type {Application}
      */
     this.application = application;
+	
+    this.dynamicOrderFilter = function () {
+        if (this.application.isAprilFirst() && !this.IsAdmin) {
+            return "Random";
+        } else {
+            return "Id";
+        }
+    }
 }

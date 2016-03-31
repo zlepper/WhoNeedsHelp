@@ -128,6 +128,19 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
         }
     });
 
+    this.isAprilFirst = function() {
+        if (moment().date() === 1 && moment().month() === 3) {
+            this.isAprilFirst = function() {
+                return true;
+            }
+            return true;
+        } else {
+            this.isAprilFirst = function() {
+                return false;
+            }
+            return false;
+        }
+    }
 
     signalR.$on("appendChannel", function (event, channel) {
         // Fix some references that json breaks
@@ -135,6 +148,7 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
             if (channel.Questions.hasOwnProperty(questionId)) {
                 var question = channel.Questions[questionId];
                 question.User = channel.Users[question.User.Id];
+                question.Random = Math.random();
             }
         }
         for (var chatMessageId in channel.ChatMessages) {
@@ -146,14 +160,20 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
 
         // Switch to the channel
         that.ActiveChannel = channel.Id;
-        that.Channels[channel.Id] = channel;
+        var ch = new Channel(channel.Id, channel.ChannelName, that);
+        ch.IsAdmin = channel.IsAdmin;
+        ch.ChatMessages = channel.ChatMessages;
+        ch.HaveQuestion = channel.HaveQuestion;
+        ch.Users = channel.Users;
+        ch.Questions = channel.Questions;
+        that.Channels[channel.Id] = ch;
 
         // Load the channel timer
-        channel.StudentTimer = new StudentTimer(channel, $interval);
-        if (channel.timeLeft) {
-            channel.StudentTimer.timeLeft = channel.timeLeft;
-            channel.StudentTimer.startTimer();
-            delete channel.timeLeft;
+        ch.StudentTimer = new StudentTimer(ch, $interval);
+        if (ch.timeLeft) {
+            ch.StudentTimer.timeLeft = ch.timeLeft;
+            ch.StudentTimer.startTimer();
+            delete ch.timeLeft;
         }
 
         setTimeout(function() {
@@ -186,6 +206,7 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
             }
         }
         question.User = that.Channels[channelid].Users[question.User.Id];
+        question.Random = Math.random();
         that.Channels[channelid].Questions[question.Id] = question;
         setTimeout(function () {
             var c = $(".collapsible");

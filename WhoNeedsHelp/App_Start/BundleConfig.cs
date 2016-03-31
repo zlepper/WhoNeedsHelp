@@ -18,6 +18,7 @@ namespace WhoNeedsHelp
                         "~/Scripts/angular-animate.js",
                         "~/Scripts/angular-cookies.js",
                         "~/Scripts/modernizr-2.8.3.js",
+                        "~/Scripts/moment.js",
                         "~/js/helpers.js",
                         "~/js/notifications.js"
                         ));

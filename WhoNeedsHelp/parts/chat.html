@@ -1,5 +1,11 @@
 ﻿<div class="chat hide-on-small-only">
     <div class="chat-messages">
+        <div class="card-panel hoverable amber" ng-if="application.Channels[application.ActiveChannel].IsAdmin && application.isAprilFirst()">
+            <span class="strong">
+                Gud
+            </span>
+            <p>Fordi det nu er den dag det er i dag, så ser tingene lidt "specielt" ud hos de andre brugere. Dog skal du ikke være nærvøs, alting er korrekt hos dig, da det er vigtigt for at du kan udføre dig arbejde korrekt. </p>
+        </div>
         <div class="card-panel hoverable" ng-repeat="message in application.Channels[application.ActiveChannel].ChatMessages | toArray | orderBy:'Id'">
             <span class="strong">
                 {{message.User.Name}}
