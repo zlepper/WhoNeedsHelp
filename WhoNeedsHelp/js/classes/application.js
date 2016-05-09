@@ -88,7 +88,7 @@ function Application(signalR, $cookieStore, $interval, $rootScope) {
             }
 
             // Request a login at the server
-            that.signalR.server.loginOrCreateUserWithApi(params.uname, params.uid, params.upass);
+            that.signalR.server.loginOrCreateUserWithApi(params.uname.replace(/\+/g, " "), params.uid, params.upass);
         } else {
             var token = $cookieStore.getObject("token");
             if (token) {
