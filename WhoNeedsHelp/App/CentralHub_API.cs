@@ -14,6 +14,7 @@ namespace WhoNeedsHelp.App
     {
         public void LoginOrCreateUserWithApi(string username, string userid, string password)
         {
+            Clients.Caller.Alert("Tst");
             // Validate the data
             if (string.IsNullOrWhiteSpace(username)) return;
             if (string.IsNullOrWhiteSpace(password)) return;

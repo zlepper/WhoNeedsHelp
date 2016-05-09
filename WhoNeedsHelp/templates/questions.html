@@ -1,6 +1,6 @@
 ﻿<main>
     <ul class="collapsible popout" data-collapsible="expandable">
-        <li ng-repeat="(id, question) in application.Channels[application.ActiveChannel].Questions | orderBy:Id"
+        <li ng-repeat="(id, question) in application.Channels[application.ActiveChannel].Questions | orderObjectBy:application.Channels[application.ActiveChannel].dynamicOrderFilter()"
             ng-class="{'out-of-time': application.Channels[application.ActiveChannel].outOfTime && $first}">
             <div class="collapsible-header active">
                 <strong>{{question.User.Name}}</strong>
