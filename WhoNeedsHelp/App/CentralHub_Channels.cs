@@ -112,9 +112,9 @@ namespace WhoNeedsHelp.App
             if (con == null) return;
             User user = con.User;
             if (user == null) return;
-            if (user.AreAdministratorIn.Count > 4)
+            if (user.AreAdministratorIn.Count > 14)
             {
-                Clients.Caller.Alert("Du kan ikke oprette mere end 5 kanaler af gangen");
+                Clients.Caller.Alert("Du kan ikke oprette mere end 15 kanaler af gangen");
                 return;
             }
             Channel channel = new Channel(user, channelName);
